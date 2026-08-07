@@ -152,10 +152,25 @@ against 340 ms for a fifty-module program.
 ## Try it
 
 ```bash
-npm install && npm test
+npm install
+npx faustx examples/1-drone-that-plays-alone.fx
 ```
 
-Requires Node 22+. The compilation tests need `faust` on your `PATH`
+It prints the Faust. `-o file.dsp` writes it instead. Gestures it refuses go to
+standard error, with their reason and the line — the rest of the file is still
+translated, which is the rule.
+
+As a library:
+
+```js
+import { createTranspiler } from 'faustx'
+
+const faustx = createTranspiler(catalogue, templates)
+faustx.apply('let lpf1 lowpass(fc:800)\n_ : lpf1 : process\n')
+faustx.write()          // the Faust
+```
+
+Requires Node 22+. `npm test` additionally needs `faust` on your `PATH`
 (measurements here were made with 2.70.3).
 
 ---

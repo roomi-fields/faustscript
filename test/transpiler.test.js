@@ -187,3 +187,13 @@ _ rev1
   assert.doesNotMatch(faust, /bypass/, 'the Faust bypass would clear the state')
   assert.equal(compile(faust), null, faust)
 })
+
+test('the command line translates a file', () => {
+  const out = join(dossier, 'cli.dsp')
+  execFileSync('node', [
+    new URL('../bin/faustx.js', import.meta.url).pathname,
+    new URL('../examples/1-drone-that-plays-alone.fx', import.meta.url).pathname,
+    '-o', out,
+  ], { stdio: 'pipe' })
+  assert.equal(compile(readFileSync(out, 'utf8')), null)
+})

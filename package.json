@@ -1,9 +1,41 @@
 {
   "name": "faustx",
   "version": "0.1.0",
-  "description": "FaustX — un sur-ensemble de Faust pour le live coding",
+  "description": "A superset of Faust for live coding: name one instance, and act on it while the sound plays.",
+  "keywords": [
+    "faust",
+    "live-coding",
+    "dsp",
+    "audio",
+    "transpiler",
+    "music"
+  ],
   "license": "MIT",
+  "author": "Romain Peyrichou",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roomi-fields/faustx.git"
+  },
   "type": "module",
+  "exports": {
+    ".": "./src/transpiler.js",
+    "./graph": "./src/graph.js",
+    "./catalogue": "./src/catalogue.js"
+  },
+  "bin": {
+    "faustx": "./bin/faustx.js"
+  },
+  "files": [
+    "src/",
+    "lib/",
+    "bin/",
+    "docs/",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "grammaire": "lezer-generator src/faustx.grammar -o src/parser.js",
     "test": "node --test test/*.test.js"
