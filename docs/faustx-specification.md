@@ -284,7 +284,7 @@ to a named instance. These are two distinct questions — the width of a cable, 
 cables on a port.
 
 **What the adaptation does not make up for**: width stays **fixed at compile time**, where VCV
-changes it while playing. Varying it live means recompiling the module concerned — 14.7 ms.
+changes it while playing. Varying it live means recompiling the module concerned — ~32 ms.
 
 ### How each one gets decorated
 
@@ -477,7 +477,7 @@ the body, which is what lets each copy vary.
 
 **The number of copies is frozen at compile time.** `par(i, 2*4, _)` passes, `par(i, hslider(…), _)`
 is refused — *the parameter must be a constant*. Changing the number of voices while playing
-therefore means recompiling the module: 14.7 ms, measured, which stays workable.
+therefore means recompiling the module: ~32 ms, measured, which stays workable.
 
 ### What live performance demands
 
@@ -529,7 +529,7 @@ designates the channel, and for a bank of one-channel modules, the channel **is*
 an expression. The slot is free.
 
 **Changing the number while playing costs a recompilation** — the number of copies is a constant for
-Faust. `lpfs:16 lowpass` replaces the bank with a bank of sixteen: 14.7 ms, and the tail of the old
+Faust. `lpfs:16 lowpass` replaces the bank with a bank of sixteen: ~32 ms, and the tail of the old
 eight drains as it does for every replacement.
 
 ### How the others get decorated
@@ -910,8 +910,8 @@ parameter stop the compilation and produce no program at all. In the studio, tha
 In concert, a compiler that refuses to return a program would leave the room in silence.
 
 **What this imposes on the implementation: nothing touches the live graph before compiling.** The
-module is compiled aside, and it replaces the old one only if the compilation succeeded. The 14.7 ms
-are therefore paid **before** the substitution, never during it.
+module is compiled aside, and it replaces the old one only if the compilation succeeded. The thirty
+milliseconds are therefore paid **before** the substitution, never during it.
 
 | where the error arises | what happens |
 | --- | --- |
@@ -949,22 +949,32 @@ receives a program where each instance is a distinct circuit, the sharing drawn 
 and each port laid down as a control in the group that bears the name.
 
 **The condition set was the overhead**, since the target is live performance. It can be measured, and
-it comes in three items — local measurements, Faust 2.70.3, C output, times excluding process
-startup.
+it comes in three items. The measurements that decide are taken where the sound will be made: the
+compiler built for WebAssembly, which is what a browser host runs.
 
 **1. Translating costs nothing.** The operation works on a few dozen lines of text, against a
-compilation that takes fifteen milliseconds at the very least.
+compilation that takes thirty milliseconds at the very least.
 
 **2. A gesture recompiles one module, never the program.**
 
-| what gets recompiled | time |
-| --- | --- |
-| one module alone | **14.7 ms** |
-| a program of 5 modules | 40.3 ms |
-| a program of 20 modules | 131.5 ms |
-| a program of 50 modules | **340.3 ms** |
+Measured by `tools/measure-compilation.mjs`, which anyone can rerun: median of twelve compilations
+after three warm-up rounds, the compiler cache defeated on every round. Figures are rounded, because
+they move by a good tenth from one run to the next.
 
-**The ratio is what decides: 23 times cheaper.** A gesture that recompiled everything would be
+| what gets recompiled | in the browser | natively, same backend |
+| --- | --- | --- |
+| one module alone | **~32 ms** | ~30 ms |
+| a program of 5 modules | ~64 ms | ~60 ms |
+| a program of 20 modules | ~200 ms | ~185 ms |
+| a program of 50 modules | **~620 ms** | ~520 ms |
+
+The first column goes through libfaust-wasm 0.16.6 (Faust 2.86.2) in the running process; the second
+is Faust 2.70.3 on the command line with the same WebAssembly backend, its 34 ms of process startup
+measured separately and subtracted. **Compiling in the browser costs about what it costs natively** —
+which is the figure that matters, since the browser is where this will be played.
+
+**The ratio is what decides: around 19 times cheaper** (17 to 21 across runs). A gesture that
+recompiled everything would be
 unplayable beyond ten modules or so; a gesture that recompiles only the module touched stays under
 the threshold of perception, and the substitution happens in the live graph with no break in the
 sound.
@@ -972,7 +982,7 @@ sound.
 **So a `let` is a compilation unit.** This is not a free implementation choice: the measurement
 imposes it, and it is what makes live performance practicable.
 
-**And these 14.7 ms are the worst case, not the common one.** A module whose body is known is
+**And these thirty milliseconds are the worst case, not the common one.** A module whose body is known is
 compiled **ahead of time**: when the piece is loaded, or while the musician is typing. All that stays
 on the critical path is the body written at that very moment — the one no anticipation can cover.
 

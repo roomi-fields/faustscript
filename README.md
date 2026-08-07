@@ -147,8 +147,10 @@ parse whole.
 
 **There is no sound here.** FaustX emits Faust source. Compiling it while the
 audio runs, and swapping a module without dropping a sample, belongs to the
-host — that is where the measured **14.7 ms** per module recompilation matters,
-against 340 ms for a fifty-module program.
+host — that is where the measured **~32 ms** per module recompilation matters,
+against ~620 ms for a fifty-module program. Both are taken through libfaust
+compiled to WebAssembly, which is what a browser host runs; rerun them with
+`node tools/measure-compilation.mjs`.
 
 ---
 
@@ -174,7 +176,8 @@ faustx.write()          // the Faust
 ```
 
 Requires Node 22+. `npm test` additionally needs `faust` on your `PATH`
-(measurements here were made with 2.70.3).
+(the tests run against 2.70.3; the timings quoted above were taken with
+libfaust-wasm 0.16.6, which carries Faust 2.86.2).
 
 ---
 

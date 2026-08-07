@@ -526,8 +526,9 @@ dly1 <span class="cx">~8</span> fb1     <span class="cc">// feed back eight chan
     <strong>998 public Faust functions</strong>, generated from Faust's own documentation.</p>
     <p><strong>There is no sound here.</strong> FaustX emits Faust source; compiling it while the
     audio runs, and swapping a module without dropping a sample, belongs to the host — that is where
-    the measured <strong>14.7 ms</strong> per module matters, against 340 ms for a fifty-module
-    program.</p>
+    the measured <strong>32 ms</strong> per module matters, against 620 ms for a fifty-module
+    program — both taken through libfaust compiled to WebAssembly, which is what a browser host
+    runs.</p>
   </div>
 </section>
 

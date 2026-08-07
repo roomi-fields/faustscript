@@ -66,7 +66,7 @@ returns **what has changed**, with the Faust needed for it:
 | `lpf1.cutoff:400` | *write a control*, with nothing to compile |
 | `!let lpf1` | *give the name back* |
 
-**That is what makes it possible to recompile only one module** — 14.7 ms instead of 340 for a
+**That is what makes it possible to recompile only one module** — some 32 ms instead of 620 for a
 fifty-module program — and it is measured in the specification.
 
 **In file mode, a complete program is the sequence of its gestures** applied to an empty graph, then
