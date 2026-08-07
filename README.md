@@ -1,5 +1,8 @@
 # FaustX — live coding on top of Faust
 
+**[roomi-fields.github.io/faustx](https://roomi-fields.github.io/faustx/)** — the five Faust
+signs, and what happens to each one.
+
 **FaustX is a language for patching while the sound is playing.** It adds to
 [Faust](https://faust.grame.fr) the two things live performance needs and Faust
 does not have: **naming one instance**, and **acting on that instance while it
