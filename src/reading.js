@@ -7,18 +7,59 @@
 import { parser } from './parser.js'
 import { Outcome } from './graph.js'
 
-/** Applies a FaustX text to a graph, line by line. */
-export function apply(text, graph) {
+/** Applies a FaustX text to a graph, line by line.
+ *
+ * Each line comes back with what it did — which gesture, on which instance.
+ * That is what lets a host recompile only the module a gesture touched instead
+ * of the whole program.
+ */
+export function apply(text, graph, alsoNote = () => ({})) {
   const arbre = parser.parse(text)
   const resultats = []
   for (const line of childrenOf(arbre.topNode, 'Line')) {
-    resultats.push({
+    const form = line.firstChild
+    const result = {
       line: lineNumber(text, line.from),
       text: contenu(text, line),
       outcome: applyLine(text, line, graph),
-    })
+      ...gestureOf(text, form),
+    }
+    // noted here and not once the text is over: a later line may release the
+    // very instance this one laid down, and the gesture must say what it did
+    // at the moment it did it
+    resultats.push({ ...result, ...alsoNote(result) })
   }
   return resultats
+}
+
+/** Which gesture a line is, and on which instance.
+ *
+ * The gesture names are the graph's own — place, replace, release, remove,
+ * bypass, set, wire — because that is what a gesture does, and a host acts on
+ * that, not on the shape of the line that expressed it.
+ */
+const GESTURES = {
+  Declaration: 'place', Definition: 'replace', Release: 'release',
+  Removal: 'remove', Bypass: 'bypass', Setting: 'set', Expression: 'wire',
+}
+
+function gestureOf(text, form) {
+  const gesture = form ? GESTURES[form.name] ?? null : null
+  return { gesture, name: gesture ? targetOf(text, form, gesture) : null }
+}
+
+/** The instance a gesture acts on. A wiring acts on no single one. */
+function targetOf(text, form, gesture) {
+  if (gesture === 'wire') return null
+  if (gesture === 'place') return declaredName(text, form)
+  if (gesture === 'set') {
+    const prefix = form.getChild('Prefix')
+    const key = form.getChild('Key')
+    if (!key) return null
+    return ((prefix ? contenu(text, prefix) : '') +
+            contenu(text, key).slice(0, -1)).split('.').filter(Boolean)[0] ?? null
+  }
+  return nameOf(text, form)
 }
 
 function applyLine(text, line, graph) {
@@ -39,11 +80,17 @@ function applyLine(text, line, graph) {
 
 // --- placing -----------------------------------------------------------------
 
-function slot(text, form, graph) {
+/** The name a declaration lays down, whether single or a bank of several. */
+function declaredName(text, form) {
   const multiple = form.getChild('MultipleName')
-  const name = multiple
+  return multiple
     ? contenu(text, multiple.getChild('Key')).slice(0, -1)
     : contenu(text, form.getChild('Name'))
+}
+
+function slot(text, form, graph) {
+  const multiple = form.getChild('MultipleName')
+  const name = declaredName(text, form)
   const multiplicity = multiple
     ? Number(contenu(text, multiple.getChild('Number')))
     : 1

@@ -36,8 +36,8 @@ function main(argv) {
     readFileSync(join(root, 'lib/faust.fx'), 'utf8'),
     readFileSync(join(root, 'lib/translation.fx'), 'utf8'))
 
-  const refused = transpiler.apply(readFileSync(source, 'utf8'))
-  for (const { line, text, outcome } of refused) {
+  const gestures = transpiler.apply(readFileSync(source, 'utf8'))
+  for (const { line, text, outcome } of gestures.filter(g => !g.outcome.done)) {
     console.error(`${source}:${line}: refused — ${outcome.reason}\n    ${text.trim()}`)
   }
 

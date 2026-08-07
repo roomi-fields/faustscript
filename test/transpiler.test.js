@@ -13,8 +13,8 @@ const dossier = mkdtempSync(join(tmpdir(), 'faustx-'))
 
 function traduire(source) {
   const t = createTranspiler(lire('../lib/faust.fx'), lire('../lib/translation.fx'))
-  const refus = t.apply(source)
-  return { faust: t.write(), refus }
+  const gestes = t.apply(source)
+  return { faust: t.write(), refus: gestes.filter(g => !g.outcome.done), gestes }
 }
 
 function compile(faust) {
@@ -67,6 +67,7 @@ test('a faulty line is refused without touching the graph', () => {
   t.apply('let osc1 sawtooth(freq:110)\nosc1 : process\n')
   const avant = t.write()
   const refus = t.apply('zorg : process\nlet osc1 sawtooth(freq:55)\n')
+    .filter(g => !g.outcome.done)
   assert.equal(refus.length, 2, 'both lines are refused')
   assert.equal(t.write(), avant, 'the graph has not moved')
 })
@@ -196,4 +197,42 @@ test('the command line translates a file', () => {
     '-o', out,
   ], { stdio: 'pipe' })
   assert.equal(compile(readFileSync(out, 'utf8')), null)
+})
+
+test('each gesture says what it touched, and what has to be recompiled', () => {
+  // this is what a host needs in order to recompile one module instead of the
+  // program: the architecture promises it, so it is tested
+  const { gestes } = traduire(`
+let osc1 sawtooth(freq:110)
+let lpf1 lowpass(fc:800)
+osc1 : lpf1
+lpf1.fc:400
+!let osc1
+`)
+  const vus = gestes.filter(g => g.gesture).map(g =>
+    [g.gesture, g.name, g.faust ? 'to compile' : 'nothing to compile'])
+
+  assert.deepEqual(vus, [
+    ['place', 'osc1', 'to compile'],
+    ['place', 'lpf1', 'to compile'],
+    ['wire', null, 'nothing to compile'],
+    ['set', 'lpf1', 'nothing to compile'],
+    ['release', 'osc1', 'nothing to compile'],
+  ])
+
+  const pose = gestes.find(g => g.name === 'lpf1' && g.gesture === 'place')
+  assert.match(pose.faust, /^lpf1 = /, 'the Faust of that instance alone')
+  assert.deepEqual(pose.needs, [], 'it compiles on its own')
+})
+
+test('a module driven by another names what it needs', () => {
+  const { gestes } = traduire(`
+let lfo1 osc(freq:0.15)
+let lpf1 lowpass(fc:800)
+lfo1 : lpf1.fc
+lpf1 lowpass(fc:900)
+`)
+  const remplacement = gestes.find(g => g.gesture === 'replace')
+  assert.deepEqual(remplacement.needs, ['lfo1'],
+    'the host cannot compile lpf1 without lfo1')
 })
