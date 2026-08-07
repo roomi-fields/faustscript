@@ -1,0 +1,16 @@
+{
+  "name": "faustx",
+  "version": "0.1.0",
+  "description": "FaustX — un sur-ensemble de Faust pour le live coding",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "grammaire": "lezer-generator src/faustx.grammar -o src/parser.js",
+    "test": "node --test test/*.test.js"
+  },
+  "devDependencies": {
+    "@lezer/generator": "^1.7.1",
+    "@lezer/lr": "^1.4.2",
+    "@lezer/common": "^1.2.1"
+  }
+}

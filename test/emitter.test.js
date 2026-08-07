@@ -1,0 +1,71 @@
+// The emitter is only right if Faust accepts what it writes. These tests
+// actually compile the result: that is the only judge.
+import { test } from 'node:test'
+import assert from 'node:assert'
+import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { readCatalogue } from '../src/catalogue.js'
+import { readTemplates } from '../src/templates.js'
+import { Graph } from '../src/graph.js'
+import { writeInstance } from '../src/emitter.js'
+
+const lire = f => readFileSync(new URL(f, import.meta.url), 'utf8')
+const catalogue = readCatalogue(lire('../lib/faust.fx'))
+const templates = readTemplates(lire('../lib/translation.fx'))
+const dossier = mkdtempSync(join(tmpdir(), 'faustx-'))
+
+/** Returns Faust's error message, or null if it accepts. */
+function compile(faust) {
+  const fichier = join(dossier, 'essai.dsp')
+  writeFileSync(fichier, faust)
+  try {
+    execFileSync('faust', ['-lang', 'c', fichier, '-o', '/dev/null'], { stdio: 'pipe' })
+    return null
+  } catch (erreur) {
+    return String(erreur.stderr).split('\n')[0]
+  }
+}
+
+function emettre(poses, expression) {
+  const g = new Graph(catalogue)
+  g.sink = templates.reserved('sink')
+  for (const [name, module, multiplicity, settings] of poses) {
+    g.place(name, module, multiplicity, new Map(settings))
+  }
+  const lines = [templates.value('template.Header')]
+  for (const e of g.instances.values()) {
+    lines.push(writeInstance(e, catalogue, templates))
+  }
+  lines.push(templates.fill('template.Sink', { expression }))
+  return lines.join('\n')
+}
+
+test('a generator and an adjustable filter', () => {
+  const faust = emettre([
+    ['osc1', 'sawtooth', 1, [['freq', '110']]],
+    ['lpf1', 'lowpass', 1, [['fc', '800']]],
+  ], 'osc1 : lpf1')
+  assert.equal(compile(faust), null, faust)
+})
+
+test('a structural parameter stays constant', () => {
+  // a filter's order cannot be a slider: Faust loops forever
+  const faust = emettre([['lpf1', 'lowpass', 1, [['fc', '800']]]], '_ : lpf1')
+  assert.ok(!faust.includes('nentry("N"'), 'N must not become a port')
+  assert.equal(compile(faust), null, faust)
+})
+
+test('a bank of eight', () => {
+  const faust = emettre([['lpfs', 'lowpass', 8, [['fc', '1200']]]], 'lpfs')
+  assert.equal(compile(faust), null, faust)
+})
+
+test('a reverb and its bounded settings', () => {
+  const faust = emettre([
+    ['rev1', 'mono_freeverb', 1, [['fb1', '0.92'], ['damp', '0.45']]],
+  ], '_ : rev1')
+  assert.ok(faust.includes('hslider'), 'a bounded setting gives a slider')
+  assert.equal(compile(faust), null, faust)
+})

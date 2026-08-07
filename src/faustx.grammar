@@ -1,0 +1,186 @@
+// The FaustX grammar. This file IS the parser: lezer-generator derives the
+// analyser from it, which is never written by hand. The rule names are the
+// node names of the tree, which the translation templates refer to.
+//
+// What each form means is in docs/LANGUAGE.md.
+//
+// Two forms cannot be told apart by syntax and are left to the graph,
+// which alone knows what exists:
+//   - `lpf1(cutoff:400)` is a call if lpf1 is a module, a grouped setting
+//     if it is an instance already placed;
+//   - `_` is an input inside an expression, and the bypass sign when it
+//     stands before a name.
+
+// One line, one statement: the newline ends what precedes it.
+@top Program { (Line? endOfLine)* Line? }
+
+Line {
+  Declaration |
+  Release |
+  Bypass |
+  Removal |
+  Setting |
+  Definition |
+  FaustDefinition |
+  Import |
+  Expression
+}
+
+// --- placing and releasing --------------------------------------------------------
+
+// let lpf1 lowpass        let lpfs:8 lowpass(cutoff:400)
+// `clic:6` reads as a name stuck to a number: the lexer makes it a Key
+// followed by a Number, and the emitter sews them back together.
+Declaration { kw<"let"> (MultipleName | Name) FreeBody }
+MultipleName { Key Number }
+
+// !let lpf1
+Release { bang kw<"let"> Name }
+
+
+// --- declaring a module -----------------------------------------------------
+
+// One and the same form serves three purposes, which only the graph tells apart:
+//   lowpass(order:3, cutoff:800)  fi.lowpass(order, cutoff)   declarer
+//   BS  pl.BS                                                 declarer sans parametre
+//   lpf1 lowpass(cutoff:400)                                  remplacer un corps
+// Is the name a known module, an instance already placed, or brand new?
+// The grammar cannot know; the graph can.
+Definition { Path Arguments? ~apres NamedBody }
+
+// lpf1 lowpass(cutoff:400) — le nom seul remplace le corps de l'exemplaire
+// --- what Faust writes, and a superset must read --------------------
+
+// process = _ : fi.lowpass(3, 800);
+FaustDefinition { Path Arguments? equals Expression semicolon }
+
+// import("stdfaust.lib");
+Import { kw<"import"> "(" String ")" semicolon }
+
+// --- gestures on an instance -------------------------------------------
+
+// _ lpf1        !_ lpf1
+Bypass { bang? Identity Name }
+
+// ! lpf1
+Removal { bang Name }
+
+// --- setting -----------------------------------------------------------------
+
+// lpf1.cutoff:400 — and lpf1.cutoff.min:20, which the graph tells apart:
+// it knows whether the last member is a port or a port's attribute.
+Setting { Prefix? Key Value }
+
+// --- connecting ---------------------------------------------------------------
+
+Expression { Term (Link Term)* }
+
+Link {
+  CutSeries | WideSeries | Series |
+  CutFeedback | WideFeedback | Feedback |
+  Split | Merge | Stack | Operator
+}
+
+Series           { colon }
+WideSeries      { Width }
+CutSeries     { bang colon }
+Feedback      { "~" }
+WideFeedback { LoopWidth }
+CutFeedback { bang "~" }
+Split     { "<:" }
+Merge          { ":>" }
+Stack      { "," }
+// Faust's operators, which FaustX passes through without decorating
+Operator       { "*" | "+" | "-" | "/" | "^" | "%" | "@" | "&" | "|" |
+                  ">" | "<" | ">=" | "<=" | "==" | "!=" }
+
+// `*` est une fonction en Faust : il se pose comme un term et s'appelle.
+Term { Call | Path | Number | NegativeNumber | String | Identity | bang | Operator | Group }
+
+Group { "(" Expression ")" }
+
+// a call, or an instance's grouped setting: the graph decides
+Call { NamedCall | OperatorCall }
+NamedCall { Path Arguments ~apres }
+OperatorCall { Operator Arguments }
+Arguments { "(" commaSep<Argument> ")" }
+Argument { Key? Value }
+
+// --- what gets named --------------------------------------------------------
+
+// lpf1     fi.lowpass     lpfs.3     lpf1.cutoff
+Path { Name ("." Member)* }
+Prefix { Name ("." Member)* "." }
+Member { Name | Number }
+
+// a `let` body is free; a definition's body starts with a name, otherwise
+// `vca1 *` would be an unfinished multiplication
+FreeBody { Expression }
+NamedBody { NamedCall | Path }
+Value { Term (SimpleLink Term)* }
+
+SimpleLink {
+  CutSeries | WideSeries | Series |
+  CutFeedback | WideFeedback | Feedback |
+  Split | Merge | Operator
+}
+
+@skip { blank | Comment }
+
+@tokens {
+  blank { $[ \t]+ }
+  endOfLine { $[\n\r] $[ \t\n\r]* }
+  Comment { "//" ![\n]* }
+
+  // a name may start with an underscore — `_b` — but the underscore alone
+  // is Faust's identity, never a name
+  Name { $[a-zA-Z] $[a-zA-Z0-9_]* | "_" $[a-zA-Z0-9_]+ }
+  // le signe moins est un operateur, jamais une part du nombre
+  // colle au chiffre, le moins fait un nombre negatif ; space, il
+  // subtracts. Same convention as for width.
+  NegativeNumber { "-" $[0-9]+ ("." $[0-9]+)? ($[eE] $[-+]? $[0-9]+)? }
+
+  // a number does not end with a dot: `a.1.b` is a path, and the dot that
+  // follows a digit takes the next member
+  Number { $[0-9]+ ("." $[0-9]+)? ($[eE] $[-+]? $[0-9]+)? }
+
+  // stuck to the sign, a digit says how many: `:8` `~8`. Spaced, it is
+  // a connection to a constant: `: 8`.
+  // un nom colle a un deux-points affecte ; space, le deux-points
+  // the convention of an earlier language of ours, and it removes every
+  // ambiguity between assigning and connecting.
+  Key { $[a-zA-Z_] $[a-zA-Z0-9_]* ":" }
+
+  Width { ":" $[0-9]+ }
+  LoopWidth { "~" $[0-9]+ }
+
+  // Faust quotes labels between double quotes: `hslider("cutoff", ...)`
+  String { '"' !["]* '"' }
+
+  equals { "=" }
+  semicolon { ";" }
+
+  Identity { "_" }
+  bang { "!" }
+  colon { ":" }
+
+  "(" ")" "." ","
+  ":>" "<:" "~"
+  "*" "+" "-" "/" "^" "%" "@" "&" "|" ">" "<" ">=" "<=" "==" "!="
+
+  // `<:` and `:>` are Faust signs: they come before the comparisons
+  @precedence { "<:", "<=", "<" }
+  @precedence { ":>", ">=", ">" }
+  @precedence { "!=", bang }
+  @precedence { Comment, "/" }
+  @precedence { NegativeNumber, "-" }
+  @precedence { Key, Width, Name, colon }
+  @precedence { Name, Identity }
+  @precedence { LoopWidth, "~" }
+  @precedence { ":>", colon }
+}
+
+@precedence { attribut @left, reglage @left }
+
+kw<term> { @specialize[@name={term}]<Name, term> }
+commaSep<content> { (content ("," content)*)? }

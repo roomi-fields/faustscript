@@ -1,0 +1,326 @@
+// ============================================================================
+// 3. A TWENTY-MINUTE SESSION
+//
+// This file is not a program: it is the trace of what a musician sends back,
+// line after line, while the sound is playing. The starting state fits in the
+// first block; all the rest arrives one line at a time.
+//
+// The corresponding Faust is written in five snapshots, taken at the moments
+// where the graph changes shape:
+//   3-session-t00-start.dsp   the state at load time
+//   3-session-t03-bank.dsp    the filter inserted, swept, and the bank of six
+//   3-session-t08-loop.dsp    the feedback loop opened
+//   3-session-t15-reverb.dsp  the widened bank, the eight voices, the reverb
+//   3-session-t19-end.dsp     the loop opened again, the bass cut
+//
+// What it exercises in the specification: everything that exists only live --
+// laying down, repatching, removing, setting, replacing a body, opening a
+// loop, giving a name back, and the dot that takes one channel from a bank.
+//
+// The lines marked ⛔ are the ones we wanted to write and that the
+// specification does not allow, or allows in two ways. Each of them is taken
+// up in the report. Where the specification has settled the question since,
+// a SETTLED SINCE line says so and names where to read it.
+//
+// The instance names are the musician's own and are left as they were
+// written, in French: basse = bass, bruit = noise, clic = click, voix =
+// voices, sortie = master out, envoi = effect send, vcab / vcac = the
+// amplifiers on the bass and on the click, envb / envc their envelopes,
+// fb1 = feedback, and its port `retour` = return amount.
+// ============================================================================
+
+
+// --- 00:00  what is loaded --------------------------------------------------
+
+let bat1   beat(t:112)
+let envb   ar(at:0.004, rt:0.16)
+let basse  sawtooth(freq:55)
+let vcab   *
+let sortie *(gain:0.5)
+
+bat1 : envb.gate
+(basse, envb) : vcab : sortie : process
+
+
+// --- 00:40  lay down a filter and insert it into the chain -------------------
+//
+// ⛔ GAP: inserting a module into a chain that is playing takes THREE lines,
+//    and between the first and the third the sound goes through both paths at
+//    once. It is the commonest gesture of live patching and it has no
+//    notation at all. What we wanted to write, as one line sent back:
+//        vcab : lpf1 : sortie
+//
+//    SETTLED SINCE: ruled on, and set aside. Faust has no cable to modify and
+//    no obvious notation presented itself, so the three lines are what one
+//    writes; to be reopened if use shows the gesture comes up often.
+//    (faustx-specification.md, "What the first programs revealed".)
+
+let lpf1 resonlp(fc:420, Q:6, gain:0.9)
+
+vcab : lpf1
+lpf1 : sortie
+vcab !: sortie
+
+
+// --- 01:30  sweep the filter ------------------------------------------------
+//
+// ⛔ GAP: `lfo1 : lpf1.fc` sends a signal between -1 and 1 into a port that
+//    expects hertz. Nothing in the notation scales a signal to a port, even
+//    though the port knows its bounds. What we wanted to write:
+//        lfo1 : lpf1.fc(140, 900)      -- or any other form
+//    Failing that, the scaling is written into the LFO's body, which makes
+//    the LFO unusable anywhere else.
+//
+//    SETTLED SINCE: a signal patched into a port is rescaled on its own.
+//    FaustX places Faust's `it.remap` between the two when both ranges are
+//    known, and lets the signal through as it is otherwise -- nothing is
+//    guessed. (LANGUAGE.md, "Setting".)
+
+let lfo1 osc(freq:0.13) * 380 + 520
+lfo1 : lpf1.fc
+
+
+// --- 02:20  tighten it ------------------------------------------------------
+
+lpf1.Q:16
+
+
+// --- 03:10  a bank of six percussive resonators -----------------------------
+//
+// ⛔ GAP: `let clic:6 …` lays down six IDENTICAL instances. `:8` has no rank,
+//    where `par(i,6,…)` has one. And "identical" means one single circuit:
+//    MEASURED, six resonators with the same settings collapse to ONE memory
+//    field in the C produced, while six distinct settings give six. So it
+//    takes six lines for the bank to exist at all -- and those six lines are
+//    not playable. What we wanted to write:
+//        let clic:6 resonbp(fc:311 * 1.5^i, Q:60, gain:1)
+//
+//    SETTLED SINCE: `i` is the rank of the copy, taken over from Faust's
+//    `par(i,6,…)`, and this exact line is now the one to write.
+//    (LANGUAGE.md, "Placing a module".)
+//
+// ⛔ GAP: `let bruit noise` and a second `let bruit2 noise` are, in the Faust
+//    emitted, THE SAME circuit -- measured, the two outputs are the same
+//    `fTemp0`. A module with no port has nothing to tell it apart from its
+//    twin and the compiler merges them; there are 240 such out of the
+//    catalogue's 998. The rule "= duplicates" only holds for what has at
+//    least one port.
+
+let bruit noise
+let envc  ar(at:0.001, rt:0.09)
+let vcac  *
+let clic:6 resonbp(fc:900, Q:60, gain:1)
+
+bat1 : envc.gate
+(bruit, envc) : vcac : clic
+clic : sortie
+
+clic.1.fc:311
+clic.2.fc:466
+clic.3.fc:622
+clic.4.fc:933
+clic.5.fc:1244
+clic.6.fc:1866
+
+
+// --- 05:00  replace a body, the memory stays --------------------------------
+//
+// ⛔ AMBIGUOUS: the new body carries the same `freq` port. Does it take over
+//    the current value (55) or the one `square`'s declaration gives (220)?
+//    The specification says the memory stays; it says nothing about ports.
+
+basse square(freq:55)
+
+
+// --- 06:30  open a feedback loop --------------------------------------------
+//
+// ⛔ GAP: in Faust, `A ~ B` TAKES A's first inputs to bring B back into them;
+//    `dly1` has only one input, already taken by `lpf1`. For the line below
+//    to mean what a musician thinks it means, FaustX has to insert a summing
+//    that nothing in the specification mentions.
+//
+// ⛔ GAP: `n:96000` sizes the delay line and has to be a compile-time
+//    constant. Nothing lets one say that a declared parameter is not a port.
+
+let dly1 fdelay(n:96000, d:13000)
+let fb1  *(retour:0.55)
+
+lpf1 : dly1
+dly1 ~ fb1
+dly1 : sortie
+
+
+// --- 08:00  modulate the delay time -----------------------------------------
+
+let lfo2 osc(freq:0.07) * 4000 + 9000
+lfo2 : dly1.d
+
+
+// --- 09:30  bypass the filter without cutting it ----------------------------
+
+_ lpf1
+
+
+// --- 10:15  put it back into the flow ---------------------------------------
+//
+// ⛔ GAP: it does not exist. `_` and `!` have no inverse. `!_ lpf1` is not in
+//    the specification -- the `!` cancels the sign it precedes, and `_` is
+//    already the sign of the neutralisation. Replacing the body puts nothing
+//    back into the flow, since `_ lpf1` "does not touch the body". The line
+//    we wanted to write has no form:
+//        ?? lpf1
+//
+//    SETTLED SINCE: `!_ lpf1` is exactly the line, and it follows from the
+//    `!` rule with nothing added. The line below is therefore no longer the
+//    way to do it. (LANGUAGE.md, "The gestures".)
+
+lpf1 resonlp(fc:420, Q:16, gain:0.9)
+
+
+// --- 11:00  take the bank out of the flow -----------------------------------
+
+! clic
+
+
+// --- 11:40  widen the bank, and find out it has to be given back ------------
+//
+// ⛔ AMBIGUOUS, and it is the worst of the review: these two lines differ by
+//    ONE SPACE and mean two opposite things.
+//        clic:12 resonbp(…)     replace the bank with twelve instances
+//        clic :12 resonbp(…)    connect clic to resonbp, in twelve copies
+//    Nothing tells them apart when read back, and one types fast.
+//
+//    SETTLED SINCE: spacing is significant, and it is a rule of the whole
+//    language -- tight, a sign qualifies; spaced, it connects. Both readings
+//    stand, and which one applies is decided by the space.
+//    (LANGUAGE.md, "Spacing is significant".)
+//
+// ⛔ GAP: the first of the two would not be enough anyway. `! clic` took the
+//    instance out of the flow, and replacing its body "does not touch the
+//    module's relation to the graph" -- it would stay silent. The only way
+//    back is to give the name back and rewire everything. Three more lines to
+//    undo a one-sign gesture.
+//
+//    SETTLED SINCE, as a decision rather than a fix: `!` removes the module
+//    AND its cables, the instance remains and its name stays taken, and
+//    giving the name back requires `!let`. The three lines below are
+//    therefore what one writes; `!` still has no inverse.
+//    (faustx-specification.md, "What the first programs revealed".)
+
+!let clic
+ let clic:12 resonbp(fc:900, Q:60, gain:1)
+
+vcac : clic
+clic : sortie
+
+clic.1.fc:311
+clic.7.fc:2489
+
+
+// --- 13:00  eight voices ----------------------------------------------------
+//
+// ⛔ AMBIGUOUS: does `voix.3` designate the third voice, or the instance's
+//    third channel? Here the two coincide because every voice is mono. With a
+//    two-output body -- a stereo reverb, say -- the two readings diverge and
+//    the specification does not settle it.
+//
+//    SETTLED SINCE: the dot followed by a number designates a channel, and
+//    for a bank of one-channel modules the channel IS the module. One rule,
+//    one reading. (LANGUAGE.md, "The channels".)
+//
+// ⛔ GAP: `lowpass(N:2, …)` -- the filter order, again.
+//
+// ⛔ GAP: eight lines for eight pitches. That is the price of `:8` with no
+//    rank, and nobody types them while playing.
+//
+//    SETTLED SINCE: `i` is the rank of the copy, so the eight pitches fit on
+//    the one `let` -- `let voix:8 sawtooth(freq:110 * (i+1))`.
+//    (LANGUAGE.md, "Placing a module".)
+
+let voix:8 sawtooth : lowpass(N:2, fc:1200)
+voix : sortie
+
+voix.1.freq:110
+voix.2.freq:165
+voix.3.freq:220
+voix.4.freq:277
+voix.5.freq:330
+voix.6.freq:440
+voix.7.freq:554
+voix.8.freq:660
+
+
+// --- 14:20  take one precise channel ----------------------------------------
+//
+// The fifth voice also goes into the delay, where it sums with what already
+// arrives there. It is the only line of the session where the dot designates
+// a channel and not a port.
+
+voix.5 : dly1
+
+
+// --- 15:00  lay the reverb down as a send -----------------------------------
+//
+// ⛔ GAP, the gravest one: `rev1` has two outputs. Two cables arriving at
+//    `process` sum there -- the specification says so without reservation. So
+//    the piece is MONO, and nothing lets one write otherwise. What we wanted
+//    to write does not exist:
+//        rev1.1 : process.1
+//        rev1.2 : process.2
+//    `process` has no channels in the specification, and element 7 names the
+//    inputs without ever naming the outputs.
+//
+//    SETTLED SINCE: it was a writing oversight, not a decision. `process` is
+//    an instance, so the dot rule applies to it, and those two lines are
+//    exactly how a stereo piece is written.
+//    (LANGUAGE.md, "What sounds".)
+
+let rev1  stereo_freeverb(fb1:0.88, fb2:0.7, damp:0.4, spread:23)
+let envoi *(niveau:0.25)
+
+sortie : envoi : rev1
+rev1 : process
+
+
+// --- 16:30  give a name back, lay down a fresh one --------------------------
+//
+// ⛔ AMBIGUOUS: `!let rev1` gives the name back and the tail drains. But the
+//    two cables `sortie : envoi : rev1` and `rev1 : process` aimed at that
+//    name. Are they destroyed with it? Repatched onto the new `rev1`? The
+//    specification does not say. We rewire by hand, for want of knowing.
+
+!let rev1
+ let rev1 mono_freeverb(fb1:0.94, fb2:0.75, damp:0.3, spread:19)
+
+sortie : envoi : rev1
+rev1 : process
+
+
+// --- 18:00  open the loop ---------------------------------------------------
+//
+// `!~` cancels the feedback: the loop opens, and what was circulating in it
+// drains. The French marker read "refermer la boucle" -- shut the feedback
+// down -- which is the opposite word for the same gesture.
+
+dly1 !~ fb1
+
+
+// --- 19:00  cut the bass ----------------------------------------------------
+//
+// ⛔ GAP: `vcab` is a `*`, so TWO inputs. Cutting one of the two cables does
+//    not silence the branch: the adaptation rule says that a channel arriving
+//    at several inputs is broadcast, so the envelope ends up multiplied by
+//    itself and the branch goes on sounding. What a musician expects from a
+//    `!:` -- silence -- does not happen.
+//
+//    SETTLED SINCE, on this very line: a cut wire does not remove the input,
+//    it puts zero into it. The width does not change and the expected silence
+//    happens. (LANGUAGE.md, "Connecting".)
+
+basse !: vcab
+
+
+// --- 19:40  fade out --------------------------------------------------------
+
+sortie.gain:0.2
+sortie.gain:0
