@@ -25,6 +25,9 @@ export function writeInstance(instance, catalogue, templates, graph = null) {
         i: templates.reserved('index'), n: instance.multiplicity, body,
       })
     }
+    if (carriesAControl(body)) {
+      body = templates.fill('template.Group', { name: instance.name, body })
+    }
     return templates.fill('template.Instance', { name: instance.name, body })
   }
 
@@ -43,10 +46,23 @@ export function writeInstance(instance, catalogue, templates, graph = null) {
       i: templates.reserved('index'), n: instance.multiplicity, body,
     })
   }
-  if (arguments_.some(a => a.includes('"'))) {
+  if (arguments_.some(carriesAControl)) {
     body = templates.fill('template.Group', { name: instance.name, body })
   }
   return templates.fill('template.Instance', { name: instance.name, body })
+}
+
+/** Has a control been written here?
+ *
+ * A control is the only thing that carries a label, so the only thing that
+ * needs the instance's name in front of its path. Whoever hosts FaustX reaches
+ * a setting at `/<program>/<instance>/<port>`, and that only holds if every
+ * instance that carries one is grouped — including those whose body is a free
+ * expression. Two instances each holding a `gain` would otherwise collide, and
+ * Faust would refuse the program.
+ */
+function carriesAControl(faust) {
+  return faust.includes('"')
 }
 
 /** What is passed to a parameter: a fixed value, or a named setting.

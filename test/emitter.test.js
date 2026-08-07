@@ -69,3 +69,15 @@ test('a reverb and its bounded settings', () => {
   assert.ok(faust.includes('hslider'), 'a bounded setting gives a slider')
   assert.equal(compile(faust), null, faust)
 })
+
+test('two free expressions carrying the same setting do not collide', () => {
+  // whoever hosts FaustX reaches a setting at `/<program>/<instance>/<port>`;
+  // an instance written as a free expression must therefore be grouped too,
+  // or Faust answers `path '/…/gain' is already used`
+  const faust = emettre([
+    ['vol1', '*(gain:0.35)', 1, []],
+    ['vol2', '*(gain:0.5)', 1, []],
+  ], 'vol1 : vol2')
+  assert.ok(faust.includes('vgroup("vol1"'), 'the instance names its own setting')
+  assert.equal(compile(faust), null, faust)
+})
