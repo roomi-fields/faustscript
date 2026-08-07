@@ -32,7 +32,7 @@ routing primitives, substitution, the iterators, the interface parameters, the e
 It is in `docs/faustx-specification.md`, and the reference that follows from it in
 `docs/LANGUAGE.md`.
 
-**The transpiler translates**: the three pieces in `exemples/` become Faust that compiles. The
+**The transpiler translates**: the three pieces in `examples/` become Faust that compiles. The
 grammar generates the parser (`src/faustx.grammar`), the catalogue declares Faust's 998 functions,
 and no sign of the language is written in the code — a guard checks it.
 

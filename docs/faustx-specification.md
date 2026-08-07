@@ -38,7 +38,7 @@ A <: B     split                 A :> B     merge
 A ~ B      recursion
 ```
 
-Its library carries **1,028 functions** — oscillators, filters, envelopes, effects, analysis — of
+Its library carries **998 public functions** — oscillators, filters, envelopes, effects, analysis — of
 which **645 depend on recursion**, the construction that makes reverbs, delays and recursive filters.
 
 **FaustX adds no computing function.** What Faust lacks in order to patch live is not a function, it
@@ -249,7 +249,7 @@ width that does not come out even must not stop the music.
 `par(i,8,os.sawtooth(100+i)) : par(i,8,fi.lowpass(3,800))` is **56 signs** against **12** for
 `saw1 :8 lpf1`. Live, that is the difference between writing while it plays and not managing at all.
 
-**Opening a loop that is sounding.** Recursion carries 645 of the library's 1,028 functions — every
+**Opening a loop that is sounding.** Recursion carries 645 of the library's functions — every
 reverb, every compressor, 109 filters out of 114.
 
 ### The adaptation rule — settled 2026-08-06
@@ -663,7 +663,7 @@ without it, Faust's 1,002 public functions would be out of reach until a declara
 **Faust's libraries already carry what is needed to write them.** Every public function is documented
 in a standardized block: a usage section that says whether it takes a signal, the description of each
 parameter with its unit and its range, and a worked example to take the default values from.
-**`tools/engendrer-declarations.py` turns them into declarations**, and the result fits in
+**`tools/generate-declarations.py` turns them into declarations**, and the result fits in
 `lib/faust.fx`.
 
 | out of the 998 public functions | |
@@ -866,7 +866,7 @@ use twelve of them is a drawback only if the collisions get in the way, and they
 ## What the first programs revealed — 2026-08-06
 
 Three complete programs were written to put the review to the test, and their Faust translations
-compile (`exemples/`). Six gaps came out of it; five are filled, one is set aside.
+compile (`examples/`). Six gaps came out of it; five are filled, one is set aside.
 
 **The bank index.** `let clic:6 …` laid down six **identical** instances, and Faust reduces six
 identical circuits to one. Without a rank, a bank does not exist. `i` is taken over from Faust's

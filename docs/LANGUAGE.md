@@ -304,7 +304,7 @@ refuses: in all three cases, what was playing keeps playing.
 
 ## What FaustX does not do
 
-**No computation.** All the sound is Faust, compiled by Faust, with its 1,028 functions.
+**No computation.** All the sound is Faust, compiled by Faust, with its 998 public functions.
 
 **No musical time.** When a gesture happens is decided by whatever invokes it.
 

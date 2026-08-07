@@ -71,7 +71,7 @@ connection, and what surrounds it qualifies it.
 **Three rules, and nothing else to remember:** a `!` in front cancels what
 follows it, a digit after says how many, and the dot reaches into an instance.
 
-**Spacing is significant**, as it is in our own BPScript: `:8` is a width,
+**Spacing is significant:** `:8` is a width,
 `: 8` connects to the constant 8; `fc:800` assigns, `a : b` connects. And one
 line is one statement.
 
@@ -127,14 +127,14 @@ definition, the five composition operators, routing primitives, substitution,
 iterators, interface parameters, entry point, imports — and every claim in the
 specification was checked by compiling.
 
-**The transpiler works.** The three pieces in `exemples/` translate without a
+**The transpiler works.** The three pieces in `examples/` translate without a
 single rejected gesture, and the Faust they produce compiles. 34 tests, a dozen
 of which invoke the real compiler.
 
 **The catalogue declares all 998 public Faust functions** — parameters, starting
 values, bounds, measured input and output counts, and measured output ranges for
 738 of them. It is generated from Faust's own documentation by
-`tools/engendrer-declarations.py`.
+`tools/generate-declarations.py`.
 
 **What is not true yet:** *every Faust program is a FaustX program* is the
 stated goal, not the current state. The grammar reads FaustX, plus Faust's
@@ -169,22 +169,18 @@ fails if any of it leaks into the engine.
 
 | | |
 |---|---|
-| `src/faustx.grammar` | the grammar; it **generates** `src/analyseur.js` (Lezer) |
+| `src/faustx.grammar` | the grammar; it **generates** `src/parser.js` (Lezer) |
 | `lib/faust.fx` | the catalogue — 998 modules, itself written in FaustX |
-| `lib/traduction.fx` | templates, reserved words, decision rules |
+| `lib/translation.fx` | templates, reserved words, decision rules |
 | `src/` | graph, reading, staging, emission — none of it knows the language |
 
 ---
 
 ## Documentation
 
-The design documents are in French, the language of the project.
-
 `docs/LANGUAGE.md` — the reference: how to write FaustX.
 `docs/ARCHITECTURE.md` — how the transpiler is built.
 `docs/faustx-specification.md` — the design: why each sign is the one it is.
-`docs/faust-etude-fork.md`, `docs/faust-etude-langage.md` — the two studies the
-project started from.
 
 ---
 
