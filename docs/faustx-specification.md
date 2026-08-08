@@ -173,8 +173,8 @@ written elsewhere would change meaning with nothing moving on screen. **A port t
 the name of an instance, nor the reverse: the collision is refused in both directions.**
 
 **The assigning `:` is not an invention**: Faust already uses it in widget modulation,
-`["cutoff": 400 -> lpf]`, where its documentation makes clear that this `:` *"is a simple visual
-separator, not the sequential composition operator"* (`syntax.md:3241`). **Verified by compiling**:
+`["cutoff": 400 -> lpf]`, and its documentation states that this `:` separates visually and is not
+the sequential composition operator (`syntax.md:3241`). **Verified by compiling**:
 the form is accepted, and the modulator takes a constant as readily as a signal —
 `["cutoff": os.osc(1) -> lpf]` compiles and adds the oscillator's state to the circuit.
 
