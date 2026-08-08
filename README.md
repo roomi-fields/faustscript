@@ -1,3 +1,5 @@
+<img src="docs/faustx.svg" alt="FaustX" width="120">
+
 # FaustX — live coding on top of Faust
 
 **[roomi-fields.github.io/faustx](https://roomi-fields.github.io/faustx/)** — the five Faust
