@@ -54,3 +54,12 @@ This project has been indexed with RTFM.
 For any **exploratory search** (finding which files/modules/classes are relevant
 to a topic), use `rtfm_search` instead of Glob, find, ls, or broad Grep.
 Then use `rtfm_expand` to read easily most relevant files/sections.
+
+## ⛔ Un dépôt lié est consommé VIVANT
+
+Les dépôts s'intègrent par **lien symbolique** : ce que j'enregistre atteint mes consommateurs **sans
+construction ni publication**. Un fichier non commité est déjà en usage chez eux — « hors du dépôt »
+n'est pas « hors d'usage ». Kairos lit BPx ; Kanopi lit BPx, bp3-frontend et les cinq runtimes.
+
+Un agent qui **compile** publie **deux instances** : une de développement, une de production.
+
