@@ -13,7 +13,7 @@ FaustX's public package, `faustx` (`packages/040-faustx`), exports one function,
 
 The package declares `@grame/faustwasm` as a peer dependency at one exact version, written in its `package.json`. The catalogue is generated from the Faust libraries that version embeds, and the tests compile the Faust FaustX writes with it: the host that installs that version plays the Faust the tests checked.
 
-Every name, field, gesture, code and sentence form of this document is a contract: changing one is a breaking change, recorded in `CHANGELOG.md` under *Changed*. Changing the declared faustwasm version is a change of the same kind.
+Every name, field, gesture, code, parameter and sentence form of this document is a contract: changing one is a breaking change, recorded in `CHANGELOG.md` under *Changed*. Changing the declared faustwasm version is a change of the same kind.
 
 **Guard** — the interface test (target, faustx-zj5.36): the package exports exactly the elements of this list, their declared types are the signatures of this document, and the declared faustwasm version is the one the catalogue records and the tests compile with.
 
@@ -63,7 +63,7 @@ export interface LineResult {
 
 export type Outcome =
   | { readonly done: true }
-  | { readonly done: false; readonly code: RefusalCode; readonly reason: string }
+  | { readonly done: false; readonly fault: Fault }
 ```
 
 | field | content |
@@ -72,7 +72,7 @@ export type Outcome =
 | `text` | the line, without its surrounding spaces |
 | `gesture` | the gesture the line expresses; `null` when the line has no form the grammar reads |
 | `name` | the instance the gesture touches; `null` for a wire |
-| `outcome` | applied, or refused with its code and its sentence (§5) |
+| `outcome` | applied, or refused with its fault (§5) |
 | `faust`, `needs` | present when a `place`, `replace`, `bypass` or `remove` is applied: the Faust definition of that instance alone, and the other instances that definition cites, which the host compiles with it |
 | `port`, `value`, `path` | present when a `set` is applied: the port, the value as written, and the control path from the program root |
 
@@ -96,9 +96,23 @@ The gesture says what the line does to the graph, and what the host has to compi
 
 ## 5. Refusals
 
-A refused line changes nothing in the graph, and the lines after it are applied. Its outcome carries a code from the closed list below, and a sentence that names the cause and the name involved. The code is what the host acts on; the sentence is what the author reads.
+A refused line changes nothing in the graph, and the lines after it are applied. Its outcome carries a fault: a code from the closed list below, the sentence that names the cause and the name involved, the values that sentence is written from, and the position of the writing at fault. The code is what the host acts on; the message is what the author reads; the position is where an editor marks it. A fault has the fields of BPScript's, so that a host that plays both reads one form.
 
 ```ts
+export interface Fault {
+  readonly code: RefusalCode
+  readonly message: string
+  readonly params: Readonly<Record<string, string>>
+  readonly origin: Origin
+}
+
+export interface Origin {
+  readonly line: number
+  readonly column: number
+  readonly endLine: number
+  readonly endColumn: number
+}
+
 export type RefusalCode =
   | 'UNREADABLE'
   | 'EMPTY_EXPRESSION'
@@ -113,23 +127,25 @@ export type RefusalCode =
   | 'NO_SUCH_WIRE'
 ```
 
-| code | the line | sentence |
-| --- | --- | --- |
-| `UNREADABLE` | does not read by the grammar | `does not read: <text>` |
-| `EMPTY_EXPRESSION` | an expression with no term | `empty expression` |
-| `UNKNOWN_FORM` | a form the grammar reads and no gesture handles | `unknown form: <form>` |
-| `ALREADY_PLACED` | `let lpf1 …` when `lpf1` is placed | `lpf1 is already placed` |
-| `UNKNOWN_NAME` | names an instance that does not exist, or gives a new body to a name that is not placed | `ghost does not exist` |
-| `UNAVAILABLE_MODULE` | places or gives a body that calls a module the declared faustwasm does not provide: `let n1 rnoises` | `rnoises calls arc4random, which faustwasm does not provide` |
-| `INCOMPLETE_SETTING` | a setting without its port or its value | `incomplete setting: <text>` |
-| `SETTING_WITHOUT_PORT` | `lpf1:3` | `a setting targets a port: lpf1` |
-| `UNKNOWN_PORT` | a setting or a wire that targets a port the instance does not carry: `lpf1.nope:3`, `osc1 : lpf1.nope` | `lpf1 has no port nope` |
-| `SETTING_FROM_INPUT` | drives a port with a signal that carries a program input | `in1 carries one of the program's inputs: a port is driven by a signal, never by an input` |
-| `NO_SUCH_WIRE` | `osc1 !: lpf1` where no wire joins them | `no wire between osc1 and lpf1` |
+| code | the line | `params` | message |
+| --- | --- | --- | --- |
+| `UNREADABLE` | does not read by the grammar | `text` | `does not read: <text>` |
+| `EMPTY_EXPRESSION` | an expression with no term | — | `empty expression` |
+| `UNKNOWN_FORM` | a form the grammar reads and no gesture handles | `form` | `unknown form: <form>` |
+| `ALREADY_PLACED` | `let lpf1 …` when `lpf1` is placed | `name` | `lpf1 is already placed` |
+| `UNKNOWN_NAME` | names an instance that does not exist, or gives a new body to a name that is not placed | `name` | `ghost does not exist` |
+| `UNAVAILABLE_MODULE` | places or gives a body that calls a module the declared faustwasm does not provide: `let n1 rnoises` | `module`, `function` | `rnoises calls arc4random, which faustwasm does not provide` |
+| `INCOMPLETE_SETTING` | a setting without its port or its value | `text` | `incomplete setting: <text>` |
+| `SETTING_WITHOUT_PORT` | `lpf1:3` | `name` | `a setting targets a port: lpf1` |
+| `UNKNOWN_PORT` | a setting or a wire that targets a port the instance does not carry: `lpf1.nope:3`, `osc1 : lpf1.nope` | `name`, `port` | `lpf1 has no port nope` |
+| `SETTING_FROM_INPUT` | drives a port with a signal that carries a program input | `name` | `in1 carries one of the program's inputs: a port is driven by a signal, never by an input` |
+| `NO_SUCH_WIRE` | `osc1 !: lpf1` where no wire joins them | `from`, `to` | `no wire between osc1 and lpf1` |
+
+`params` holds, under the names of its column, the values the message is written from, as they appear in the line. `origin` is the span of the writing at fault in the text passed to `apply`: the node the refusal names (the name, the port, the wire), or the line without its surrounding spaces for `UNREADABLE`, `EMPTY_EXPRESSION` and `UNKNOWN_FORM`. Its lines count from 1 as `line` does, its columns from 1 in UTF-16 code units; `endColumn` is just past the last character.
 
 A module that faustwasm does not provide is one whose Faust calls a foreign function that faustwasm's WebAssembly backend refuses; the catalogue marks it (§9), and its sentence names that function. An error the Faust compiler raises on the Faust that FaustX writes is the compiler's message: the host receives it from the compiler.
 
-**Guard** — `tests/unit/transpiler.test.js` (a faulty line is refused without touching the graph; a port cannot be driven by a program input); `tests/unit/language-examples.test.js` (each refused example of the language reference carries its code); target, faustx-zj5.9: each code of the list is produced by its line, every refusal carries a code of the list, and the graph view after a refused line equals the view before it.
+**Guard** — `tests/unit/transpiler.test.js` (a faulty line is refused without touching the graph; a port cannot be driven by a program input); `tests/unit/language-examples.test.js` (each refused example of the language reference carries its code); target, faustx-zj5.9: each code of the list is produced by its line with its parameters and its origin, every refusal carries a code of the list, and the graph view after a refused line equals the view before it.
 
 ## 6. `write`
 
@@ -240,9 +256,9 @@ export interface Position {
 }
 ```
 
-`faustx/editor` serves an editor. `parser` is the Lezer parser generated from FaustX's grammar, the one the session reads with: a CodeMirror editor builds its language from it (`LRLanguage.define({ parser })`) and highlights FaustX by the grammar's node names. `diagnose` applies a text to a new session, as the command line applies a file, and returns one diagnostic per refused line, in the order of the lines. A `Diagnostic` has the form of the Language Server Protocol's: `range` covers the refused line without its surrounding spaces, its lines and characters counted from 0 in UTF-16 code units; `severity` is 1, an error; `code` and `message` are the refusal's code and sentence (§5).
+`faustx/editor` serves an editor. `parser` is the Lezer parser generated from FaustX's grammar, the one the session reads with: a CodeMirror editor builds its language from it (`LRLanguage.define({ parser })`) and highlights FaustX by the grammar's node names. `diagnose` applies a text to a new session, as the command line applies a file, and returns one diagnostic per refused line, in the order of the lines: the fault of §5, printed in the form of the Language Server Protocol. `range` is the fault's `origin`, its lines and characters counted from 0 in UTF-16 code units; `severity` is 1, an error; `code` and `message` are the fault's.
 
-**Guard** — target, faustx-zj5.36: the interface test checks the two exports; each refused example of the language reference gives one diagnostic with its code and the range of its line.
+**Guard** — target, faustx-zj5.36: the interface test checks the two exports; each refused example of the language reference gives one diagnostic with its code and the range of its fault's origin.
 
 ## 11. The command line
 
@@ -251,6 +267,6 @@ faustx <file.fx> [-o <file.dsp>]
 faustx --version
 ```
 
-The command applies the file to a new session and writes the Faust program to standard output, or to the file given by `-o`. Each refused line goes to standard error as `<file>:<line>: refused <CODE> — <reason>`, followed by the line. It exits with 0 once the file is read, refused lines included, and with 2 when no file is given.
+The command applies the file to a new session and writes the Faust program to standard output, or to the file given by `-o`. Each refused line goes to standard error as `<file>:<line>:<column>: refused <CODE> — <message>`, the position being the fault's origin, followed by the line. It exits with 0 once the file is read, refused lines included, and with 2 when no file is given.
 
 **Guard** — `tests/unit/transpiler.test.js` (the command line translates a file).

@@ -29,7 +29,7 @@ FaustX is a superset of Faust for live coding, and its transpiler: it reads a Fa
 
 ## 6. Refuses
 
-- **R10.** A line that does not read, an empty expression, an unknown form, a name already placed, a name that does not exist, a module that faustwasm does not provide, a setting that is incomplete, does not target a port or targets a port the instance does not carry (a parameter of its module, or a `key:value` its author named in its Faust body), a port driven by a signal that carries one of the program's inputs, a wire that does not exist: the refusal carries a stable code and a sentence that names the cause and the name involved, and the line changes nothing.
+- **R10.** A line that does not read, an empty expression, an unknown form, a name already placed, a name that does not exist, a module that faustwasm does not provide, a setting that is incomplete, does not target a port or targets a port the instance does not carry (a parameter of its module, or a `key:value` its author named in its Faust body), a port driven by a signal that carries one of the program's inputs, a wire that does not exist: the refusal carries a fault with the fields of BPScript's: a stable code, a sentence that names the cause and the name involved, the values it is written from, and the position of the writing at fault; the line changes nothing.
 - **R11.** An error the Faust compiler raises on the Faust FaustX writes stays the compiler's message; the host receives it from the compiler.
 
 ## 7. Invariants
