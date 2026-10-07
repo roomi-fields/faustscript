@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// faustx — translate a FaustX file into Faust.
+// faustscript — translate a FaustScript file into Faust.
 //
-//   faustx piece.fx              writes the Faust to standard output
-//   faustx piece.fx -o piece.dsp writes it to a file
-//   faustx --version
+//   faustscript piece.fsc              writes the Faust to standard output
+//   faustscript piece.fsc -o piece.dsp writes it to a file
+//   faustscript --version
 //
 // What it prints on standard error, if anything, is the gestures it refused:
 // a line that names something that does not exist, or asks for something Faust
@@ -28,13 +28,13 @@ function main(argv) {
   const [source] = argv.filter(a => !a.startsWith('-'))
 
   if (!source) {
-    console.error('usage: faustx <file.fx> [-o <file.dsp>]')
+    console.error('usage: faustscript <file.fsc> [-o <file.dsp>]')
     return 2
   }
 
   const transpiler = createTranspiler(
-    readFileSync(join(root, 'lib/faust.fx'), 'utf8'),
-    readFileSync(join(root, 'lib/translation.fx'), 'utf8')
+    readFileSync(join(root, 'lib/faust.fsc'), 'utf8'),
+    readFileSync(join(root, 'lib/translation.fsc'), 'utf8')
   )
 
   const gestures = transpiler.apply(readFileSync(source, 'utf8'))

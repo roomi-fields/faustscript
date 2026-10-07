@@ -7,7 +7,7 @@ import { parser } from '../../src/parser.js'
 
 const dossier = new URL('../../examples/', import.meta.url)
 
-for (const name of readdirSync(dossier).filter(f => f.endsWith('.fx'))) {
+for (const name of readdirSync(dossier).filter(f => f.endsWith('.fsc'))) {
   test(`${name} parses without error`, () => {
     const text = readFileSync(new URL(name, dossier), 'utf8')
     const erreurs = []
@@ -27,8 +27,8 @@ function lineNumber(text, position) {
 }
 
 test('the catalogue parses in full', () => {
-  // it is written in FaustX: our own parser must read it without a single fault
-  const text = readFileSync(new URL('../../lib/faust.fx', import.meta.url), 'utf8')
+  // it is written in FaustScript: our own parser must read it without a single fault
+  const text = readFileSync(new URL('../../lib/faust.fsc', import.meta.url), 'utf8')
   const erreurs = []
   parser.parse(text).iterate({
     enter: n => {

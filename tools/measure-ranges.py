@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Measures the output range of every module in the catalogue, by making it sound.
 
-A signal patched into a port is rescaled: FaustX puts an `it.remap` between what
+A signal patched into a port is rescaled: FaustScript puts an `it.remap` between what
 the sending module produces and the bounds of the receiving port. That requires
 knowing what a module produces — and no text says it. So we measure it.
 

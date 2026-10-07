@@ -1,4 +1,4 @@
-FaustX reference output of the faustx block 7 of docs/LANGUAGE.md, which opens with fi.lowpass(N:4, fc:2000)  fi.lowpass(N, fc).
+FaustScript reference output of the faustscript block 7 of docs/LANGUAGE.md, which opens with fi.lowpass(N:4, fc:2000)  fi.lowpass(N, fc).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply

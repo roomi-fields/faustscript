@@ -62,7 +62,7 @@ module.exports = {
     'node_modules/',
     'coverage/',
     '*.cjs',
-    // generated from src/faustx.grammar (npm run grammaire)
+    // generated from src/faustscript.grammar (npm run grammaire)
     'src/parser.js',
     'src/parser.terms.js',
   ],

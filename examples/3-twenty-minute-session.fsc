@@ -5,8 +5,8 @@
 // line after line, while the sound is playing. The starting state fits in the
 // first block; all the rest arrives one line at a time.
 //
-// What FaustX returns for each line, and the Faust it writes at the end of the
-// session, are engraved in tests/references/examples/3-twenty-minute-session.fx.txt.
+// What FaustScript returns for each line, and the Faust it writes at the end of the
+// session, are engraved in tests/references/examples/3-twenty-minute-session.fsc.txt.
 //
 // What it exercises in docs/LANGUAGE.md: everything that exists only live --
 // laying down, repatching, removing, setting, replacing a body, opening a
@@ -66,7 +66,7 @@ vcab !: sortie
 //    the LFO unusable anywhere else.
 //
 //    SETTLED SINCE: a signal patched into a port is rescaled on its own.
-//    FaustX places Faust's `it.remap` between the two when both ranges are
+//    FaustScript places Faust's `it.remap` between the two when both ranges are
 //    known, and lets the signal through as it is otherwise -- nothing is
 //    guessed. (LANGUAGE.md §6.)
 
@@ -134,7 +134,7 @@ basse os.square(freq:55)
 //
 // ⛔ GAP: in Faust, `A ~ B` TAKES A's first inputs to bring B back into them;
 //    `dly1` has only one input, already taken by `lpf1`. For the line below
-//    to mean what a musician thinks it means, FaustX has to insert a summing
+//    to mean what a musician thinks it means, FaustScript has to insert a summing
 //    that nothing in docs/LANGUAGE.md mentions.
 //
 // ⛔ GAP: `n:96000` sizes the delay line and has to be a compile-time

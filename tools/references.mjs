@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// The reference outputs of FaustX, against what it writes now (tests/unit/references.js).
+// The reference outputs of FaustScript, against what it writes now (tests/unit/references.js).
 //
-//   npm run references               lists each reference that differs from what FaustX writes
-//   npm run references -- --update   engraves what FaustX writes as the references, and removes
+//   npm run references               lists each reference that differs from what FaustScript writes
+//   npm run references -- --update   engraves what FaustScript writes as the references, and removes
 //                                    the reference of an entry that no longer exists
 //
 // --update goes only in a commit that names the gap: a regression is fixed before the commit, a

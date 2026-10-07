@@ -1,6 +1,6 @@
 /**
  * Faust's verdict on a program, from the Faust of @grame/faustwasm, the version package.json pins:
- * the only judge of the Faust FaustX writes.
+ * the only judge of the Faust FaustScript writes.
  */
 
 import { copyFileSync, mkdtempSync, rmSync } from 'node:fs'
@@ -22,7 +22,7 @@ let compiler = null
  */
 export async function instantiate() {
   const FaustWasm = await import(join(pkg, 'dist/esm/index.js'))
-  const folder = mkdtempSync(join(tmpdir(), 'faustx-libfaust-'))
+  const folder = mkdtempSync(join(tmpdir(), 'faustscript-libfaust-'))
   try {
     const script = join(folder, 'libfaust-wasm.js')
     copyFileSync(`${libfaust}.js`, script)

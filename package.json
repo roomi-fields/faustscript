@@ -1,5 +1,5 @@
 {
-  "name": "faustx",
+  "name": "faustscript",
   "version": "0.1.0",
   "description": "A superset of Faust for live coding: name one instance, and act on it while the sound plays.",
   "keywords": [
@@ -27,7 +27,7 @@
     "./catalogue": "./src/catalogue.js"
   },
   "bin": {
-    "faustx": "./bin/faustx.js"
+    "faustscript": "./bin/faustscript.js"
   },
   "files": [
     "src/",
@@ -47,12 +47,12 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "references": "node tools/references.mjs",
-    "catalogue": "python3 -B tools/generate-declarations.py > lib/faust.fx",
+    "catalogue": "python3 -B tools/generate-declarations.py > lib/faust.fsc",
     "lint": "eslint src tests bin tools --ext .ts,.js,.mjs",
     "lint:fix": "eslint src tests bin tools --ext .ts,.js,.mjs --fix",
     "format": "prettier --write \"{src,tests,bin,tools}/**/*.{ts,js,mjs}\"",
     "format:check": "prettier --check \"{src,tests,bin,tools}/**/*.{ts,js,mjs}\"",
-    "grammaire": "lezer-generator src/faustx.grammar -o src/parser.js",
+    "grammaire": "lezer-generator src/faustscript.grammar -o src/parser.js",
     "prepublishOnly": "npm run lint && npm run typecheck && npm test"
   },
   "devDependencies": {

@@ -1,19 +1,19 @@
-<img src="docs/faustx.svg" alt="FaustX" width="120">
+<img src="docs/faustscript.svg" alt="FaustScript" width="120">
 
-# FaustX — live coding on top of Faust
+# FaustScript — live coding on top of Faust
 
 **[roomi-fields.github.io/faustx](https://roomi-fields.github.io/faustx/)** — the five Faust
 signs, and what happens to each one.
 
-**FaustX is a language for patching while the sound is playing.** It adds to
+**FaustScript is a language for patching while the sound is playing.** It adds to
 [Faust](https://faust.grame.fr) the two things live performance needs and Faust
 does not have: **naming one instance**, and **acting on that instance while it
 runs**.
 
-It computes nothing. A FaustX program is **translated into Faust**, and Faust
+It computes nothing. A FaustScript program is **translated into Faust**, and Faust
 compiles it — with the functions its libraries declare, untouched.
 
-```faustx
+```faustscript
 let saw1 os.sawtooth(freq:110)
 let lpf1 fi.lowpass(fc:800)
 
@@ -49,7 +49,7 @@ instance that already exists**. Naming duplicates; there is no address. That is
 what stops you from writing, an hour into a set, *"that filter, the one that is
 currently ringing — open it up."*
 
-FaustX gives that address, and nothing else.
+FaustScript gives that address, and nothing else.
 
 ---
 
@@ -61,19 +61,19 @@ connection, and what surrounds it qualifies it.
 | written | what it does | |
 |---|---|---|
 | `A : B` | connect | Faust |
-| `let lpf1 fi.lowpass` | place **one** instance | FaustX |
-| `let lpfs:8 fi.lowpass` | place eight | FaustX |
-| `lpf1 fi.lowpass(fc:400)` | replace its body, memory kept | FaustX |
-| `!let lpf1` | give the name back | FaustX |
-| `saw1 :8 lpf1` | connect as eight instances | FaustX |
-| `saw1 !: lpf1` | cut the wire | FaustX |
-| `dly1 ~ fb1` · `dly1 !~ fb1` | close · open a feedback loop | Faust · FaustX |
-| `_ lpf1` · `!_ lpf1` | bypass · un-bypass | FaustX |
-| `! lpf1` | remove it and its wires | FaustX |
-| `lpf1.fc:400` | set one control | FaustX |
-| `lpf1(fc:400, q:2)` | set several at once | FaustX |
-| `lfo1 : lpf1.fc` | drive a control with a signal | FaustX |
-| `saw1.3` | one channel of an instance | FaustX |
+| `let lpf1 fi.lowpass` | place **one** instance | FaustScript |
+| `let lpfs:8 fi.lowpass` | place eight | FaustScript |
+| `lpf1 fi.lowpass(fc:400)` | replace its body, memory kept | FaustScript |
+| `!let lpf1` | give the name back | FaustScript |
+| `saw1 :8 lpf1` | connect as eight instances | FaustScript |
+| `saw1 !: lpf1` | cut the wire | FaustScript |
+| `dly1 ~ fb1` · `dly1 !~ fb1` | close · open a feedback loop | Faust · FaustScript |
+| `_ lpf1` · `!_ lpf1` | bypass · un-bypass | FaustScript |
+| `! lpf1` | remove it and its wires | FaustScript |
+| `lpf1.fc:400` | set one control | FaustScript |
+| `lpf1(fc:400, q:2)` | set several at once | FaustScript |
+| `lfo1 : lpf1.fc` | drive a control with a signal | FaustScript |
+| `saw1.3` | one channel of an instance | FaustScript |
 
 **Three rules, and nothing else to remember:** a `!` in front cancels what
 follows it, a digit after says how many, and the dot reaches into an instance.
@@ -88,7 +88,7 @@ plays and not managing at all.**
 
 ---
 
-## What FaustX does not do
+## What FaustScript does not do
 
 **It computes nothing.** Every sample is Faust's work.
 
@@ -144,13 +144,13 @@ ranges. It is generated from the documentation of the libraries that the pinned
 `@grame/faustwasm` carries, by `tools/generate-declarations.py`
 (`npm run catalogue`); its header records the versions and the count.
 
-**What is not true yet:** *every Faust program is a FaustX program* is the
-stated goal, not the current state. The grammar reads FaustX, plus Faust's
+**What is not true yet:** *every Faust program is a FaustScript program* is the
+stated goal, not the current state. The grammar reads FaustScript, plus Faust's
 definitions, imports, operators, iterators and feedback — but not yet `with{}`,
 `letrec`, pattern matching or explicit substitution. Real `.dsp` files do not
 parse whole.
 
-**There is no sound here.** FaustX emits Faust source. Compiling it while the
+**There is no sound here.** FaustScript emits Faust source. Compiling it while the
 audio runs, and swapping an instance without dropping a sample, belongs to the
 host — that is where the measured **~32 ms** per instance recompilation matters,
 against ~620 ms for a fifty-instance program. Both are taken through libfaust
@@ -163,7 +163,7 @@ compiled to WebAssembly, which is what a browser host runs; rerun them with
 
 ```bash
 npm install
-npx faustx examples/1-drone-that-plays-alone.fx
+npx faustscript examples/1-drone-that-plays-alone.fsc
 ```
 
 It prints the Faust. `-o file.dsp` writes it instead. Gestures it refuses go to
@@ -173,11 +173,11 @@ translated, which is the rule.
 As a library:
 
 ```js
-import { createTranspiler } from 'faustx'
+import { createTranspiler } from 'faustscript'
 
-const faustx = createTranspiler(catalogue, templates)
-faustx.apply('let lpf1 fi.lowpass(fc:800)\n_ : lpf1 : process\n')
-faustx.write()          // the Faust
+const faustscript = createTranspiler(catalogue, templates)
+faustscript.apply('let lpf1 fi.lowpass(fc:800)\n_ : lpf1 : process\n')
+faustscript.write()          // the Faust
 ```
 
 Requires Node 22+. The tests compile with `@grame/faustwasm` 0.19.0, which
@@ -194,16 +194,16 @@ fails if any of it leaks into the engine.
 
 | | |
 |---|---|
-| `src/faustx.grammar` | the grammar; it **generates** `src/parser.js` (Lezer) |
-| `lib/faust.fx` | the catalogue — the modules Faust's libraries declare, itself written in FaustX |
-| `lib/translation.fx` | templates, reserved words, decision rules |
+| `src/faustscript.grammar` | the grammar; it **generates** `src/parser.js` (Lezer) |
+| `lib/faust.fsc` | the catalogue — the modules Faust's libraries declare, itself written in FaustScript |
+| `lib/translation.fsc` | templates, reserved words, decision rules |
 | `src/` | graph, reading, staging, emission — none of it knows the language |
 
 ---
 
 ## Documentation
 
-`docs/LANGUAGE.md` — the reference: how to write FaustX.
+`docs/LANGUAGE.md` — the reference: how to write FaustScript.
 `docs/ARCHITECTURE.md` — how the transpiler is built.
 `docs/PRINCIPES.md` — the principles: why each sign is the one it is.
 
@@ -211,13 +211,13 @@ fails if any of it leaks into the engine.
 
 ## Licence and upstream
 
-**FaustX is MIT licensed** — see `LICENSE`. Nothing is imposed on anyone using
+**FaustScript is MIT licensed** — see `LICENSE`. Nothing is imposed on anyone using
 it.
 
 The Faust compiler is LGPL 2.1, and **the code it generates is not covered by
-it** — GRAME's FAQ states so explicitly. FaustX requires **no change to the
+it** — GRAME's FAQ states so explicitly. FaustScript requires **no change to the
 compiler** and touches none of its 304 architecture files, whose licence
 exception holds precisely on the condition that they are not modified.
 
-FaustX is an independent project. It is not affiliated with GRAME-CNCM, who
+FaustScript is an independent project. It is not affiliated with GRAME-CNCM, who
 develop Faust.

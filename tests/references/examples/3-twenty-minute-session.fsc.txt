@@ -1,4 +1,4 @@
-FaustX reference output of examples/3-twenty-minute-session.fx.
+FaustScript reference output of examples/3-twenty-minute-session.fsc.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply

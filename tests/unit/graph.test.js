@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs'
 import { readCatalogue } from '../../src/catalogue.js'
 import { Graph } from '../../src/graph.js'
 
-const text = readFileSync(new URL('../../lib/faust.fx', import.meta.url), 'utf8')
+const text = readFileSync(new URL('../../lib/faust.fsc', import.meta.url), 'utf8')
 const catalogue = readCatalogue(text)
 
 const neuf = () => {

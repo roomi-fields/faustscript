@@ -10,8 +10,8 @@ import { writeInstance } from '../../src/emitter.js'
 import { compile } from './faust.js'
 
 const lire = f => readFileSync(new URL(f, import.meta.url), 'utf8')
-const catalogue = readCatalogue(lire('../../lib/faust.fx'))
-const templates = readTemplates(lire('../../lib/translation.fx'))
+const catalogue = readCatalogue(lire('../../lib/faust.fsc'))
+const templates = readTemplates(lire('../../lib/translation.fsc'))
 
 function emettre(poses, expression) {
   const g = new Graph(catalogue)
@@ -70,7 +70,7 @@ test('a reverb and its bounded settings', async () => {
 })
 
 test('two free expressions carrying the same setting do not collide', async () => {
-  // whoever hosts FaustX reaches a setting at `/<program>/<instance>/<port>`;
+  // whoever hosts FaustScript reaches a setting at `/<program>/<instance>/<port>`;
   // an instance written as a free expression must therefore be grouped too,
   // or Faust answers `path '/…/gain' is already used`
   const faust = emettre(

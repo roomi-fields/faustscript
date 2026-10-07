@@ -1,3 +1,3 @@
-# Generated from src/faustx.grammar (npm run grammaire)
+# Generated from src/faustscript.grammar (npm run grammaire)
 src/parser.js
 src/parser.terms.js

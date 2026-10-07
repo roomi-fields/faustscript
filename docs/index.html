@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>FaustX — live coding on top of Faust</title>
+<title>FaustScript — live coding on top of Faust</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="A superset of Faust for live coding: name one instance, and act on it while the sound plays.">
-<meta property="og:title" content="FaustX — live coding on top of Faust">
+<meta property="og:title" content="FaustScript — live coding on top of Faust">
 <meta property="og:description" content="Name one instance. Act on it while it plays.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔌</text></svg>">
@@ -21,26 +21,26 @@
     --muted: #55707C;
     --rule: #C2CDD2;
     --faust: #2F6377;
-    --faustx: #B5691A;
-    --faustx-soft: #EBD9C2;
+    --faustscript: #B5691A;
+    --faustscript-soft: #EBD9C2;
     --faust-soft: #D3DFE5;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --ground: #0C171C; --panel: #12222A; --ink: #DCE6E9; --muted: #8AA5AF;
-      --rule: #263B45; --faust: #6FAEC5; --faustx: #E0A055;
-      --faustx-soft: #3A2A17; --faust-soft: #1A2F3A;
+      --rule: #263B45; --faust: #6FAEC5; --faustscript: #E0A055;
+      --faustscript-soft: #3A2A17; --faust-soft: #1A2F3A;
     }
   }
   :root[data-theme="dark"] {
     --ground: #0C171C; --panel: #12222A; --ink: #DCE6E9; --muted: #8AA5AF;
-    --rule: #263B45; --faust: #6FAEC5; --faustx: #E0A055;
-    --faustx-soft: #3A2A17; --faust-soft: #1A2F3A;
+    --rule: #263B45; --faust: #6FAEC5; --faustscript: #E0A055;
+    --faustscript-soft: #3A2A17; --faust-soft: #1A2F3A;
   }
   :root[data-theme="light"] {
     --ground: #E4E9EB; --panel: #EDF1F2; --ink: #0E2029; --muted: #55707C;
-    --rule: #C2CDD2; --faust: #2F6377; --faustx: #B5691A;
-    --faustx-soft: #EBD9C2; --faust-soft: #D3DFE5;
+    --rule: #C2CDD2; --faust: #2F6377; --faustscript: #B5691A;
+    --faustscript-soft: #EBD9C2; --faust-soft: #D3DFE5;
   }
 
   body {
@@ -73,7 +73,7 @@
     padding: 8px 14px;
   }
   .links a:hover, .links a:focus-visible { background: var(--ink); color: var(--ground); }
-  .links a:focus-visible { outline: 2px solid var(--faustx); outline-offset: 2px; }
+  .links a:focus-visible { outline: 2px solid var(--faustscript); outline-offset: 2px; }
 
   .summary { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin: 44px 0 8px; }
   @media (min-width: 720px) { .summary { grid-template-columns: repeat(5, 1fr); } }
@@ -85,7 +85,7 @@
     padding: 3px 7px; align-self: flex-start; border: 1px solid currentColor;
   }
   .chip.keep { color: var(--faust); }
-  .chip.deco { color: var(--faustx); }
+  .chip.deco { color: var(--faustscript); }
   .chip.gone { color: var(--muted); }
 
   section { padding: 56px 0 8px; border-top: 1px solid var(--rule); margin-top: 40px; }
@@ -108,7 +108,7 @@
     font-size: 14px; line-height: 1.7;
   }
   code { font-size: 0.92em; }
-  .cx { color: var(--faustx); }
+  .cx { color: var(--faustscript); }
   .cc { color: var(--muted); }
 
   .verdict { background: var(--panel); border: 1px solid var(--rule); padding: 22px 24px; margin: 34px 0 0; }
@@ -127,9 +127,9 @@
 
 <header>
   <div class="col">
-    <img src="faustx.svg" alt="" width="104" height="104"
+    <img src="faustscript.svg" alt="" width="104" height="104"
          style="display:block;width:104px;height:104px;margin:0 0 26px">
-    <p class="kicker">FaustX · a superset of Faust · MIT</p>
+    <p class="kicker">FaustScript · a superset of Faust · MIT</p>
     <h1>Name one instance. Act on it while it plays.</h1>
     <p>In <a href="https://faust.grame.fr">Faust</a>, a name is a macro: it is replaced by its body
     at evaluation, so writing <code>lpf</code> twice builds two filters. Measured on Faust 2.70.3 —
@@ -137,7 +137,7 @@
     <p>Separate state is therefore free. What is missing is the <strong>address</strong>: no Faust
     expression can point at an instance that already exists. That is what stops you writing, an hour
     into a set, <em>that filter, the one currently ringing — open it up.</em></p>
-    <p><strong>FaustX gives that address, and nothing else.</strong> It computes nothing: a FaustX
+    <p><strong>FaustScript gives that address, and nothing else.</strong> It computes nothing: a FaustScript
     program is translated into Faust, and Faust compiles it.</p>
     <div class="links">
       <a href="https://github.com/roomi-fields/faustx">Repository</a>
@@ -205,10 +205,10 @@ _ : (_,_)    <span class="cc">→ ERROR : sequential composition A:B</span></cod
   </div>
 
   <figure>
-    <svg viewBox="0 0 900 300" role="img" aria-label="Faust's colon requires equal widths; FaustX decorates it with a written count and a cut.">
+    <svg viewBox="0 0 900 300" role="img" aria-label="Faust's colon requires equal widths; FaustScript decorates it with a written count and a cut.">
       <defs>
         <marker id="s1af" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--faust)"/></marker>
-        <marker id="s1ax" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--faustx)"/></marker>
+        <marker id="s1ax" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--faustscript)"/></marker>
       </defs>
       <text x="0" y="16" font-size="11" fill="var(--faust)" font-family="monospace" letter-spacing="1.5">FAUST</text>
       <rect x="0" y="34" width="120" height="44" fill="var(--faust-soft)" stroke="var(--faust)" stroke-width="1.5"/>
@@ -228,19 +228,19 @@ _ : (_,_)    <span class="cc">→ ERROR : sequential composition A:B</span></cod
       <text x="298" y="167" font-size="12" fill="var(--ink)" text-anchor="middle" font-family="monospace">par(i,8,…)</text>
       <text x="382" y="167" font-size="13" fill="var(--muted)" font-family="monospace">56 signs to type</text>
 
-      <text x="0" y="228" font-size="11" fill="var(--faustx)" font-family="monospace" letter-spacing="1.5">FAUSTX</text>
-      <rect x="0" y="246" width="120" height="44" fill="var(--faustx-soft)" stroke="var(--faustx)" stroke-width="1.5"/>
+      <text x="0" y="228" font-size="11" fill="var(--faustscript)" font-family="monospace" letter-spacing="1.5">FAUSTSCRIPT</text>
+      <rect x="0" y="246" width="120" height="44" fill="var(--faustscript-soft)" stroke="var(--faustscript)" stroke-width="1.5"/>
       <text x="60" y="273" font-size="13" fill="var(--ink)" text-anchor="middle" font-family="monospace">saw1</text>
-      <line x1="120" y1="260" x2="228" y2="260" stroke="var(--faustx)" stroke-width="1.2"/>
-      <line x1="120" y1="268" x2="228" y2="268" stroke="var(--faustx)" stroke-width="1.2"/>
-      <line x1="120" y1="276" x2="228" y2="276" stroke="var(--faustx)" stroke-width="1.2" marker-end="url(#s1ax)"/>
-      <text x="174" y="248" font-size="12" fill="var(--faustx)" text-anchor="middle" font-family="monospace">8</text>
-      <rect x="238" y="246" width="120" height="44" fill="var(--faustx-soft)" stroke="var(--faustx)" stroke-width="1.5"/>
+      <line x1="120" y1="260" x2="228" y2="260" stroke="var(--faustscript)" stroke-width="1.2"/>
+      <line x1="120" y1="268" x2="228" y2="268" stroke="var(--faustscript)" stroke-width="1.2"/>
+      <line x1="120" y1="276" x2="228" y2="276" stroke="var(--faustscript)" stroke-width="1.2" marker-end="url(#s1ax)"/>
+      <text x="174" y="248" font-size="12" fill="var(--faustscript)" text-anchor="middle" font-family="monospace">8</text>
+      <rect x="238" y="246" width="120" height="44" fill="var(--faustscript-soft)" stroke="var(--faustscript)" stroke-width="1.5"/>
       <text x="298" y="273" font-size="13" fill="var(--ink)" text-anchor="middle" font-family="monospace">lpf1</text>
-      <text x="382" y="273" font-size="13" fill="var(--faustx)" font-family="monospace">saw1 :8 lpf1</text>
+      <text x="382" y="273" font-size="13" fill="var(--faustscript)" font-family="monospace">saw1 :8 lpf1</text>
       <text x="530" y="273" font-size="13" fill="var(--muted)" font-family="monospace">12 signs</text>
     </svg>
-    <figcaption>The same chain at eight voices: Faust duplicates both sides by hand, FaustX writes
+    <figcaption>The same chain at eight voices: Faust duplicates both sides by hand, FaustScript writes
     the count on the sign that connects. The <code>:</code> stays the connection; the digit
     qualifies it.</figcaption>
   </figure>
@@ -252,7 +252,7 @@ saw1 <span class="cx">!:</span> lpf1     <span class="cc">// cut the wire</span>
     <p><strong>And the bare <code>:</code> stops refusing</strong> — it adapts, like a polyphonic
     cable in VCV Rack.</p>
     <table>
-      <thead><tr><th>what arrives</th><th>what FaustX does</th></tr></thead>
+      <thead><tr><th>what arrives</th><th>what FaustScript does</th></tr></thead>
       <tbody>
         <tr><td>one channel into several</td><td>it spreads over all of them</td></tr>
         <tr><td>several into an instance's input</td><td>they sum — nothing goes silent</td></tr>
@@ -263,7 +263,7 @@ saw1 <span class="cx">!:</span> lpf1     <span class="cc">// cut the wire</span>
     voltage standards prescribe summing on an audio input and taking the first channel on a
     modulation input. And our notation already carries it: <code>saw8 : lpf1</code> targets the
     instance's input, <code>lfo8 : lpf1.cutoff</code> targets a port.</p>
-    <p><strong>It costs Faust nothing</strong>: since we translate, FaustX emits the
+    <p><strong>It costs Faust nothing</strong>: since we translate, FaustScript emits the
     <code>&lt;:</code>, the <code>:&gt;</code> or the bus that fits the widths it sees. The compiler
     receives widths that add up and never knows an adaptation happened.</p>
   </div>
@@ -289,7 +289,7 @@ saw1 <span class="cx">!:</span> lpf1     <span class="cc">// cut the wire</span>
     <svg viewBox="0 0 900 260" role="img" aria-label="In Faust, adding a parallel branch means rewriting the whole expression; live, a line sent on its own adds it.">
       <defs>
         <marker id="s2af" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--faust)"/></marker>
-        <marker id="s2ax" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--faustx)"/></marker>
+        <marker id="s2ax" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--faustscript)"/></marker>
       </defs>
       <text x="0" y="16" font-size="11" fill="var(--faust)" font-family="monospace" letter-spacing="1.5">WHAT IS PLAYING</text>
       <rect x="0" y="32" width="104" height="40" fill="var(--faust-soft)" stroke="var(--faust)" stroke-width="1.5"/>
@@ -298,11 +298,11 @@ saw1 <span class="cx">!:</span> lpf1     <span class="cc">// cut the wire</span>
       <rect x="206" y="32" width="104" height="40" fill="var(--faust-soft)" stroke="var(--faust)" stroke-width="1.5"/>
       <text x="258" y="57" font-size="13" fill="var(--ink)" text-anchor="middle" font-family="monospace">rev1</text>
 
-      <text x="0" y="122" font-size="11" fill="var(--faustx)" font-family="monospace" letter-spacing="1.5">WHAT YOU TYPE WHILE IT PLAYS</text>
-      <rect x="0" y="138" width="104" height="40" fill="var(--faustx-soft)" stroke="var(--faustx)" stroke-width="1.5"/>
+      <text x="0" y="122" font-size="11" fill="var(--faustscript)" font-family="monospace" letter-spacing="1.5">WHAT YOU TYPE WHILE IT PLAYS</text>
+      <rect x="0" y="138" width="104" height="40" fill="var(--faustscript-soft)" stroke="var(--faustscript)" stroke-width="1.5"/>
       <text x="52" y="163" font-size="13" fill="var(--ink)" text-anchor="middle" font-family="monospace">voice2</text>
-      <path d="M104 158 L150 158 L150 62 L196 62" fill="none" stroke="var(--faustx)" stroke-width="1.5" marker-end="url(#s2ax)"/>
-      <text x="330" y="163" font-size="13" fill="var(--faustx)" font-family="monospace">voice2 : rev1</text>
+      <path d="M104 158 L150 158 L150 62 L196 62" fill="none" stroke="var(--faustscript)" stroke-width="1.5" marker-end="url(#s2ax)"/>
+      <text x="330" y="163" font-size="13" fill="var(--faustscript)" font-family="monospace">voice2 : rev1</text>
       <text x="330" y="185" font-size="12" fill="var(--muted)" font-family="monospace">one line, nothing else to rewrite</text>
 
       <line x1="0" y1="212" x2="900" y2="212" stroke="var(--rule)" stroke-width="1"/>
@@ -339,7 +339,7 @@ saw1 <span class="cx">!:</span> lpf1     <span class="cc">// cut the wire</span>
     <svg viewBox="0 0 900 280" role="img" aria-label="Faust's explicit split becomes automatic as soon as a named instance is wired twice.">
       <defs>
         <marker id="s3af" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--faust)"/></marker>
-        <marker id="s3ax" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--faustx)"/></marker>
+        <marker id="s3ax" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--faustscript)"/></marker>
       </defs>
       <text x="0" y="16" font-size="11" fill="var(--faust)" font-family="monospace" letter-spacing="1.5">FAUST — THE SPLIT IS DRAWN</text>
       <rect x="0" y="52" width="104" height="40" fill="var(--faust-soft)" stroke="var(--faust)" stroke-width="1.5"/>
@@ -352,18 +352,18 @@ saw1 <span class="cx">!:</span> lpf1     <span class="cc">// cut the wire</span>
       <text x="258" y="107" font-size="13" fill="var(--ink)" text-anchor="middle" font-family="monospace">rev1</text>
       <text x="336" y="77" font-size="13" fill="var(--muted)" font-family="monospace">saw1 &lt;: (lpf1, rev1)</text>
 
-      <text x="0" y="176" font-size="11" fill="var(--faustx)" font-family="monospace" letter-spacing="1.5">FAUSTX — IT COMES FOR FREE</text>
-      <rect x="0" y="212" width="104" height="40" fill="var(--faustx-soft)" stroke="var(--faustx)" stroke-width="1.5"/>
+      <text x="0" y="176" font-size="11" fill="var(--faustscript)" font-family="monospace" letter-spacing="1.5">FAUSTSCRIPT — IT COMES FOR FREE</text>
+      <rect x="0" y="212" width="104" height="40" fill="var(--faustscript-soft)" stroke="var(--faustscript)" stroke-width="1.5"/>
       <text x="52" y="237" font-size="13" fill="var(--ink)" text-anchor="middle" font-family="monospace">saw1</text>
-      <path d="M104 232 L146 232 L146 202 L196 202" fill="none" stroke="var(--faustx)" stroke-width="1.5" marker-end="url(#s3ax)"/>
-      <path d="M104 232 L146 232 L146 262 L196 262" fill="none" stroke="var(--faustx)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#s3ax)"/>
-      <rect x="206" y="182" width="104" height="40" fill="var(--faustx-soft)" stroke="var(--faustx)" stroke-width="1.5"/>
+      <path d="M104 232 L146 232 L146 202 L196 202" fill="none" stroke="var(--faustscript)" stroke-width="1.5" marker-end="url(#s3ax)"/>
+      <path d="M104 232 L146 232 L146 262 L196 262" fill="none" stroke="var(--faustscript)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#s3ax)"/>
+      <rect x="206" y="182" width="104" height="40" fill="var(--faustscript-soft)" stroke="var(--faustscript)" stroke-width="1.5"/>
       <text x="258" y="207" font-size="13" fill="var(--ink)" text-anchor="middle" font-family="monospace">lpf1</text>
-      <rect x="206" y="242" width="104" height="40" fill="var(--faustx-soft)" stroke="var(--faustx)" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <rect x="206" y="242" width="104" height="40" fill="var(--faustscript-soft)" stroke="var(--faustscript)" stroke-width="1.5" stroke-dasharray="5 4"/>
       <text x="258" y="267" font-size="13" fill="var(--ink)" text-anchor="middle" font-family="monospace">rev1</text>
       <text x="336" y="207" font-size="13" fill="var(--muted)" font-family="monospace">saw1 : lpf1</text>
       <text x="470" y="207" font-size="12" fill="var(--muted)" font-family="monospace">← wired at the start</text>
-      <text x="336" y="267" font-size="13" fill="var(--faustx)" font-family="monospace">saw1 : rev1</text>
+      <text x="336" y="267" font-size="13" fill="var(--faustscript)" font-family="monospace">saw1 : rev1</text>
       <text x="470" y="267" font-size="12" fill="var(--muted)" font-family="monospace">← added an hour later</text>
     </svg>
     <figcaption>Dashed is what you add an hour later. Because <code>saw1</code> names an instance
@@ -398,28 +398,28 @@ saw1 <span class="cx">!:</span> lpf1     <span class="cc">// cut the wire</span>
   <figure>
     <svg viewBox="0 0 900 260" role="img" aria-label="Two voices sent into the same reverb sum by themselves, because the reverb is a named instance and not two copies.">
       <defs>
-        <marker id="s4ax" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--faustx)"/></marker>
+        <marker id="s4ax" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--faustscript)"/></marker>
         <marker id="s4am" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--muted)"/></marker>
       </defs>
-      <rect x="0" y="30" width="104" height="40" fill="var(--faustx-soft)" stroke="var(--faustx)" stroke-width="1.5"/>
+      <rect x="0" y="30" width="104" height="40" fill="var(--faustscript-soft)" stroke="var(--faustscript)" stroke-width="1.5"/>
       <text x="52" y="55" font-size="13" fill="var(--ink)" text-anchor="middle" font-family="monospace">voice1</text>
-      <rect x="0" y="122" width="104" height="40" fill="var(--faustx-soft)" stroke="var(--faustx)" stroke-width="1.5"/>
+      <rect x="0" y="122" width="104" height="40" fill="var(--faustscript-soft)" stroke="var(--faustscript)" stroke-width="1.5"/>
       <text x="52" y="147" font-size="13" fill="var(--ink)" text-anchor="middle" font-family="monospace">voice2</text>
-      <rect x="0" y="196" width="104" height="40" fill="none" stroke="var(--faustx)" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <rect x="0" y="196" width="104" height="40" fill="none" stroke="var(--faustscript)" stroke-width="1.5" stroke-dasharray="5 4"/>
       <text x="52" y="221" font-size="13" fill="var(--ink)" text-anchor="middle" font-family="monospace">voice3</text>
 
-      <path d="M104 50 L188 50 L188 128 L236 128" fill="none" stroke="var(--faustx)" stroke-width="1.5" marker-end="url(#s4ax)"/>
-      <path d="M104 142 L188 142 L188 132 L236 132" fill="none" stroke="var(--faustx)" stroke-width="1.5" marker-end="url(#s4ax)"/>
-      <path d="M104 216 L188 216 L188 140 L236 140" fill="none" stroke="var(--faustx)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#s4ax)"/>
-      <circle cx="188" cy="133" r="4" fill="var(--faustx)"/>
+      <path d="M104 50 L188 50 L188 128 L236 128" fill="none" stroke="var(--faustscript)" stroke-width="1.5" marker-end="url(#s4ax)"/>
+      <path d="M104 142 L188 142 L188 132 L236 132" fill="none" stroke="var(--faustscript)" stroke-width="1.5" marker-end="url(#s4ax)"/>
+      <path d="M104 216 L188 216 L188 140 L236 140" fill="none" stroke="var(--faustscript)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#s4ax)"/>
+      <circle cx="188" cy="133" r="4" fill="var(--faustscript)"/>
 
-      <rect x="246" y="110" width="118" height="46" fill="var(--faustx-soft)" stroke="var(--faustx)" stroke-width="1.5"/>
+      <rect x="246" y="110" width="118" height="46" fill="var(--faustscript-soft)" stroke="var(--faustscript)" stroke-width="1.5"/>
       <text x="305" y="138" font-size="13" fill="var(--ink)" text-anchor="middle" font-family="monospace">rev1</text>
       <line x1="364" y1="133" x2="440" y2="133" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#s4am)"/>
 
       <text x="466" y="60" font-size="13" fill="var(--muted)" font-family="monospace">voice1 : rev1</text>
       <text x="466" y="84" font-size="13" fill="var(--muted)" font-family="monospace">voice2 : rev1</text>
-      <text x="466" y="108" font-size="13" fill="var(--faustx)" font-family="monospace">voice3 : rev1</text>
+      <text x="466" y="108" font-size="13" fill="var(--faustscript)" font-family="monospace">voice3 : rev1</text>
       <text x="600" y="108" font-size="12" fill="var(--muted)" font-family="monospace">← added while playing</text>
       <text x="466" y="150" font-size="13" fill="var(--ink)" font-family="monospace">one reverb,</text>
       <text x="466" y="172" font-size="13" fill="var(--ink)" font-family="monospace">three sends that add up</text>
@@ -456,10 +456,10 @@ saw1 <span class="cx">!:</span> lpf1     <span class="cc">// cut the wire</span>
   </div>
 
   <figure>
-    <svg viewBox="0 0 900 280" role="img" aria-label="Faust's feedback with its one-sample delay, and opening the loop in FaustX.">
+    <svg viewBox="0 0 900 280" role="img" aria-label="Faust's feedback with its one-sample delay, and opening the loop in FaustScript.">
       <defs>
         <marker id="s5af" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--faust)"/></marker>
-        <marker id="s5ax" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--faustx)"/></marker>
+        <marker id="s5ax" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="var(--faustscript)"/></marker>
       </defs>
       <text x="0" y="16" font-size="11" fill="var(--faust)" font-family="monospace" letter-spacing="1.5">THE LOOP CLOSED</text>
       <rect x="60" y="40" width="118" height="44" fill="var(--faust-soft)" stroke="var(--faust)" stroke-width="1.5"/>
@@ -473,15 +473,15 @@ saw1 <span class="cx">!:</span> lpf1     <span class="cc">// cut the wire</span>
       <text x="352" y="67" font-size="13" fill="var(--muted)" font-family="monospace">dly1 ~ fb1</text>
       <text x="352" y="90" font-size="12" fill="var(--muted)" font-family="monospace">the one-sample delay is placed by Faust</text>
 
-      <text x="0" y="196" font-size="11" fill="var(--faustx)" font-family="monospace" letter-spacing="1.5">THE LOOP OPENED, WHILE IT SOUNDS</text>
-      <rect x="60" y="220" width="118" height="44" fill="var(--faustx-soft)" stroke="var(--faustx)" stroke-width="1.5"/>
+      <text x="0" y="196" font-size="11" fill="var(--faustscript)" font-family="monospace" letter-spacing="1.5">THE LOOP OPENED, WHILE IT SOUNDS</text>
+      <rect x="60" y="220" width="118" height="44" fill="var(--faustscript-soft)" stroke="var(--faustscript)" stroke-width="1.5"/>
       <text x="119" y="247" font-size="13" fill="var(--ink)" text-anchor="middle" font-family="monospace">dly1</text>
-      <line x1="0" y1="242" x2="52" y2="242" stroke="var(--faustx)" stroke-width="1.5" marker-end="url(#s5ax)"/>
-      <line x1="178" y1="242" x2="330" y2="242" stroke="var(--faustx)" stroke-width="1.5" marker-end="url(#s5ax)"/>
-      <path d="M250 242 L250 268" fill="none" stroke="var(--faustx)" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <line x1="238" y1="256" x2="262" y2="280" stroke="var(--faustx)" stroke-width="2.5"/>
-      <line x1="262" y1="256" x2="238" y2="280" stroke="var(--faustx)" stroke-width="2.5"/>
-      <text x="352" y="247" font-size="13" fill="var(--faustx)" font-family="monospace">dly1 !~ fb1</text>
+      <line x1="0" y1="242" x2="52" y2="242" stroke="var(--faustscript)" stroke-width="1.5" marker-end="url(#s5ax)"/>
+      <line x1="178" y1="242" x2="330" y2="242" stroke="var(--faustscript)" stroke-width="1.5" marker-end="url(#s5ax)"/>
+      <path d="M250 242 L250 268" fill="none" stroke="var(--faustscript)" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <line x1="238" y1="256" x2="262" y2="280" stroke="var(--faustscript)" stroke-width="2.5"/>
+      <line x1="262" y1="256" x2="238" y2="280" stroke="var(--faustscript)" stroke-width="2.5"/>
+      <text x="352" y="247" font-size="13" fill="var(--faustscript)" font-family="monospace">dly1 !~ fb1</text>
       <text x="352" y="270" font-size="12" fill="var(--muted)" font-family="monospace">the loop opens, what circulates drains out</text>
     </svg>
     <figcaption>The one-sample delay is what makes the loop computable — Faust places it itself.
@@ -504,7 +504,7 @@ dly1 <span class="cx">~8</span> fb1     <span class="cc">// feed back eight chan
   <div class="col">
     <h2>What the review gives</h2>
     <table>
-      <thead><tr><th>sign</th><th>what it does</th><th>in FaustX</th></tr></thead>
+      <thead><tr><th>sign</th><th>what it does</th><th>in FaustScript</th></tr></thead>
       <tbody>
         <tr><td class="mono">:</td><td>in series</td><td><code class="cx">:8</code> how many · <code class="cx">!:</code> cut · and it adapts instead of refusing</td></tr>
         <tr><td class="mono">,</td><td>stacked</td><td>unchanged — a line sent on its own already adds a branch</td></tr>
@@ -526,7 +526,7 @@ dly1 <span class="cx">~8</span> fb1     <span class="cc">// feed back eight chan
     <p>The three pieces in the repository translate with nothing refused, and the Faust they produce
     compiles. 35 tests, a dozen of which invoke the real compiler. The catalogue declares
     <strong>the modules Faust's libraries declare</strong>, generated from their own documentation.</p>
-    <p><strong>There is no sound here.</strong> FaustX emits Faust source; compiling it while the
+    <p><strong>There is no sound here.</strong> FaustScript emits Faust source; compiling it while the
     audio runs, and swapping an instance without dropping a sample, belongs to the host — that is where
     the measured <strong>32 ms</strong> per instance matters, against 620 ms for a fifty-instance
     program — both taken through libfaust compiled to WebAssembly, which is what a browser host
@@ -535,7 +535,7 @@ dly1 <span class="cx">~8</span> fb1     <span class="cc">// feed back eight chan
 </section>
 
 <footer class="col">
-  <p style="margin:0 0 10px"><strong>FaustX</strong> — MIT licensed, an independent project, not
+  <p style="margin:0 0 10px"><strong>FaustScript</strong> — MIT licensed, an independent project, not
   affiliated with GRAME-CNCM, who develop Faust.</p>
   <p style="margin:0"><a href="https://github.com/roomi-fields/faustx">github.com/roomi-fields/faustx</a></p>
 </footer>

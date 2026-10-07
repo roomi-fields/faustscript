@@ -15,8 +15,8 @@
 //
 // `N:3` is the filter order: Faust requires a compile-time constant there,
 // and a port without bounds stays one (§3.4).
-// The Faust that FaustX writes for this piece is engraved in
-// tests/references/examples/1-drone-that-plays-alone.fx.txt.
+// The Faust that FaustScript writes for this piece is engraved in
+// tests/references/examples/1-drone-that-plays-alone.fsc.txt.
 //
 // The instance names are the musician's own and are left untouched:
 //   `bat1` is the beat (French *battement*), `vca1` the amplifier the

@@ -1,9 +1,9 @@
-FaustX reference output of the faustx block 22 of docs/LANGUAGE.md, which opens with import("mes-modules.fx").
+FaustScript reference output of the faustscript block 22 of docs/LANGUAGE.md, which opens with import("mes-modules.fsc").
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  import("mes-modules.fx")             // as in Faust
+1  import("mes-modules.fsc")            // as in Faust
     outcome: {"done":false,"reason":"unknown form: Import"}
     gesture: null
     name: null

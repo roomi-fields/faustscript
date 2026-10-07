@@ -3,8 +3,8 @@ import { callsByName } from './catalogue.js'
 
 // The emitter: it writes the Faust the graph describes.
 //
-// It knows neither FaustX's signs nor Faust's — the first live in the
-// grammar, the second in `lib/translation.fx`. All it does is choose which
+// It knows neither FaustScript's signs nor Faust's — the first live in the
+// grammar, the second in `lib/translation.fsc`. All it does is choose which
 // template to fill.
 
 /** The Faust body of an instance, without the definition around it. */
@@ -61,7 +61,7 @@ export function writeInstance(instance, catalogue, templates, graph = null) {
 /** Has a control been written here?
  *
  * A control is the only thing that carries a label, so the only thing that
- * needs the instance's name in front of its path. Whoever hosts FaustX reaches
+ * needs the instance's name in front of its path. Whoever hosts FaustScript reaches
  * a setting at `/<program>/<instance>/<port>`, and that only holds if every
  * instance that carries one is grouped — including those whose body is a free
  * expression. Two instances each holding a `gain` would otherwise collide, and

@@ -16,8 +16,8 @@
 //     (§6).
 //
 // `N:3` is the filter order, a constant (§3.4).
-// The Faust that FaustX writes for this piece is engraved in
-// tests/references/examples/2-processed-guitar.fx.txt.
+// The Faust that FaustScript writes for this piece is engraved in
+// tests/references/examples/2-processed-guitar.fsc.txt.
 //
 // The instance names are the musician's own, and French; they are left
 // untouched. guitare = guitar, pedale = pedal, porte1 = gate, creux1 = notch,

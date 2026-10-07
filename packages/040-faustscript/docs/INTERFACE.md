@@ -1,17 +1,17 @@
-# FaustX — interface
+# FaustScript — interface
 
-FaustX's public package, `faustx` (`packages/040-faustx`), exports one function, `createSession`, which returns a session holding one graph of instances and wires: the piece being played. The host sends FaustX text to the session's `apply`, which applies each line as a gesture on the graph and returns what each line did; it reads the Faust program, a frozen view of the graph, the program's controls and the catalogue from four other methods. A second entry, `faustx/editor`, gives an editor the parser of the grammar and the refusals of a text as diagnostics. This document lists each element that crosses that boundary: its form, what it returns, what it refuses, and the guard that holds it.
+FaustScript's public package, `faustscript` (`packages/040-faustscript`), exports one function, `createSession`, which returns a session holding one graph of instances and wires: the piece being played. The host sends FaustScript text to the session's `apply`, which applies each line as a gesture on the graph and returns what each line did; it reads the Faust program, a frozen view of the graph, the program's controls and the catalogue from four other methods. A second entry, `faustscript/editor`, gives an editor the parser of the grammar and the refusals of a text as diagnostics. This document lists each element that crosses that boundary: its form, what it returns, what it refuses, and the guard that holds it.
 
 ## 1. The package
 
 | specifier | content |
 | --- | --- |
-| `faustx` | `createSession` and the types of §2 to §9 |
-| `faustx/editor` | `parser`, `diagnose` and the types of §10 |
-| command `faustx` | the command line (§11) |
+| `faustscript` | `createSession` and the types of §2 to §9 |
+| `faustscript/editor` | `parser`, `diagnose` and the types of §10 |
+| command `faustscript` | the command line (§11) |
 | peer dependency `@grame/faustwasm` | the faustwasm version the host compiles with, at one exact version |
 
-The package declares `@grame/faustwasm` as a peer dependency at one exact version, written in its `package.json`. The catalogue is generated from the Faust libraries that version embeds, and the tests compile the Faust FaustX writes with it: the host that installs that version plays the Faust the tests checked.
+The package declares `@grame/faustwasm` as a peer dependency at one exact version, written in its `package.json`. The catalogue is generated from the Faust libraries that version embeds, and the tests compile the Faust FaustScript writes with it: the host that installs that version plays the Faust the tests checked.
 
 Every name, field, gesture, code, parameter and sentence form of this document is a contract: changing one is a breaking change, recorded in `CHANGELOG.md` under *Changed*. Changing the declared faustwasm version is a change of the same kind.
 
@@ -43,7 +43,7 @@ export interface Session {
 
 ## 4. `apply` and the result of a line
 
-`apply` receives FaustX text, one or more lines, as the author wrote it. It applies the lines in order and returns one result per line that carries a statement, in the same order. A blank line, or a line that holds only a comment, returns no result; the other lines keep their number in the text. A result describes its line at the moment it was applied: a later line of the same text that releases the instance does not change it.
+`apply` receives FaustScript text, one or more lines, as the author wrote it. It applies the lines in order and returns one result per line that carries a statement, in the same order. A blank line, or a line that holds only a comment, returns no result; the other lines keep their number in the text. A result describes its line at the moment it was applied: a later line of the same text that releases the instance does not change it.
 
 ```ts
 export type Gesture = 'place' | 'replace' | 'release' | 'remove' | 'bypass' | 'set' | 'wire'
@@ -144,7 +144,7 @@ export type RefusalCode =
 
 `params` holds, under the names of its column, the values the message is written from, as they appear in the line. `origin` is the span of the writing at fault in the text passed to `apply`: the node the refusal names (the name, the port, the wire), or the line without its surrounding spaces for `UNREADABLE`, `EMPTY_EXPRESSION` and `UNKNOWN_FORM`. Its lines count from 1 as `line` does, its columns from 1 in UTF-16 code units; `endColumn` is just past the last character.
 
-A module that faustwasm does not provide is one whose Faust calls a foreign function that faustwasm's WebAssembly backend refuses; the catalogue marks it (§9), and its sentence names that function. An error the Faust compiler raises on the Faust that FaustX writes is the compiler's message: the host receives it from the compiler.
+A module that faustwasm does not provide is one whose Faust calls a foreign function that faustwasm's WebAssembly backend refuses; the catalogue marks it (§9), and its sentence names that function. An error the Faust compiler raises on the Faust that FaustScript writes is the compiler's message: the host receives it from the compiler.
 
 **Guard** — `tests/unit/transpiler.test.js` (a faulty line is refused without touching the graph; a port cannot be driven by a program input; a name without its prefix is refused, and its sentence names the modules); `tests/unit/language-examples.test.js` (each refused example of the language reference carries its code); target, faustx-zj5.9: each code of the list is produced by its line with its parameters and its origin, every refusal carries a code of the list, and the graph view after a refused line equals the view before it.
 
@@ -203,7 +203,7 @@ export interface Control {
 }
 ```
 
-`controls` returns the controls of the program `write` returns at the same instant, as one value frozen in depth: for each instance in the flow, in the order instances were placed, its controls in the order its body writes them. A control is a port that has a setting and bounds (`LANGUAGE.md` §3.4). `path` is its control path from the program root, the one a `set` returns; `min` and `max` are the bounds the slider carries; `unit` is the port's `unit` attribute, `null` when it has none; `start` is the value the slider starts at, as written; `smoothing` is the Faust function the program applies to the control's value before the circuit reads it (`si.smoo`), `null` when the value enters as it is. The host scales its values into the bounds and writes them by path; FaustX scales nothing.
+`controls` returns the controls of the program `write` returns at the same instant, as one value frozen in depth: for each instance in the flow, in the order instances were placed, its controls in the order its body writes them. A control is a port that has a setting and bounds (`LANGUAGE.md` §3.4). `path` is its control path from the program root, the one a `set` returns; `min` and `max` are the bounds the slider carries; `unit` is the port's `unit` attribute, `null` when it has none; `start` is the value the slider starts at, as written; `smoothing` is the Faust function the program applies to the control's value before the circuit reads it (`si.smoo`), `null` when the value enters as it is. The host scales its values into the bounds and writes them by path; FaustScript scales nothing.
 
 **Guard** — target, faustx-zj5.36: each control a compiled program exposes, read from the compiler's description of its interface, has an entry with the same path and bounds, and no entry lacks its control.
 
@@ -242,7 +242,7 @@ export interface Diagnostic {
   readonly range: Range
   readonly severity: 1
   readonly code: RefusalCode
-  readonly source: 'faustx'
+  readonly source: 'faustscript'
   readonly message: string
 }
 
@@ -257,15 +257,15 @@ export interface Position {
 }
 ```
 
-`faustx/editor` serves an editor. `parser` is the Lezer parser generated from FaustX's grammar, the one the session reads with: a CodeMirror editor builds its language from it (`LRLanguage.define({ parser })`) and highlights FaustX by the grammar's node names. `diagnose` applies a text to a new session, as the command line applies a file, and returns one diagnostic per refused line, in the order of the lines: the fault of §5, printed in the form of the Language Server Protocol. `range` is the fault's `origin`, its lines and characters counted from 0 in UTF-16 code units; `severity` is 1, an error; `code` and `message` are the fault's.
+`faustscript/editor` serves an editor. `parser` is the Lezer parser generated from FaustScript's grammar, the one the session reads with: a CodeMirror editor builds its language from it (`LRLanguage.define({ parser })`) and highlights FaustScript by the grammar's node names. `diagnose` applies a text to a new session, as the command line applies a file, and returns one diagnostic per refused line, in the order of the lines: the fault of §5, printed in the form of the Language Server Protocol. `range` is the fault's `origin`, its lines and characters counted from 0 in UTF-16 code units; `severity` is 1, an error; `code` and `message` are the fault's.
 
 **Guard** — target, faustx-zj5.36: the interface test checks the two exports; each refused example of the language reference gives one diagnostic with its code and the range of its fault's origin.
 
 ## 11. The command line
 
 ```
-faustx <file.fx> [-o <file.dsp>]
-faustx --version
+faustscript <file.fsc> [-o <file.dsp>]
+faustscript --version
 ```
 
 The command applies the file to a new session and writes the Faust program to standard output, or to the file given by `-o`. Each refused line goes to standard error as `<file>:<line>:<column>: refused <CODE> — <message>`, the position being the fault's origin, followed by the line. It exits with 0 once the file is read, refused lines included, and with 2 when no file is given.

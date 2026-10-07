@@ -1,4 +1,4 @@
-// The transpiler: from a FaustX text, it returns Faust.
+// The transpiler: from a FaustScript text, it returns Faust.
 //
 // All it does is chain the four pieces — the catalogue says what a module is,
 // reading applies the lines to the graph, the emitter writes the Faust, and

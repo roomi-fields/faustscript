@@ -1,4 +1,4 @@
-FaustX reference output of the faustx block 2 of docs/LANGUAGE.md, which opens with let lpf1 fi.lowpass.
+FaustScript reference output of the faustscript block 2 of docs/LANGUAGE.md, which opens with let lpf1 fi.lowpass.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply

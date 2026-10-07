@@ -1,7 +1,7 @@
 // The templates: what each form of the language becomes in Faust.
 //
-// Nothing here says what FaustX looks like or what Faust expects: it all comes
-// from `lib/translation.fx`. This file only knows how to fill in blanks.
+// Nothing here says what FaustScript looks like or what Faust expects: it all comes
+// from `lib/translation.fsc`. This file only knows how to fill in blanks.
 
 /** Reads the template file: lines of `key  value`, everything else ignored. */
 export function readTemplates(text) {

@@ -1,4 +1,4 @@
-FaustX reference output of the faustx block 16 of docs/LANGUAGE.md, which opens with let lfo1 os.osc(freq:0.2).
+FaustScript reference output of the faustscript block 16 of docs/LANGUAGE.md, which opens with let lfo1 os.osc(freq:0.2).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply

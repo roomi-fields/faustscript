@@ -1,4 +1,4 @@
-FaustX reference output of examples/2-processed-guitar.fx.
+FaustScript reference output of examples/2-processed-guitar.fsc.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply

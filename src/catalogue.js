@@ -1,8 +1,8 @@
 // The catalogue: what the transpiler knows about modules.
 //
 // It knows nothing else. The names, the parameters, the starting values, the
-// bounds and the output ranges all come from `lib/faust.fx`, which is itself
-// written in FaustX and read by our own parser.
+// bounds and the output ranges all come from `lib/faust.fsc`, which is itself
+// written in FaustScript and read by our own parser.
 //
 // This file contains no sign of the language: it only knows the names of the
 // grammar's nodes, which are the interface between grammar and code.
@@ -29,7 +29,7 @@ class Module {
   }
 }
 
-/** Reads a catalogue written in FaustX and returns a name -> Module table. */
+/** Reads a catalogue written in FaustScript and returns a name -> Module table. */
 export function readCatalogue(text) {
   const arbre = parser.parse(text)
   const modules = new Map()

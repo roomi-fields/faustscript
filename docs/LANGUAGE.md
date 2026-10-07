@@ -1,6 +1,6 @@
-# FaustX — the language
+# FaustScript — the language
 
-FaustX is Faust with named instances. A FaustX text is a sequence of lines; each line places an instance, connects instances, sets a port or changes an instance already placed, and the transpiler writes the Faust program that the resulting graph describes. Every Faust program is a FaustX program: FaustX gives a meaning only to writings that Faust refuses. This document is the specification of the language: what it describes exists, and a gap between it and the transpiler is a defect of the transpiler.
+FaustScript is Faust with named instances. A FaustScript text is a sequence of lines; each line places an instance, connects instances, sets a port or changes an instance already placed, and the transpiler writes the Faust program that the resulting graph describes. Every Faust program is a FaustScript program: FaustScript gives a meaning only to writings that Faust refuses. This document is the specification of the language: what it describes exists, and a gap between it and the transpiler is a defect of the transpiler.
 
 ## 1. Lines and signs
 
@@ -10,7 +10,7 @@ A newline ends the statement that precedes it; no writing carries over to the ne
 
 ### 1.2 The three decorations
 
-FaustX keeps Faust's signs and qualifies them with three decorations, each with one meaning in every position:
+FaustScript keeps Faust's signs and qualifies them with three decorations, each with one meaning in every position:
 
 | decoration | meaning | examples |
 | --- | --- | --- |
@@ -18,7 +18,7 @@ FaustX keeps Faust's signs and qualifies them with three decorations, each with 
 | a number after | says how many | `:8` `~4` `lpfs:8` |
 | a dot | reaches into an instance | `lpf1.fc` `saw1.3` `lpf1.fc.min` |
 
-The colon stuck to a name assigns a value, as in Faust's widget modulation `["fc": 400 -> lpf]`; FaustX writes the target outside the brackets because the instance is already placed and named. The name comes first, its value after.
+The colon stuck to a name assigns a value, as in Faust's widget modulation `["fc": 400 -> lpf]`; FaustScript writes the target outside the brackets because the instance is already placed and named. The name comes first, its value after.
 
 ### 1.3 Spacing
 
@@ -39,7 +39,7 @@ A gesture sign written before a name is spaced from it: `_lpf1` and `!lpf1` are 
 
 `let` places an instance and names it: the first word is the name, the rest of the line is the body.
 
-```faustx
+```faustscript
 let lpf1 fi.lowpass                  // one instance, every parameter at its starting value
 let lpf2 fi.lowpass(fc:400)          // one parameter given
 let lpfs:8 fi.lowpass                // a bank of eight
@@ -49,7 +49,7 @@ let vca1 *                           // any Faust expression is a body
 
 A name is placed once. A second `let` on a placed name is refused, as Faust refuses a second definition of an identifier:
 
-```faustx
+```faustscript
 let lpf1 fi.lowpass
 let lpf1 fi.lowpass                  // refused: ALREADY_PLACED
 ```
@@ -60,7 +60,7 @@ let lpf1 fi.lowpass                  // refused: ALREADY_PLACED
 
 A name placed by `let` designates one instance; Faust's `=` designates a definition that each use copies. Using a `let` name in two places connects the same circuit twice: the instance sums what enters it and sends its output to every destination, as an effect send does.
 
-```faustx
+```faustscript
 let voix1 os.sawtooth
 let voix2 os.sawtooth(freq:165)
 let rev1 re.mono_freeverb
@@ -75,7 +75,7 @@ A number stuck to the declared name makes the name designate that many copies of
 
 `i` is the rank of the copy inside a bank, from 0, as in Faust's `par(i, N, …)`. It lets the copies differ; eight identical copies would be reduced by Faust to one circuit.
 
-```faustx
+```faustscript
 let clic:6 fi.resonbp(fc:311 * 1.5^i, Q:40)  // six resonators, six pitches
 let voix:8 os.sawtooth(freq:110 * (i+1))     // eight harmonics
 ```
@@ -84,7 +84,7 @@ let voix:8 os.sawtooth(freq:110 * (i+1))     // eight harmonics
 
 The number of copies is a constant for Faust. A replacement that carries a new number resizes the bank:
 
-```faustx
+```faustscript
 let lpfs:8 fi.lowpass
 lpfs:16 fi.lowpass                   // the bank becomes sixteen filters
 ```
@@ -93,11 +93,11 @@ lpfs:16 fi.lowpass                   // the bank becomes sixteen filters
 
 ### 3.1 The catalogue
 
-A module is a Faust function that the catalogue declares with the names of its parameters and their starting values. The catalogue, `lib/faust.fx`, declares the public functions of Faust's libraries under Faust's own names, prefix included: `fi.lowpass`, `os.osc`, `re.mono_freeverb`. Two libraries that define the same name give two modules, `ma.SR` and `pl.SR`, and a new version of a library adds a module without changing the meaning of a name already written.
+A module is a Faust function that the catalogue declares with the names of its parameters and their starting values. The catalogue, `lib/faust.fsc`, declares the public functions of Faust's libraries under Faust's own names, prefix included: `fi.lowpass`, `os.osc`, `re.mono_freeverb`. Two libraries that define the same name give two modules, `ma.SR` and `pl.SR`, and a new version of a library adds a module without changing the meaning of a name already written.
 
-A module is written as Faust writes the function, and FaustX decorates the call: `fi.lowpass(fc:800)` gives its parameters by name, in any order. The name without its prefix designates no module, and the refusal names the modules whose name it ends:
+A module is written as Faust writes the function, and FaustScript decorates the call: `fi.lowpass(fc:800)` gives its parameters by name, in any order. The name without its prefix designates no module, and the refusal names the modules whose name it ends:
 
-```faustx
+```faustscript
 let lpf1 lowpass                     // refused: UNKNOWN_NAME
 ```
 
@@ -105,7 +105,7 @@ let lpf1 lowpass                     // refused: UNKNOWN_NAME
 
 A declaration gives the module's name, its parameters with their starting values, then its body; the lines that follow set the attributes of its parameters.
 
-```faustx
+```faustscript
 fi.lowpass(N:4, fc:2000)  fi.lowpass(N, fc)
   fc.min:2
   fc.max:8000
@@ -113,9 +113,9 @@ fi.lowpass(N:4, fc:2000)  fi.lowpass(N, fc)
   fc.unit:Hz
 ```
 
-The same word names the parameter in the body, the port of an instance, and the attribute that bounds it. The body is FaustX: it calls the modules already declared by their names, or Faust as it stands.
+The same word names the parameter in the body, the port of an instance, and the attribute that bounds it. The body is FaustScript: it calls the modules already declared by their names, or Faust as it stands.
 
-```faustx
+```faustscript
 voix(freq:110, fc:800)  os.sawtooth(freq:freq) : fi.lowpass(fc:fc)
 ```
 
@@ -123,7 +123,7 @@ voix(freq:110, fc:800)  os.sawtooth(freq:freq) : fi.lowpass(fc:fc)
 
 A call that passes an argument without its name is written in Faust's argument order and keeps Faust's meaning: `fi.lowpass(3, 800)` is Faust's call. A Faust function the catalogue does not declare is called this way. In such a call, an argument written `key:value` becomes a port that the author names; Faust's parameter names cannot serve, since they are out of scope at the call site.
 
-```faustx
+```faustscript
 let lpf1 fi.lowpass(3, cutoff:800)   // Faust's order, a port named cutoff
 ```
 
@@ -133,17 +133,17 @@ A port named this way cannot bear the name of a placed instance, and the reverse
 
 A port is what a setting or a wire targets on an instance, by its name after the dot: each parameter of the instance's module that carries no nature, or each `key:value` the author named in a Faust body (§3.3). A port that is not written stays a constant, which Faust precomputes; a control costs computation, so one names what one controls.
 
-A port that is written and whose bounds are known becomes a control, a slider between those bounds. The bounds come from the catalogue, or from `min` and `max` written on the instance. A port without bounds stays a constant: FaustX guesses no range, and the author gives `min` and `max` to make the port controllable.
+A port that is written and whose bounds are known becomes a control, a slider between those bounds. The bounds come from the catalogue, or from `min` and `max` written on the instance. A port without bounds stays a constant: FaustScript guesses no range, and the author gives `min` and `max` to make the port controllable.
 
 Setting a port that is still a constant recompiles the instance, so that the control exists.
 
-The attributes are the ones Faust reads between brackets in a control's label: `min`, `max`, `scale`, `unit`, `style`, `midi`, `osc`. FaustX passes the word through to Faust.
+The attributes are the ones Faust reads between brackets in a control's label: `min`, `max`, `scale`, `unit`, `style`, `midi`, `osc`. FaustScript passes the word through to Faust.
 
 ## 4. Connecting
 
 ### 4.1 Wires
 
-```faustx
+```faustscript
 let saw1 os.sawtooth
 let lpf1 fi.lowpass
 saw1 : lpf1                          // connects
@@ -155,7 +155,7 @@ saw1 :8 lpf1                         // connects as eight copies
 
 A line sent alone adds its wires to the graph: `voix2 : rev1` adds one branch and leaves the others. Faust's `,` stacks two circuits that keep their own inputs and outputs, and stays available inside an expression; the studio's parallel, Faust's `A <: (X, Y) :> B`, is what two wires to one instance write.
 
-| Faust's sign | what it does | in FaustX |
+| Faust's sign | what it does | in FaustScript |
 | --- | --- | --- |
 | `:` | series | `:8` copies, `!:` cuts, and widths adapt (§4.2) |
 | `,` | stacks | unchanged |
@@ -180,7 +180,7 @@ The dot tells the two middle cases apart: an instance's input carries audio, whi
 
 Cutting a wire leaves the destination's width unchanged: the input that the wire fed receives zero. In the example below, `basse !: vcab` silences the bass branch; the other branch is not sent into the freed input.
 
-```faustx
+```faustscript
 let basse os.sawtooth(freq:55)
 let nappe os.sawtooth(freq:220)
 let vcab si.bus(2) :> _
@@ -194,7 +194,7 @@ basse !: vcab
 
 `~` puts an instance's output back into its input, with the one-sample delay that Faust places.
 
-```faustx
+```faustscript
 let dly1 de.delay(4096, 1000)
 let fb1 _ * 0.5
 dly1 ~ fb1                           // closes the loop
@@ -212,7 +212,7 @@ The number says how many channels return; the inputs that receive no return stay
 
 ## 5. Changing a placed instance
 
-```faustx
+```faustscript
 let lpf1 fi.lowpass
 lpf1 fi.lowpass(fc:400)              // replaces its body
 _ lpf1                               // bypasses it
@@ -229,7 +229,7 @@ Replacing a body changes the circuit; a bypass leaves the body and changes the i
 
 Two ways to start again, and the author chooses:
 
-```faustx
+```faustscript
 let rev1 re.mono_freeverb
 rev1 re.mono_freeverb(damp:0.9)      // the same instance, with its settings
 !let rev1
@@ -238,7 +238,7 @@ let rev1 re.mono_freeverb(damp:0.9)  // a new instance, from the module's starti
 
 ## 6. Settings
 
-```faustx
+```faustscript
 let lpf1 fi.lowpass(fc:800)
 let lfo1 os.osc(freq:0.2)
 lpf1.fc:400                          // one port
@@ -251,7 +251,7 @@ The dot sets one port, the parentheses several. A port's attributes are reached 
 
 A signal connected to a port is rescaled from the range of the module that emits it to the bounds of the port, with Faust's `it.remap`: an `os.osc` from -1 to 1 sweeps `lpf1.fc` from 2 to 8000 Hz. When either range is unknown, the signal passes as it is, and the author writes the rescaling:
 
-```faustx
+```faustscript
 let lfo1 os.osc(freq:0.2)
 let lpf1 fi.lowpass(fc:800)
 lfo1 : it.remap(-1, 1, 140, 900) : lpf1.fc
@@ -259,7 +259,7 @@ lfo1 : it.remap(-1, 1, 140, 900) : lpf1.fc
 
 A port is driven by a signal, never by one of the program's inputs:
 
-```faustx
+```faustscript
 let micro _
 let lpf1 fi.lowpass(fc:800)
 micro : lpf1.fc                      // refused: SETTING_FROM_INPUT
@@ -267,9 +267,9 @@ micro : lpf1.fc                      // refused: SETTING_FROM_INPUT
 
 ## 7. Channels
 
-A dot followed by a number designates a channel, counted from 1 as Faust's `route` counts them. FaustX writes the `route` that carries only the channels named.
+A dot followed by a number designates a channel, counted from 1 as Faust's `route` counts them. FaustScript writes the `route` that carries only the channels named.
 
-```faustx
+```faustscript
 let src1 si.bus(4)
 let dst1 si.bus(8)
 let lpfs:8 fi.lowpass
@@ -281,9 +281,9 @@ In a bank of one-channel bodies, the channel is the copy: `lpfs.3` is the third 
 
 ## 8. The sink and the inputs
 
-`process` is the sink: what arrives there is the program's output. It is Faust's own name; FaustX writes `process = <what arrives>`, and several wires into it are summed. It has channels like any instance.
+`process` is the sink: what arrives there is the program's output. It is Faust's own name; FaustScript writes `process = <what arrives>`, and several wires into it are summed. It has channels like any instance.
 
-```faustx
+```faustscript
 let saw1 os.sawtooth
 let lpf1 fi.lowpass
 let rev1 re.stereo_freeverb
@@ -294,14 +294,14 @@ rev1.1 : process.1                   // a stereo output
 rev1.2 : process.2
 ```
 
-An input is Faust's wire `_`, written in a chain or placed under a name; both writings are FaustX.
+An input is Faust's wire `_`, written in a chain or placed under a name; both writings are FaustScript.
 
-```faustx
+```faustscript
 let lpf1 fi.lowpass
 _ : lpf1 : process                   // the first input through a filter
 ```
 
-```faustx
+```faustscript
 let micro _
 let lpf1 fi.lowpass
 micro : lpf1 : process
@@ -314,13 +314,13 @@ The order in which the inputs are placed is their order on the program: the firs
 
 The transpiler imports Faust's standard library and the catalogue into every program: `fi.lowpass` needs no import. A Faust program that writes its own imports keeps them.
 
-```faustx
-import("mes-modules.fx")             // as in Faust
+```faustscript
+import("mes-modules.fsc")            // as in Faust
 ```
 
 ## 10. A refused line
 
-A line that the transpiler refuses changes nothing in the graph, and the lines after it are applied; what plays keeps playing. A line that is accepted and sounds wrong is still accepted: FaustX checks the writing, not the music. The refusals and their codes are listed in `packages/040-faustx/docs/INTERFACE.md` §5.
+A line that the transpiler refuses changes nothing in the graph, and the lines after it are applied; what plays keeps playing. A line that is accepted and sounds wrong is still accepted: FaustScript checks the writing, not the music. The refusals and their codes are listed in `packages/040-faustscript/docs/INTERFACE.md` §5.
 
 ## 11. Quick reference
 

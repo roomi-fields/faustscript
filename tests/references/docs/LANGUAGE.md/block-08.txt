@@ -1,4 +1,4 @@
-FaustX reference output of the faustx block 8 of docs/LANGUAGE.md, which opens with voix(freq:110, fc:800)  os.sawtooth(freq:freq) : fi.lowpass(fc:fc).
+FaustScript reference output of the faustscript block 8 of docs/LANGUAGE.md, which opens with voix(freq:110, fc:800)  os.sawtooth(freq:freq) : fi.lowpass(fc:fc).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply

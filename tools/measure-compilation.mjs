@@ -98,7 +98,7 @@ try {
   process.exit(0)
 }
 
-const dir = mkdtempSync(join(tmpdir(), 'faustx-measure-'))
+const dir = mkdtempSync(join(tmpdir(), 'faustscript-measure-'))
 const floor = median(
   Array.from({ length: 12 }, () => {
     const file = join(dir, 'floor.dsp')

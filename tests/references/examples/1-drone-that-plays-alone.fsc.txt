@@ -1,4 +1,4 @@
-FaustX reference output of examples/1-drone-that-plays-alone.fx.
+FaustScript reference output of examples/1-drone-that-plays-alone.fsc.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply

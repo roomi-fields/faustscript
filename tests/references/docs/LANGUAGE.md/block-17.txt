@@ -1,4 +1,4 @@
-FaustX reference output of the faustx block 17 of docs/LANGUAGE.md, which opens with let micro _.
+FaustScript reference output of the faustscript block 17 of docs/LANGUAGE.md, which opens with let micro _.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply

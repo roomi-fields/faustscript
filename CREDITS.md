@@ -7,7 +7,7 @@
 
 ## Acknowledgments
 
-- [Faust](https://faust.grame.fr) (GRAME) — every computation FaustX names is Faust,
+- [Faust](https://faust.grame.fr) (GRAME) — every computation FaustScript names is Faust,
   compiled by Faust.
 
 ## Third-Party Libraries

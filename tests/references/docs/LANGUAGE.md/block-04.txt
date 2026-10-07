@@ -1,4 +1,4 @@
-FaustX reference output of the faustx block 4 of docs/LANGUAGE.md, which opens with let clic:6 fi.resonbp(fc:311 * 1.5^i, Q:40).
+FaustScript reference output of the faustscript block 4 of docs/LANGUAGE.md, which opens with let clic:6 fi.resonbp(fc:311 * 1.5^i, Q:40).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply

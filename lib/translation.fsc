@@ -1,4 +1,4 @@
-// Translation templates: what each FaustX form becomes in Faust.
+// Translation templates: what each FaustScript form becomes in Faust.
 //
 // The transpiler knows no sign of the language — it reads this file. What sits
 // between braces is replaced; everything else is copied as it stands.

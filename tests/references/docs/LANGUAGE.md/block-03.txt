@@ -1,4 +1,4 @@
-FaustX reference output of the faustx block 3 of docs/LANGUAGE.md, which opens with let voix1 os.sawtooth.
+FaustScript reference output of the faustscript block 3 of docs/LANGUAGE.md, which opens with let voix1 os.sawtooth.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply

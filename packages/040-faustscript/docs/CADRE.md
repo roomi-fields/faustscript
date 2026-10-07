@@ -1,16 +1,16 @@
-# FaustX — the frame
+# FaustScript — the frame
 
-FaustX is a superset of Faust for live coding, and its transpiler: it reads a FaustX text line by line, applies each line as a gesture on a living graph of named instances, and writes the Faust that the graph describes. The package `faustx` (`packages/040-faustx`) carries that boundary: a host creates one session per piece, sends it text, and compiles and plays the Faust it returns with the faustwasm version the package declares.
+FaustScript is a superset of Faust for live coding, and its transpiler: it reads a FaustScript text line by line, applies each line as a gesture on a living graph of named instances, and writes the Faust that the graph describes. The package `faustscript` (`packages/040-faustscript`) carries that boundary: a host creates one session per piece, sends it text, and compiles and plays the Faust it returns with the faustwasm version the package declares.
 
 ## 1. Role
 
-- **R1.** FaustX translates FaustX text into Faust text: the whole program of the graph, and, for a gesture that changes an instance's circuit, that instance's Faust alone.
-- **R2.** FaustX holds the state of a piece as a graph of instances and wires, one graph per session; a line of text is the only way to change it.
+- **R1.** FaustScript translates FaustScript text into Faust text: the whole program of the graph, and, for a gesture that changes an instance's circuit, that instance's Faust alone.
+- **R2.** FaustScript holds the state of a piece as a graph of instances and wires, one graph per session; a line of text is the only way to change it.
 
 ## 2. Receives
 
 - **R3.** At the creation of a session, nothing: the catalogue belongs to the library, which reads it once for every session.
-- **R4.** Then, FaustX text, as the author wrote it, one or more lines at a time.
+- **R4.** Then, FaustScript text, as the author wrote it, one or more lines at a time.
 
 ## 3. Returns
 
@@ -21,7 +21,7 @@ FaustX is a superset of Faust for live coding, and its transpiler: it reads a Fa
 ## 4. Knows
 
 - **R7.** Faust's syntax and the modules its libraries declare, with their parameters, starting values and bounds, through the catalogue, generated from the libraries of the faustwasm version the package declares.
-- **R8.** The signs of FaustX, through the grammar that generates its parser and through the templates.
+- **R8.** The signs of FaustScript, through the grammar that generates its parser and through the templates.
 
 ## 5. Does not know
 
@@ -30,14 +30,14 @@ FaustX is a superset of Faust for live coding, and its transpiler: it reads a Fa
 ## 6. Refuses
 
 - **R10.** A line that does not read, an empty expression, an unknown form, a name already placed, a name that does not exist, a module that faustwasm does not provide, a setting that is incomplete, does not target a port or targets a port the instance does not carry (a parameter of its module, or a `key:value` its author named in its Faust body), a port driven by a signal that carries one of the program's inputs, a wire that does not exist: the refusal carries a fault with the fields of BPScript's: a stable code, a sentence that names the cause and the name involved, the values it is written from, and the position of the writing at fault; the line changes nothing.
-- **R11.** An error the Faust compiler raises on the Faust FaustX writes stays the compiler's message; the host receives it from the compiler.
+- **R11.** An error the Faust compiler raises on the Faust FaustScript writes stays the compiler's message; the host receives it from the compiler.
 
 ## 7. Invariants
 
 - **R12.** The same text, in the same order of gestures, gives the same result, to the character.
 - **R13.** A refused line leaves the graph as it was.
 - **R14.** No sign of the language is written in the code: the grammar and the files under `lib/` carry them.
-- **R15.** FaustX computes no signal and modifies nothing of Faust; its output is Faust that the declared faustwasm version compiles.
+- **R15.** FaustScript computes no signal and modifies nothing of Faust; its output is Faust that the declared faustwasm version compiles.
 - **R18.** Two sessions share no state; they read the same frozen catalogue.
 
 ## 8. Cost

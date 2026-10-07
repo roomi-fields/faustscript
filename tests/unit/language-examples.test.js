@@ -1,5 +1,5 @@
 /**
- * The examples of docs/LANGUAGE.md, run. Each `faustx` block is applied to a new transpiler: each
+ * The examples of docs/LANGUAGE.md, run. Each `faustscript` block is applied to a new transpiler: each
  * example it applies gives results that are all applied; each example marked `// refused: CODE`
  * gives results that are all refused with that code; no line outside an example is applied;
  * and the Faust that write() returns for the block compiles with faustwasm.
@@ -61,7 +61,7 @@ const KNOWN_DEFECTS = new Map([
     { ticket: 'faustx-zj5.21', now: [refused(null, 'voix is not a placed instance'), applied] },
   ],
   [
-    'applies: import("mes-modules.fx")',
+    'applies: import("mes-modules.fsc")',
     { ticket: 'faustx-zj5.21', now: [refused(null, 'unknown form: Import')] },
   ],
   [
@@ -80,12 +80,12 @@ const KNOWN_DEFECTS = new Map([
 
 /** The blocks that are not a whole program, by their first example, with the reason. */
 const NOT_PROGRAMS = new Map([
-  ['import("mes-modules.fx")', 'it imports a file the document does not give'],
+  ['import("mes-modules.fsc")', 'it imports a file the document does not give'],
 ])
 
 const libraryFile = f => readFileSync(new URL(f, import.meta.url), 'utf8')
-const CATALOGUE = libraryFile('../../lib/faust.fx')
-const TEMPLATES = libraryFile('../../lib/translation.fx')
+const CATALOGUE = libraryFile('../../lib/faust.fsc')
+const TEMPLATES = libraryFile('../../lib/translation.fsc')
 
 const runs = new Map()
 
@@ -171,8 +171,8 @@ describe('the reading of a document', () => {
   it('cuts a comment only outside a string, and joins indented lines to their example', () => {
     const { blocks, problems } = read(
       doc([
-        `${fence}faustx`,
-        'import("http://a.fx")   // refused: UNKNOWN_FORM',
+        `${fence}faustscript`,
+        'import("http://a.fsc")  // refused: UNKNOWN_FORM',
         '',
         '// a comment',
         'm(a:1)  _',
@@ -183,7 +183,7 @@ describe('the reading of a document', () => {
     )
     expect(problems).toEqual([])
     expect(blocks[0].examples).toEqual([
-      { text: 'import("http://a.fx")', first: 1, last: 1, refused: 'UNKNOWN_FORM' },
+      { text: 'import("http://a.fsc")', first: 1, last: 1, refused: 'UNKNOWN_FORM' },
       { text: 'm(a:1)  _', first: 4, last: 6, refused: null },
     ])
   })
@@ -191,18 +191,18 @@ describe('the reading of a document', () => {
   it('reports every writing it cannot read as an example', () => {
     const { blocks, problems } = read(
       doc([
-        `${fence}faustx`,
+        `${fence}faustscript`,
         '  a.min:0',
         'let a b   // refused: unknown',
         'let c d',
         '  e.f:1   // refused: UNKNOWN_PORT',
         fence,
-        ` ${fence}faustx`,
+        ` ${fence}faustscript`,
         fence,
-        `${fence}faustx`,
+        `${fence}faustscript`,
         '// only a comment',
         fence,
-        `${fence}faustx`,
+        `${fence}faustscript`,
       ])
     )
     expect(blocks.map(b => b.at)).toEqual([1])
@@ -211,7 +211,7 @@ describe('the reading of a document', () => {
 })
 
 describe('the examples of docs/LANGUAGE.md', () => {
-  it('reads every faustx block, and holds examples the transpiler refuses', () => {
+  it('reads every faustscript block, and holds examples the transpiler refuses', () => {
     expect(PROBLEMS).toEqual([])
     expect(BLOCKS.length).toBeGreaterThan(0)
     expect(BLOCKS.flatMap(b => b.examples).filter(e => e.refused !== null).length).toBeGreaterThan(

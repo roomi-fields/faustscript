@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Generates FaustX module declarations from the documentation of Faust's libraries.
+"""Generates FaustScript module declarations from the documentation of Faust's libraries.
 
 The Faust libraries document every public function in a standard block: a usage
 section, the description of each parameter, and a worked example. This script
-extracts from it what a FaustX declaration needs — the names, the starting
+extracts from it what a FaustScript declaration needs — the names, the starting
 values, the bounds, the units — and leaves as a comment what it could not read.
 
     npm run catalogue
@@ -1364,7 +1364,7 @@ def repair(broken, stats):
 
 def main():
     versions = faustwasm.ask({'op': 'versions'})
-    root = tempfile.mkdtemp(prefix='faustx-libraries-')
+    root = tempfile.mkdtemp(prefix='faustscript-libraries-')
     try:
         faustwasm.ask({'op': 'libraries', 'to': root})
         generate(root, versions)
@@ -1419,7 +1419,7 @@ def generate(root, versions):
         if 'output.min:' in text: stats['with an output range'] += 1
         if 'TO COMPLETE' not in text: stats['complete'] += 1
 
-    print('// FaustX module declarations, generated from the Faust libraries of')
+    print('// FaustScript module declarations, generated from the Faust libraries of')
     print('// @grame/faustwasm %s: libfaust %s, libraries %s (version.lib).'
           % (versions['faustwasm'], versions['libfaust'], versions['libraries']))
     print('// %d modules.' % len(done))

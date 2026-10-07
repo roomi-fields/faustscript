@@ -1,4 +1,4 @@
-// The FaustX grammar. This file IS the parser: lezer-generator derives the
+// The FaustScript grammar. This file IS the parser: lezer-generator derives the
 // analyser from it, which is never written by hand. The rule names are the
 // node names of the tree, which the translation templates refer to.
 //
@@ -90,7 +90,7 @@ CutFeedback { bang "~" }
 Split     { "<:" }
 Merge          { ":>" }
 Stack      { "," }
-// Faust's operators, which FaustX passes through without decorating
+// Faust's operators, which FaustScript passes through without decorating
 Operator       { "*" | "+" | "-" | "/" | "^" | "%" | "@" | "&" | "|" |
                   ">" | "<" | ">=" | "<=" | "==" | "!=" }
 

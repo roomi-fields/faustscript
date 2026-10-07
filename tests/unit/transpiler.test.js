@@ -1,4 +1,4 @@
-// End to end: a FaustX text must become Faust that the compiler accepts.
+// End to end: a FaustScript text must become Faust that the compiler accepts.
 // This is the only test that proves the whole chain holds.
 import { test } from 'vitest'
 import assert from 'node:assert'
@@ -10,10 +10,10 @@ import { createTranspiler } from '../../src/transpiler.js'
 import { compile } from './faust.js'
 
 const lire = f => readFileSync(new URL(f, import.meta.url), 'utf8')
-const dossier = mkdtempSync(join(tmpdir(), 'faustx-'))
+const dossier = mkdtempSync(join(tmpdir(), 'faustscript-'))
 
 function traduire(source) {
-  const t = createTranspiler(lire('../../lib/faust.fx'), lire('../../lib/translation.fx'))
+  const t = createTranspiler(lire('../../lib/faust.fsc'), lire('../../lib/translation.fsc'))
   const gestes = t.apply(source)
   return { faust: t.write(), refus: gestes.filter(g => !g.outcome.done), gestes }
 }
@@ -49,7 +49,7 @@ lpfs : process
 })
 
 test('the first complete piece compiles', async () => {
-  const { faust, refus } = traduire(lire('../../examples/1-drone-that-plays-alone.fx'))
+  const { faust, refus } = traduire(lire('../../examples/1-drone-that-plays-alone.fsc'))
   assert.deepEqual(
     refus.map(r => r.text),
     []
@@ -58,7 +58,7 @@ test('the first complete piece compiles', async () => {
 })
 
 test('a faulty line is refused without touching the graph', () => {
-  const t = createTranspiler(lire('../../lib/faust.fx'), lire('../../lib/translation.fx'))
+  const t = createTranspiler(lire('../../lib/faust.fsc'), lire('../../lib/translation.fsc'))
   t.apply('let osc1 os.sawtooth(freq:110)\nosc1 : process\n')
   const avant = t.write()
   const refus = t
@@ -74,7 +74,7 @@ test('all three pieces translate with nothing refused', () => {
     '2-processed-guitar',
     '3-twenty-minute-session',
   ]) {
-    const { refus } = traduire(lire(`../../examples/${name}.fx`))
+    const { refus } = traduire(lire(`../../examples/${name}.fsc`))
     assert.deepEqual(
       refus.map(r => r.text.trim()),
       [],
@@ -89,7 +89,7 @@ test('the pieces compile', async () => {
     '2-processed-guitar',
     '3-twenty-minute-session',
   ]) {
-    const { faust } = traduire(lire(`../../examples/${name}.fx`))
+    const { faust } = traduire(lire(`../../examples/${name}.fsc`))
     assert.equal(await compile(faust), null, `${name} :\n${faust}`)
   }
 })
@@ -206,8 +206,8 @@ test('the command line translates a file', async () => {
   execFileSync(
     'node',
     [
-      new URL('../../bin/faustx.js', import.meta.url).pathname,
-      new URL('../../examples/1-drone-that-plays-alone.fx', import.meta.url).pathname,
+      new URL('../../bin/faustscript.js', import.meta.url).pathname,
+      new URL('../../examples/1-drone-that-plays-alone.fsc', import.meta.url).pathname,
       '-o',
       out,
     ],
@@ -266,7 +266,7 @@ saw1 : lpf1 : process
 })
 
 test('a short name is refused, and the refusal names the module', () => {
-  const t = createTranspiler(lire('../../lib/faust.fx'), lire('../../lib/translation.fx'))
+  const t = createTranspiler(lire('../../lib/faust.fsc'), lire('../../lib/translation.fsc'))
   t.apply('let lpf1 fi.lowpass\n')
   const avant = t.write()
   const gestes = t.apply(

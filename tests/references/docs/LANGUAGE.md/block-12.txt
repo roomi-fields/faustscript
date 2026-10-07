@@ -1,4 +1,4 @@
-FaustX reference output of the faustx block 12 of docs/LANGUAGE.md, which opens with let dly1 de.delay(4096, 1000).
+FaustScript reference output of the faustscript block 12 of docs/LANGUAGE.md, which opens with let dly1 de.delay(4096, 1000).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply

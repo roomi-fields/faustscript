@@ -1,10 +1,10 @@
 /**
- * The reference outputs of FaustX: for each entry, the text a new transpiler applies, what apply
+ * The reference outputs of FaustScript: for each entry, the text a new transpiler applies, what apply
  * returns for each line, and the Faust that write() returns once the whole text is applied. The
- * entries are each piece of examples/ and each `faustx` block of docs/LANGUAGE.md; the reference of
+ * entries are each piece of examples/ and each `faustscript` block of docs/LANGUAGE.md; the reference of
  * an entry lives under tests/references/, at a path that mirrors its source.
  *
- * A reference says what FaustX does, defects included: a known defect stays engraved as it is, and
+ * A reference says what FaustScript does, defects included: a known defect stays engraved as it is, and
  * the commit that fixes it engraves the new output.
  */
 
@@ -16,11 +16,11 @@ const ROOT = new URL('../../', import.meta.url)
 export const REFERENCES = new URL('../references/', import.meta.url)
 
 const text = path => readFileSync(new URL(path, ROOT), 'utf8')
-const CATALOGUE = text('lib/faust.fx')
-const TEMPLATES = text('lib/translation.fx')
+const CATALOGUE = text('lib/faust.fsc')
+const TEMPLATES = text('lib/translation.fsc')
 
 const pieces = readdirSync(new URL('examples/', ROOT))
-  .filter(f => f.endsWith('.fx'))
+  .filter(f => f.endsWith('.fsc'))
   .sort()
   .map(f => ({
     source: 'examples/',
@@ -34,14 +34,14 @@ const blocks = read(LANGUAGE).blocks.map((block, k) => {
   return {
     source: 'docs/LANGUAGE.md',
     reference: `docs/LANGUAGE.md/block-${rank}.txt`,
-    title: `the faustx block ${k + 1} of docs/LANGUAGE.md, which opens with ${block.examples[0].text}`,
+    title: `the faustscript block ${k + 1} of docs/LANGUAGE.md, which opens with ${block.examples[0].text}`,
     text: block.text,
   }
 })
 
 /**
  * Every entry: its source, the path of its reference under tests/references/, the title its
- * reference opens with, and the FaustX text it applies.
+ * reference opens with, and the FaustScript text it applies.
  */
 export const ENTRIES = [...pieces, ...blocks]
 
@@ -49,14 +49,14 @@ export const ENTRIES = [...pieces, ...blocks]
 const value = v => (typeof v === 'string' ? v : JSON.stringify(v))
 
 /**
- * The reference of `entry`, as FaustX writes it now: its title, then for each result of apply its
+ * The reference of `entry`, as FaustScript writes it now: its title, then for each result of apply its
  * line number and text followed by each other field of the result in the order apply gives them,
  * then the Faust of write(). A string that holds a newline continues on lines indented under it.
  */
 export function engrave(entry) {
   const transpiler = createTranspiler(CATALOGUE, TEMPLATES)
   const out = [
-    `FaustX reference output of ${entry.title}.`,
+    `FaustScript reference output of ${entry.title}.`,
     'Engraved by `npm run references -- --update`, in a commit that names the gap.',
     '',
     '--- apply',

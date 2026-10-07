@@ -1,5 +1,5 @@
 /**
- * The engraved reference outputs: what FaustX writes today for each entry, compared to the reference
+ * The engraved reference outputs: what FaustScript writes today for each entry, compared to the reference
  * under tests/references/. A gap is a regression, fixed before the commit, or a change, engraved by
  * `npm run references -- --update` in a commit that names it.
  */
@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest'
 import { ENTRIES, engrave, engraved, orphans } from './references.js'
 
 describe('the engraved reference outputs', () => {
-  it('engrave every piece of examples/ and every faustx block of docs/LANGUAGE.md', () => {
+  it('engrave every piece of examples/ and every faustscript block of docs/LANGUAGE.md', () => {
     const sources = new Set(ENTRIES.map(e => e.source))
     expect(sources).toEqual(new Set(['examples/', 'docs/LANGUAGE.md']))
     expect(ENTRIES.filter(e => e.source === 'examples/').length).toBeGreaterThan(0)
@@ -20,7 +20,7 @@ describe('the engraved reference outputs', () => {
   })
 
   for (const entry of ENTRIES) {
-    it(`${entry.reference} holds what FaustX writes today`, () => {
+    it(`${entry.reference} holds what FaustScript writes today`, () => {
       expect(engrave(entry), 'npm run references -- --update engraves it').toBe(engraved(entry))
     })
   }

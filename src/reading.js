@@ -8,7 +8,7 @@ import { parser } from './parser.js'
 import { Outcome } from './graph.js'
 import { callsByName } from './catalogue.js'
 
-/** Applies a FaustX text to a graph, line by line.
+/** Applies a FaustScript text to a graph, line by line.
  *
  * Each line comes back with what it did — which gesture, on which instance.
  * That is what lets a host recompile only the module a gesture touched instead

@@ -1,4 +1,4 @@
-// FaustX module declarations, generated from the Faust libraries of
+// FaustScript module declarations, generated from the Faust libraries of
 // @grame/faustwasm 0.19.0: libfaust 2.90.0, libraries 2.74.2 (version.lib).
 // 1172 modules.
 // Each module bears Faust's name, its prefix included: fi.lowpass.

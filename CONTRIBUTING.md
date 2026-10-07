@@ -2,11 +2,11 @@
 
 ## Before proposing a sign
 
-FaustX **decorates Faust's signs, it does not invent others**. Ask first: *does it decorate
+FaustScript **decorates Faust's signs, it does not invent others**. Ask first: *does it decorate
 something that exists in Faust?* If not, it goes out. The principles are in
 [`docs/PRINCIPES.md`](docs/PRINCIPES.md).
 
-FaustX computes nothing (all DSP is Faust), knows nothing of its host, and never modifies
+FaustScript computes nothing (all DSP is Faust), knows nothing of its host, and never modifies
 the Faust compiler.
 
 ## Development Setup
@@ -26,11 +26,11 @@ npm test
 | `npm run lint` / `lint:fix` | Check / fix code style |
 | `npm run format` / `format:check` | Format with Prettier |
 | `npm run typecheck` | TypeScript check |
-| `npm run grammaire` | Regenerate the parser from `src/faustx.grammar` |
-| `npm run catalogue` | Regenerate `lib/faust.fx` from the libraries of the pinned `@grame/faustwasm`, every module compiled and measured by that same Faust (needs Python 3) |
+| `npm run grammaire` | Regenerate the parser from `src/faustscript.grammar` |
+| `npm run catalogue` | Regenerate `lib/faust.fsc` from the libraries of the pinned `@grame/faustwasm`, every module compiled and measured by that same Faust (needs Python 3) |
 
 The parser (`src/parser.js`, `src/parser.terms.js`) is generated: edit the grammar, never
-the parser. The catalogue (`lib/faust.fx`) is generated too: correct
+the parser. The catalogue (`lib/faust.fsc`) is generated too: correct
 `tools/generate-declarations.py`, never the catalogue; its header records the versions of
 faustwasm, libfaust and the libraries it describes, and `tools/measured-ranges.json` keeps the
 measured output ranges of that libfaust.

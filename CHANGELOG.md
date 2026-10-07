@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- FaustX is renamed FaustScript: the package and the command are `faustscript`, a file of the
+  language ends in `.fsc` (`lib/faust.fsc`, `lib/translation.fsc`, `examples/*.fsc`), the grammar
+  is `src/faustscript.grammar`, and a block of the language in a document is fenced `faustscript`.
 - The catalogue is generated from the libraries of the pinned `@grame/faustwasm` (0.19.0:
   libfaust 2.90.0, libraries 2.74.2), every module compiled and measured by that same Faust
   (`npm run catalogue`); its header records the versions and the module count, and
