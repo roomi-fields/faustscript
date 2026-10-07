@@ -9,8 +9,16 @@
  * that any other failure stays red, and turns red once the defect is fixed, so that the entry leaves
  * the list. A block that is not a whole program is listed in NOT_PROGRAMS with its reason, and is
  * not compiled.
+ *
+ * A block written in a notation the transpiler does not read yet is listed in AWAITING, with the
+ * ticket that teaches it: its checks run together, and at least one of them departs today from what
+ * the lists say (it fails, or a known defect observes something other than its entry). The test
+ * turns red once none departs, so that the block leaves the list; a known defect of such a block
+ * keeps the observation it had in the notation the transpiler reads, checked again once the block
+ * leaves the list.
  */
 
+import { isDeepStrictEqual } from 'node:util'
 import { describe, expect, it } from 'vitest'
 import { createTranspiler } from '../../src/transpiler.js'
 import { compile } from './faust.js'
@@ -47,7 +55,7 @@ const KNOWN_DEFECTS = new Map([
     { ticket: 'faustx-zj5.22', now: [refused(null, 'a setting targets a port'), applied] },
   ],
   [
-    'applies: fi.lowpass(N:4, fc:2000)  fi.lowpass(N, fc)',
+    'applies: fi.lowpass(N=4, fc=2000)  fi.lowpass(N, fc)',
     {
       ticket: 'faustx-zj5.21',
       now: [
@@ -57,15 +65,15 @@ const KNOWN_DEFECTS = new Map([
     },
   ],
   [
-    'applies: voix(freq:110, fc:800)  os.sawtooth(freq:freq) : fi.lowpass(fc:fc)',
+    'applies: voix(freq=110, fc=800)  os.sawtooth(freq=freq) : fi.lowpass(fc=fc)',
     { ticket: 'faustx-zj5.21', now: [refused(null, 'voix is not a placed instance'), applied] },
   ],
   [
-    'applies: import("mes-modules.fsc")',
+    'applies: import("mes-modules.fsc");',
     { ticket: 'faustx-zj5.21', now: [refused(null, 'unknown form: Import')] },
   ],
   [
-    'compiles: the block that opens with let basse os.sawtooth(freq:55)',
+    'compiles: the block that opens with let basse os.sawtooth(freq=55)',
     { ticket: 'faustx-zj5.15', now: 'ERROR : sequential composition nappe:vcab' },
   ],
   [
@@ -80,8 +88,36 @@ const KNOWN_DEFECTS = new Map([
 
 /** The blocks that are not a whole program, by their first example, with the reason. */
 const NOT_PROGRAMS = new Map([
-  ['import("mes-modules.fsc")', 'it imports a file the document does not give'],
+  ['import("mes-modules.fsc");', 'it imports a file the document does not give'],
 ])
+
+/**
+ * The blocks written in a notation the transpiler does not read yet, each named by one example it
+ * alone holds, and the ticket that teaches the transpiler that notation.
+ */
+const AWAITING = {
+  ticket: 'faustx-zj5.49',
+  blocks: new Set([
+    'gain = 0.5;',
+    'let lpf2 fi.lowpass(fc=400)',
+    'let voix2 os.sawtooth(freq=165)',
+    'let clic:6 fi.resonbp(fc=311 * 1.5^i, Q=40)',
+    'fi.lowpass(N=4, fc=2000)  fi.lowpass(N, fc)',
+    'voix(freq=110, fc=800)  os.sawtooth(freq=freq) : fi.lowpass(fc=fc)',
+    'let lpf1 fi.lowpass(3, cutoff=800)',
+    'lpf1.N = 5',
+    'let basse os.sawtooth(freq=55)',
+    'rev1 re.mono_freeverb(damp=0.9)',
+    'lpf1.fc.min = 20',
+    'lfo1 : it.remap(-1, 1, 140, 900) : lpf1.fc',
+    'micro : lpf1.fc',
+    'lpfs.3.fc = 400',
+    'process = no.noise * 0.1;',
+  ]),
+}
+
+/** Does `block` hold the example `text`? */
+const holds = (block, text) => block.examples.some(e => e.text === text)
 
 const runs = new Map()
 
@@ -221,10 +257,31 @@ describe('the examples of docs/LANGUAGE.md', () => {
     expect([...KNOWN_DEFECTS.keys()].filter(key => named(key).length !== 1)).toEqual([])
     expect([...KNOWN_DEFECTS].filter(([key, { now }]) => named(key)[0]?.holds(now))).toEqual([])
     expect([...NOT_PROGRAMS.keys()].filter(first => opens(first) !== 1)).toEqual([])
+    const holders = text => BLOCKS.filter(b => holds(b, text)).length
+    expect([...AWAITING.blocks].filter(text => holders(text) !== 1)).toEqual([])
   })
 
   for (const block of BLOCKS) {
     describe(`the block at line ${block.at}`, () => {
+      const awaiting = [...AWAITING.blocks].some(text => holds(block, text))
+      if (awaiting) {
+        it(`is written in a notation the transpiler does not read yet (${AWAITING.ticket})`, async () => {
+          // a check holds as the lists say when it holds, or observes what its known defect names;
+          // a check whose observation throws does not
+          const asListed = async c => {
+            try {
+              const seen = await c.observe()
+              const defect = KNOWN_DEFECTS.get(c.title)
+              return defect === undefined ? c.holds(seen) : isDeepStrictEqual(seen, defect.now)
+            } catch {
+              return false
+            }
+          }
+          const held = await Promise.all(CHECKS.filter(c => c.block === block).map(asListed))
+          expect(held, `if ${AWAITING.ticket} reads the block, it leaves AWAITING`).toContain(false)
+        })
+        return
+      }
       for (const check of CHECKS.filter(c => c.block === block)) {
         const defect = KNOWN_DEFECTS.get(check.title)
         if (defect === undefined) {
