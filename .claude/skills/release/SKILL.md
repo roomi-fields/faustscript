@@ -84,7 +84,7 @@ npm test
 ### 6. Commit and Tag
 
 ```bash
-git add -A
+git add package.json package-lock.json CHANGELOG.md README.md   # the files this release changed, named
 git commit -m "chore: release vX.Y.Z"
 git tag -a vX.Y.Z -m "Release vX.Y.Z"
 ```
@@ -92,7 +92,7 @@ git tag -a vX.Y.Z -m "Release vX.Y.Z"
 ### 7. Push to GitHub
 
 ```bash
-git push origin main
+git push origin HEAD
 git push origin vX.Y.Z
 ```
 

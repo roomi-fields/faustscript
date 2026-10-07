@@ -41,6 +41,7 @@
     "node": ">=22"
   },
   "scripts": {
+    "setup": "bash scripts/setup.sh",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
