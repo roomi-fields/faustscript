@@ -1,30 +1,40 @@
-FaustScript reference output of the faustscript block 17 of docs/LANGUAGE.md, which opens with let micro _.
+FaustScript reference output of the faustscript block 17 of docs/LANGUAGE.md, which opens with let dly1 de.delay(4096, 1000).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let micro _
+1  let dly1 de.delay(4096, 1000)
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: micro
-    faust: micro = _;
+    name: dly1
+    faust: dly1 = de.delay(4096, 1000);
     needs: []
 
-2  let lpf1 fi.lowpass(fc:800)
+2  let fb1 _ * 0.5
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: lpf1
-    faust: lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 800, 2, 8000, 0.001)));
+    name: fb1
+    faust: fb1 = _ * 0.5;
     needs: []
 
-3  micro : lpf1.fc
-    outcome: {"done":false,"reason":"micro carries one of the program's inputs: a setting can only be driven by a signal"}
+3  dly1 ~ fb1
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+4  dly1 : process
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+5  dly1 !~ fb1
+    outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
 
 --- write
 
 import("stdfaust.lib");
-micro = _;
-lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 800, 2, 8000, 0.001)));
-process = 0;
+dly1 = de.delay(4096, 1000);
+fb1 = _ * 0.5;
+process = dly1;

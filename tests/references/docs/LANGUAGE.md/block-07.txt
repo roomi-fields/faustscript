@@ -1,32 +1,12 @@
-FaustScript reference output of the faustscript block 7 of docs/LANGUAGE.md, which opens with fi.lowpass(N:4, fc:2000)  fi.lowpass(N, fc).
+FaustScript reference output of the faustscript block 7 of docs/LANGUAGE.md, which opens with let lpf1 lowpass.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  fi.lowpass(N:4, fc:2000)  fi.lowpass(N, fc)
-    outcome: {"done":false,"reason":"fi.lowpass is not a placed instance"}
-    gesture: replace
-    name: fi.lowpass
-
-2  fc.min:2
-    outcome: {"done":false,"reason":"fc does not exist"}
-    gesture: set
-    name: fc
-
-3  fc.max:8000
-    outcome: {"done":false,"reason":"fc does not exist"}
-    gesture: set
-    name: fc
-
-4  fc.scale:log
-    outcome: {"done":false,"reason":"fc does not exist"}
-    gesture: set
-    name: fc
-
-5  fc.unit:Hz
-    outcome: {"done":false,"reason":"fc does not exist"}
-    gesture: set
-    name: fc
+1  let lpf1 lowpass
+    outcome: {"done":false,"reason":"lowpass is not a module; fi.lowpass is"}
+    gesture: place
+    name: lpf1
 
 --- write
 

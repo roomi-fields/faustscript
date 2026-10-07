@@ -1,50 +1,43 @@
-FaustScript reference output of the faustscript block 19 of docs/LANGUAGE.md, which opens with let saw1 os.sawtooth.
+FaustScript reference output of the faustscript block 19 of docs/LANGUAGE.md, which opens with let lpf1 fi.lowpass(fc=800).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let saw1 os.sawtooth
-    outcome: {"done":true,"reason":null}
-    gesture: place
-    name: saw1
-    faust: saw1 = os.sawtooth(220);
-    needs: []
-
-2  let lpf1 fi.lowpass
+1  let lpf1 fi.lowpass(fc=800)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lpf1
-    faust: lpf1 = fi.lowpass(4, 2000);
+    faust: lpf1 = fi.lowpass(fc=800);
     needs: []
 
-3  let rev1 re.stereo_freeverb
+2  let lfo1 os.osc(freq=0.2)
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: rev1
-    faust: rev1 = re.stereo_freeverb(0.7, 0.5, 0.3, 30);
+    name: lfo1
+    faust: lfo1 = os.osc(freq=0.2);
     needs: []
 
-4  saw1 : lpf1 : process
+3  lpf1.fc = 400                        // one port
+    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
+    gesture: null
+    name: null
+
+4  lpf1(fc=400, N=
+    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
+    gesture: null
+    name: null
+
+4  5
     outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
 
-5  lpf1 !: process
-    outcome: {"done":true,"reason":null}
-    gesture: wire
+5  lpf1.fc.min = 20                     // an attribute of the port
+    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
+    gesture: null
     name: null
 
-6  lpf1 : rev1
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
-
-7  rev1.1 : process.1
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
-
-8  rev1.2 : process.2
+6  lfo1 : lpf1.fc
     outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
@@ -52,7 +45,6 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 --- write
 
 import("stdfaust.lib");
-saw1 = os.sawtooth(220);
-lpf1 = fi.lowpass(4, 2000);
-rev1 = re.stereo_freeverb(0.7, 0.5, 0.3, 30);
+lpf1 = fi.lowpass(fc=800);
+lfo1 = os.osc(freq=0.2);
 process = 0;

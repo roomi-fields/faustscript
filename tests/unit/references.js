@@ -50,7 +50,8 @@ const value = v => (typeof v === 'string' ? v : JSON.stringify(v))
 /**
  * The reference of `entry`, as FaustScript writes it now: its title, then for each result of apply its
  * line number and text followed by each other field of the result in the order apply gives them,
- * then the Faust of write(). A string that holds a newline continues on lines indented under it.
+ * then the Faust of write(). An apply or a write that throws gives its message in their place. A
+ * string that holds a newline continues on lines indented under it.
  */
 export function engrave(entry) {
   const transpiler = createTranspiler(CATALOGUE, TEMPLATES)
@@ -60,7 +61,14 @@ export function engrave(entry) {
     '',
     '--- apply',
   ]
-  for (const result of transpiler.apply(entry.text)) {
+  let results
+  try {
+    results = transpiler.apply(entry.text)
+  } catch (error) {
+    out.push('', `throws: ${error.message}`)
+    results = []
+  }
+  for (const result of results) {
     out.push('', `${result.line}  ${result.text}`)
     for (const [key, v] of Object.entries(result)) {
       if (key !== 'line' && key !== 'text') {
@@ -68,7 +76,13 @@ export function engrave(entry) {
       }
     }
   }
-  out.push('', '--- write', '', transpiler.write())
+  let faust
+  try {
+    faust = transpiler.write()
+  } catch (error) {
+    faust = `throws: ${error.message}`
+  }
+  out.push('', '--- write', '', faust)
   return `${out.join('\n').trimEnd()}\n`
 }
 

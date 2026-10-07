@@ -1,53 +1,22 @@
-FaustScript reference output of the faustscript block 11 of docs/LANGUAGE.md, which opens with let basse os.sawtooth(freq:55).
+FaustScript reference output of the faustscript block 11 of docs/LANGUAGE.md, which opens with let lpf1 fi.lowpass.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let basse os.sawtooth(freq:55)
+1  let lpf1 fi.lowpass
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: basse
-    faust: basse = vgroup("basse", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 55, 0.08, 220, 0.001)));
+    name: lpf1
+    faust: lpf1 = fi.lowpass(4, 2000);
     needs: []
 
-2  let nappe os.sawtooth(freq:220)
-    outcome: {"done":true,"reason":null}
-    gesture: place
-    name: nappe
-    faust: nappe = vgroup("nappe", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 220, 0.08, 220, 0.001)));
-    needs: []
-
-3  let vcab si.bus(2) :> _
-    outcome: {"done":true,"reason":null}
-    gesture: place
-    name: vcab
-    faust: vcab = si.bus(2) :> _;
-    needs: []
-
-4  basse : vcab
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
-
-5  nappe : vcab
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
-
-6  vcab : process
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
-
-7  basse !: vcab
-    outcome: {"done":true,"reason":null}
-    gesture: wire
+2  lpf1.N = 5                           // recompiles lpf1 as a filter of order 5
+    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
+    gesture: null
     name: null
 
 --- write
 
 import("stdfaust.lib");
-basse = vgroup("basse", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 55, 0.08, 220, 0.001)));
-nappe = vgroup("nappe", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 220, 0.08, 220, 0.001)));
-vcab = si.bus(2) :> _;
-process = nappe : vcab;
+lpf1 = fi.lowpass(4, 2000);
+process = 0;

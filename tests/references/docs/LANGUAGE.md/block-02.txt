@@ -10,13 +10,40 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     faust: lpf1 = fi.lowpass(4, 2000);
     needs: []
 
-2  let lpf1 fi.lowpass
-    outcome: {"done":false,"reason":"lpf1 is already placed"}
+2  let lpf2 fi.lowpass(fc=400)
+    outcome: {"done":true,"reason":null}
     gesture: place
-    name: lpf1
+    name: lpf2
+    faust: lpf2 = fi.lowpass(fc=400);
+    needs: []
+
+3  let lpfs:8 fi.lowpass
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: lpfs
+    faust: lpfs = par(i,8,fi.lowpass(4, 2000));
+    needs: []
+
+4  let voix:8 os.sawtooth : fi.lowpass
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: voix
+    faust: voix = par(i,8,os.sawtooth(220) : fi.lowpass(4, 2000));
+    needs: []
+
+5  let vca1 *
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: vca1
+    faust: vca1 = *;
+    needs: []
 
 --- write
 
 import("stdfaust.lib");
 lpf1 = fi.lowpass(4, 2000);
+lpf2 = fi.lowpass(fc=400);
+lpfs = par(i,8,fi.lowpass(4, 2000));
+voix = par(i,8,os.sawtooth(220) : fi.lowpass(4, 2000));
+vca1 = *;
 process = 0;

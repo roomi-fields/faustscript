@@ -1,25 +1,48 @@
-FaustScript reference output of the faustscript block 4 of docs/LANGUAGE.md, which opens with let clic:6 fi.resonbp(fc:311 * 1.5^i, Q:40).
+FaustScript reference output of the faustscript block 4 of docs/LANGUAGE.md, which opens with let voix1 os.sawtooth.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let clic:6 fi.resonbp(fc:311 * 1.5^i, Q:40)
+1  let voix1 os.sawtooth
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: clic
-    faust: clic = vgroup("clic", par(i,6,fi.resonbp(hslider("fc[unit:Hz][scale:log]", 311 * 1.5^i, 20, 20000, 0.001), hslider("Q[scale:log]", 40, 0.5, 50, 0.001), 0.8)));
+    name: voix1
+    faust: voix1 = os.sawtooth(220);
     needs: []
 
-2  let voix:8 os.sawtooth(freq:110 * (i+1))
+2  let voix2 os.sawtooth(freq=165)
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: voix
-    faust: voix = vgroup("voix", par(i,8,os.sawtooth(hslider("freq[unit:Hz][scale:log]", 110 * (i+1), 0.08, 220, 0.001))));
+    name: voix2
+    faust: voix2 = os.sawtooth(freq=165);
     needs: []
+
+3  let rev1 re.mono_freeverb
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: rev1
+    faust: rev1 = re.mono_freeverb(0.7, 0.5, 0.3, 30);
+    needs: []
+
+4  voix1 : rev1
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+5  voix2 : rev1
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+6  rev1 : process
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
 
 --- write
 
 import("stdfaust.lib");
-clic = vgroup("clic", par(i,6,fi.resonbp(hslider("fc[unit:Hz][scale:log]", 311 * 1.5^i, 20, 20000, 0.001), hslider("Q[scale:log]", 40, 0.5, 50, 0.001), 0.8)));
-voix = vgroup("voix", par(i,8,os.sawtooth(hslider("freq[unit:Hz][scale:log]", 110 * (i+1), 0.08, 220, 0.001))));
-process = 0;
+voix1 = os.sawtooth(220);
+voix2 = os.sawtooth(freq=165);
+rev1 = re.mono_freeverb(0.7, 0.5, 0.3, 30);
+process = (voix1, voix2) :> rev1;

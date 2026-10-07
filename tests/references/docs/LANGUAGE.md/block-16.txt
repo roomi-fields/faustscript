@@ -1,30 +1,49 @@
-FaustScript reference output of the faustscript block 16 of docs/LANGUAGE.md, which opens with let lfo1 os.osc(freq:0.2).
+FaustScript reference output of the faustscript block 16 of docs/LANGUAGE.md, which opens with let lpf1 fi.lowpass.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let lfo1 os.osc(freq:0.2)
-    outcome: {"done":true,"reason":null}
-    gesture: place
-    name: lfo1
-    faust: lfo1 = vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.2, 0.1, 12000, 0.001)));
-    needs: []
-
-2  let lpf1 fi.lowpass(fc:800)
+1  let lpf1 fi.lowpass
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lpf1
-    faust: lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 800, 2, 8000, 0.001)));
+    faust: lpf1 = fi.lowpass(4, 2000);
     needs: []
 
-3  lfo1 : it.remap(-1, 1, 140, 900) : lpf1.fc
-    outcome: {"done":false,"reason":"it does not exist"}
-    gesture: wire
-    name: null
+2  lpf1 fi.lowpass(fc=400)
+    outcome: {"done":true,"reason":null}
+    gesture: replace
+    name: lpf1
+    faust: lpf1 = fi.lowpass(fc=400);
+    needs: []
+
+3  _ lpf1
+    outcome: {"done":true,"reason":null}
+    gesture: bypass
+    name: lpf1
+    faust: lpf1 = fi.lowpass(fc=400);
+    needs: []
+
+4  !_ lpf1
+    outcome: {"done":true,"reason":null}
+    gesture: bypass
+    name: lpf1
+    faust: lpf1 = fi.lowpass(fc=400);
+    needs: []
+
+5  ! lpf1
+    outcome: {"done":true,"reason":null}
+    gesture: remove
+    name: lpf1
+    faust: lpf1 = fi.lowpass(fc=400);
+    needs: []
+
+6  !let lpf1
+    outcome: {"done":true,"reason":null}
+    gesture: release
+    name: lpf1
 
 --- write
 
 import("stdfaust.lib");
-lfo1 = vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.2, 0.1, 12000, 0.001)));
-lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 800, 2, 8000, 0.001)));
 process = 0;

@@ -1,43 +1,36 @@
-FaustScript reference output of the faustscript block 18 of docs/LANGUAGE.md, which opens with let src1 si.bus(4).
+FaustScript reference output of the faustscript block 18 of docs/LANGUAGE.md, which opens with let rev1 re.mono_freeverb.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let src1 si.bus(4)
+1  let rev1 re.mono_freeverb
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: src1
-    faust: src1 = si.bus(4);
+    name: rev1
+    faust: rev1 = re.mono_freeverb(0.7, 0.5, 0.3, 30);
     needs: []
 
-2  let dst1 si.bus(8)
+2  rev1 re.mono_freeverb(damp=0.9)
+    outcome: {"done":true,"reason":null}
+    gesture: replace
+    name: rev1
+    faust: rev1 = re.mono_freeverb(damp=0.9);
+    needs: []
+
+3  !let rev1
+    outcome: {"done":true,"reason":null}
+    gesture: release
+    name: rev1
+
+4  let rev1 re.mono_freeverb(damp=0.9)
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: dst1
-    faust: dst1 = si.bus(8);
+    name: rev1
+    faust: rev1 = re.mono_freeverb(damp=0.9);
     needs: []
-
-3  let lpfs:8 fi.lowpass
-    outcome: {"done":true,"reason":null}
-    gesture: place
-    name: lpfs
-    faust: lpfs = par(i,8,fi.lowpass(4, 2000));
-    needs: []
-
-4  src1.3 : dst1.5
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
-
-5  lpfs.3.fc:400
-    outcome: {"done":true,"reason":null}
-    gesture: set
-    name: lpfs
 
 --- write
 
 import("stdfaust.lib");
-src1 = si.bus(4);
-dst1 = si.bus(8);
-lpfs = par(i,8,fi.lowpass(4, 2000));
+rev1 = re.mono_freeverb(damp=0.9);
 process = 0;
