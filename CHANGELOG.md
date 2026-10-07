@@ -9,10 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The catalogue is generated from the libraries of the pinned `@grame/faustwasm` (0.16.6:
-  libfaust 2.86.2, libraries 2.71.0), every module compiled and measured by that same Faust
+- The catalogue is generated from the libraries of the pinned `@grame/faustwasm` (0.19.0:
+  libfaust 2.90.0, libraries 2.74.2), every module compiled and measured by that same Faust
   (`npm run catalogue`); its header records the versions and the module count, and
   `faustwasm.unavailable` marks a module faustwasm refuses to compile.
+- The catalogue declares every function a documentation title of the libraries names, alone or
+  grouped (`(ef.)cubicnl`, `(ef.)cubicnl_nodc`): 1170 modules, `tf2`, `fft` and `conv` among them.
+- From the libraries 2.74.2: `os.osc` freq goes up to 12000 Hz (was 8000), `de.fdelay` n starts at
+  512 samples on a log scale (was 44100), and `ba.selector` takes its channel as a constant.
 
 - Project tooling: Vitest replaces `node --test` (tests move to `tests/unit/`), ESLint,
   Prettier, EditorConfig, a TypeScript configuration ready for the migration, GitHub CI

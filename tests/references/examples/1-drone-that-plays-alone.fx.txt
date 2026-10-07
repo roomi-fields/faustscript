@@ -55,7 +55,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lfo1
-    faust: lfo1 = vgroup("lfo1", vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.15, 0.1, 8000, 0.001))) * 900 + 1100);
+    faust: lfo1 = vgroup("lfo1", vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.15, 0.1, 12000, 0.001))) * 900 + 1100);
     needs: []
 
 37  let bat1 beat(t:96)
@@ -120,7 +120,7 @@ osc1 = vgroup("osc1", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 110, 0.08,
 osc2 = vgroup("osc2", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 110.6, 0.08, 220, 0.001)));
 osc3 = vgroup("osc3", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 55, 0.08, 220, 0.001)));
 lpf1 = fi.lowpass(3, lfo1);
-lfo1 = vgroup("lfo1", vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.15, 0.1, 8000, 0.001))) * 900 + 1100);
+lfo1 = vgroup("lfo1", vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.15, 0.1, 12000, 0.001))) * 900 + 1100);
 bat1 = ba.beat(96);
 env1 = vgroup("env1", en.adsr(0.01, 0.35, hslider("sl", 0.45, 0, 1, 0.001), 1.4, bat1));
 vca1 = *;

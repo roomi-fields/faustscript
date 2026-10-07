@@ -38,9 +38,11 @@ and a logarithmic scale, and the instance name becomes the control path
 ## Why a new language at all
 
 In Faust, **a name is a macro**: it is replaced by its body during evaluation,
-so writing `lpf` twice builds two filters. Measured on Faust 2.70.3: one use of
-`fi.lowpass(3, 800)` produces a circuit with **18 memory fields**, two uses
-produce **36**.
+so writing `lpf` twice builds two filters. Measured with faustwasm 0.19.0
+(Faust 2.90.0): one use of `fi.lowpass(3, 800)` produces a circuit with **15
+memory fields**, two uses produce **22**: each use carries its own 7 fields of
+filter state, the 8 others are constants set once from the sample rate and
+shared.
 
 Separate state is therefore free — but **no Faust expression can point at an
 instance that already exists**. Naming duplicates; there is no address. That is
@@ -178,8 +180,8 @@ faustx.apply('let lpf1 lowpass(fc:800)\n_ : lpf1 : process\n')
 faustx.write()          // the Faust
 ```
 
-Requires Node 22+. The tests compile with `@grame/faustwasm` 0.16.6, which
-carries Faust 2.86.2, the same Faust as the timings quoted above.
+Requires Node 22+. The tests compile with `@grame/faustwasm` 0.19.0, which
+carries Faust 2.90.0.
 
 ---
 

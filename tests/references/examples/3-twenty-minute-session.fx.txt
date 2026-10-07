@@ -74,7 +74,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lfo1
-    faust: lfo1 = vgroup("lfo1", vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.13, 0.1, 8000, 0.001))) * 380 + 520);
+    faust: lfo1 = vgroup("lfo1", vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.13, 0.1, 12000, 0.001))) * 380 + 520);
     needs: []
 
 74  lfo1 : lpf1.fc
@@ -171,7 +171,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     outcome: {"done":true,"reason":null}
     gesture: place
     name: dly1
-    faust: dly1 = vgroup("dly1", de.fdelay(hslider("n[unit:samples]", 96000, 44100, 2.09715e+06, 0.001), 13000));
+    faust: dly1 = vgroup("dly1", de.fdelay(hslider("n[unit:samples][scale:log]", 96000, 512, 2.09715e+06, 0.001), 13000));
     needs: []
 
 145  let fb1  *(retour:0.55)
@@ -200,7 +200,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lfo2
-    faust: lfo2 = vgroup("lfo2", vgroup("lfo2", os.osc(hslider("freq[unit:Hz][scale:log]", 0.07, 0.1, 8000, 0.001))) * 4000 + 9000);
+    faust: lfo2 = vgroup("lfo2", vgroup("lfo2", os.osc(hslider("freq[unit:Hz][scale:log]", 0.07, 0.1, 12000, 0.001))) * 4000 + 9000);
     needs: []
 
 155  lfo2 : dly1.d
@@ -393,13 +393,13 @@ basse = vgroup("basse", os.square(hslider("freq[unit:Hz][scale:log]", 55, 20, 20
 vcab = *;
 sortie = vgroup("sortie", *(nentry("gain", 0.5, 0, 1e6, 0.001)));
 lpf1 = vgroup("lpf1", fi.resonlp(lfo1, hslider("Q[scale:log]", 16, 0.5, 50, 0.001), hslider("gain", 0.9, 0, 1, 0.001)));
-lfo1 = vgroup("lfo1", vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.13, 0.1, 8000, 0.001))) * 380 + 520);
+lfo1 = vgroup("lfo1", vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.13, 0.1, 12000, 0.001))) * 380 + 520);
 bruit = no.noise;
 envc = vgroup("envc", en.ar(hslider("at[unit:s][scale:log]", 0.001, 0.001, 0.1, 0.001), hslider("rt[unit:s][scale:log]", 0.09, 0.001, 0.8, 0.001), bat1));
 vcac = *;
-dly1 = vgroup("dly1", de.fdelay(hslider("n[unit:samples]", 96000, 44100, 2.09715e+06, 0.001), lfo2));
+dly1 = vgroup("dly1", de.fdelay(hslider("n[unit:samples][scale:log]", 96000, 512, 2.09715e+06, 0.001), lfo2));
 fb1 = vgroup("fb1", *(nentry("retour", 0.55, 0, 1e6, 0.001)));
-lfo2 = vgroup("lfo2", vgroup("lfo2", os.osc(hslider("freq[unit:Hz][scale:log]", 0.07, 0.1, 8000, 0.001))) * 4000 + 9000);
+lfo2 = vgroup("lfo2", vgroup("lfo2", os.osc(hslider("freq[unit:Hz][scale:log]", 0.07, 0.1, 12000, 0.001))) * 4000 + 9000);
 clic = vgroup("clic", par(i,12,fi.resonbp(hslider("fc[unit:Hz][scale:log]", 900, 20, 20000, 0.001), hslider("Q[scale:log]", 60, 0.5, 50, 0.001), hslider("gain", 1, 0, 1, 0.001))));
 voix = vgroup("voix", par(i,8,os.sawtooth(220) : vgroup("voix", fi.lowpass(2, hslider("fc[unit:Hz][scale:log]", 1200, 2, 8000, 0.001)))));
 envoi = vgroup("envoi", *(nentry("niveau", 0.25, 0, 1e6, 0.001)));

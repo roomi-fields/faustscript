@@ -186,21 +186,11 @@ CONVENTIONS = [
     (('size', 'roomsize'), '0.5'),
 ]
 
-# Two headings in the upstream documentation name no definition at all: the
-# `(fi.)allpass1m` block describes `allpassn1m`, the `(no.)velvet_noise_vm`
-# block describes `velvet_noise`. We declare the name actually defined, the
-# only one that can be called.
-WRONG_HEADINGS = {
-    'allpass1m': 'allpassn1m',
-    'velvet_noise_vm': 'velvet_noise',
-}
-
-# `pm.waveguideN` is not a definition but a documentation entry heading a
-# family. Real environments, for their part, are recognised by their body and
-# do not have to be listed here.
-FAMILIES = {
-    'waveguideN': 'waveguideUd, waveguideFd, waveguideFd2, waveguideFd4',
-}
+# A documentation title names one function or several sharing its block:
+# `(ef.)cubicnl`, `(ef.)cubicnl_nodc`. A name written `name[n]` stands for a
+# family of definitions and declares none.
+TITLE = re.compile(r'^//-+\s*(`\(\w+\.\).*`)[-\s]*$', re.M)
+TITLED = re.compile(r'`\((\w+)\.\)(\w+)`')
 
 
 # ---------------------------------------------------------------- reading ----
@@ -210,15 +200,16 @@ def files(root):
 
 
 def documented_blocks(root):
-    """Returns {name: (prefix, text of the block)} for each public function."""
+    """Returns {name: (prefix, text of the block)} for each function a title names."""
     out = {}
     for f in files(root):
         txt = f.read_text(errors='replace')
-        parts = re.split(r'^//-+`\((\w+)\.\)(\w+)`-+\s*$', txt, flags=re.M)
-        for i in range(1, len(parts) - 2, 3):
-            body = re.split(r'^//-{10,}\s*$', parts[i + 2], maxsplit=1, flags=re.M)[0]
-            name = WRONG_HEADINGS.get(parts[i + 1], parts[i + 1])
-            out[name] = (parts[i], body)
+        titles = list(TITLE.finditer(txt))
+        for title, following in zip(titles, titles[1:] + [None]):
+            block = txt[title.end():following.start() if following else len(txt)]
+            body = re.split(r'^//-{10,}\s*$', block, maxsplit=1, flags=re.M)[0]
+            for prefix, name in TITLED.findall(title.group(1)):
+                out[name] = (prefix, body)
     return out
 
 
@@ -963,7 +954,7 @@ def declare(name, prefix, block, params, body, ui, uib, everywhere, stats):
              'environment': None, 'remarks': [], 'unverifiable': None,
              'inputs': None, 'outputs': None, 'error': None, 'range': None}
 
-    inside = FAMILIES.get(name) or environment_contents(body)
+    inside = environment_contents(body)
     if inside is not None:
         stats['environments'] += 1
         return dict(empty, environment=inside), None
@@ -1078,7 +1069,8 @@ def quote(value):
 
     `FTZ_test = ((ma.MIN * 0.5)` carries an equals sign and an unclosed
     parenthesis; between quotes it is text that the parser goes through without
-    trying to understand it.
+    trying to understand it. So is the ellipsis of a documented table,
+    `(k1,k2,k3,...)`.
     """
     value = str(value).strip()
     # a number written `.2` is normalised: the dot belongs to a copy, it does
@@ -1087,7 +1079,7 @@ def quote(value):
     # nor end with a dot: `0.` becomes `0.0`, without which the next dot would
     # be taken for the dot of a path
     value = re.sub(r'(\d)\.(?![\d.])', r'\1.0', value)
-    fragile = (re.search(r'[=;{}]', value)
+    fragile = (re.search(r'[=;{}]|\.\.', value)
                or value.count('(') != value.count(')'))
     if fragile:
         return '"%s"' % value.replace('"', "'")

@@ -1,6 +1,7 @@
 // The catalogue describes the Faust that package.json pins: its header names the versions of
-// faustwasm, libfaust and the libraries it was generated from (npm run catalogue), and it marks
-// the modules that faustwasm refuses to compile.
+// faustwasm, libfaust and the libraries it was generated from (npm run catalogue), it declares
+// every function a documentation title of those libraries names, and it marks the modules that
+// faustwasm refuses to compile.
 
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
@@ -11,16 +12,36 @@ import { compile, instantiate } from './faust.js'
 const require = createRequire(import.meta.url)
 const CATALOGUE = readFileSync(new URL('../../lib/faust.fx', import.meta.url), 'utf8')
 
+/** Where libfaust-wasm keeps its libraries, in its virtual file system. */
+const LIBRARIES = '/usr/share/faust'
+
 it('names the faustwasm, libfaust and libraries versions the tests compile with', async () => {
   const compiler = await instantiate()
   const faustwasm = require('@grame/faustwasm/package.json').version
-  const library = compiler.fs().readFile('/usr/share/faust/version.lib', { encoding: 'utf8' })
+  const library = compiler.fs().readFile(`${LIBRARIES}/version.lib`, { encoding: 'utf8' })
   const [, major, minor, patch] = library.match(/^version\s*=\s*(\d+),.*\n\s*(\d+),.*\n\s*(\d+);/m)
   const header = CATALOGUE.split('\n\n')[0]
   expect(header).toContain(
     `@grame/faustwasm ${faustwasm}: libfaust ${compiler.version()}, ` +
       `libraries ${major}.${minor}.${patch} (version.lib).`
   )
+})
+
+it('declares every function a documentation title of the libraries names, alone or grouped', async () => {
+  const compiler = await instantiate()
+  const fs = compiler.fs()
+  const catalogue = readCatalogue(CATALOGUE)
+  const titled = new Set()
+  for (const file of fs.readdir(LIBRARIES).filter(f => f.endsWith('.lib'))) {
+    const text = fs.readFile(`${LIBRARIES}/${file}`, { encoding: 'utf8' })
+    for (const [title] of text.matchAll(/^\/\/-+.*`\(\w+\.\)\w+`.*$/gm)) {
+      for (const [, name] of title.matchAll(/`\(\w+\.\)(\w+)`/g)) {
+        titled.add(name)
+      }
+    }
+  }
+  expect(titled).toContain('cubicnl_nodc')
+  expect([...titled].filter(name => !catalogue.has(name))).toEqual([])
 })
 
 it('marks a module that calls a foreign function faustwasm refuses, and that one only', async () => {

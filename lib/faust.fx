@@ -1,6 +1,6 @@
 // FaustX module declarations, generated from the Faust libraries of
-// @grame/faustwasm 0.16.6: libfaust 2.86.2, libraries 2.71.0 (version.lib).
-// 1006 modules.
+// @grame/faustwasm 0.19.0: libfaust 2.90.0, libraries 2.74.2 (version.lib).
+// 1170 modules.
 // A starting point to be corrected: the names are still Faust's own.
 // Every declaration has been compiled with its starting values: the
 // "N inputs, M outputs" line comes from the compiler, not from the text.
@@ -156,6 +156,10 @@ CZsquareP(index:0.5)  os.CZsquareP(fund, index)
   output.measure:silence-and-noise
   // 1 input, 1 output
 
+DEBUG  db.DEBUG
+  // CONSTANT OUTPUT: the output does not move from 1
+  // 0 input, 1 output
+
 E  ma.E
   // CONSTANT OUTPUT: the output does not move from 2.71828
   // 0 input, 1 output
@@ -247,6 +251,10 @@ FTZ  ma.FTZ(x)
   output.measure:silence-and-noise
   // 1 input, 1 output
 
+INFINITY  ma.INFINITY
+  // CONSTANT OUTPUT: the output does not move from 3.40282e+38
+  // 0 input, 1 output
+
 J0  ma.J0
   faustwasm.unavailable:j0
   // DOES NOT COMPILE: ERROR : calling foreign function 'j0' is not allowed in this compilation mode
@@ -263,6 +271,14 @@ MAX  ma.MAX
   // CONSTANT OUTPUT: the output does not move from 3.40282e+38
   // 0 input, 1 output
 
+MAX_INTER  it.MAX_INTER
+  // CONSTANT OUTPUT: the output does not move from 4
+  // 0 input, 1 output
+
+MAX_SAW_ORDER  os.MAX_SAW_ORDER
+  // CONSTANT OUTPUT: the output does not move from 4
+  // 0 input, 1 output
+
 MIN  ma.MIN
   // CONSTANT OUTPUT: the output does not move from 1.17549e-38
   // 0 input, 1 output
@@ -270,6 +286,13 @@ MIN  ma.MIN
 PI  ma.PI
   // CONSTANT OUTPUT: the output does not move from 3.14159
   // 0 input, 1 output
+
+RMS(n:64)  rm.RMS(n)
+  n.unit:samples
+  output.min:0
+  output.max:0.704422
+  output.measure:silence-and-noise
+  // 1 input, 1 output
 
 RMS_FBFFcompressor_N_chan(strength:0.4, thresh:-18, att:0.02, rel:0.12, knee:6, prePost:0, link:0.5, FBFF:0.3, meter, N:2)  co.RMS_FBFFcompressor_N_chan(strength, thresh, att, rel, knee, prePost, link, FBFF, meter, N)
   strength.min:0
@@ -471,6 +494,10 @@ Rtan  aa.Rtan(x)
   output.measure:silence-and-noise
   // 1 input, 1 output
 
+SAFE  os.SAFE
+  // CONSTANT OUTPUT: nothing comes out with the starting values
+  // 0 input, 1 output
+
 SFFormantModel(voiceType:0, vowel:0, exType:0.2, freq:220, gain:0.7, filterbank, isFof:1)  pm.SFFormantModel(voiceType, vowel, exType, freq, gain, source, filterbank, isFof)
   freq.min:20
   freq.max:20000
@@ -498,8 +525,8 @@ SFFormantModelBP(voiceType:0, vowel:0, exType:0.2, freq:220, gain:0.7)  pm.SFFor
   freq.scale:log
   gain.min:0
   gain.max:1
-  output.min:-2.1153
-  output.max:1.62226
+  output.min:-2.11528
+  output.max:1.62223
   output.measure:no-input
   // BOUNDS FROM INTERFACE, from the slider the libraries put on it: voiceType from 0 to 4
   // BOUNDS FROM INTERFACE, from the slider the libraries put on it: vowel from 0 to 4
@@ -538,7 +565,7 @@ SFFormantModelFofCycle(voiceType:0, vowel:0, freq:220, gain:0.7)  pm.SFFormantMo
   // 0 input, 1 output
 
 SFFormantModelFofCycle_ui  pm.SFFormantModelFofCycle_ui
-  output.min:-0.784445
+  output.min:-0.784444
   output.max:0.949384
   output.measure:no-input
   // 0 input, 1 output
@@ -567,8 +594,8 @@ SFFormantModelFofSmooth(voiceType:0, vowel:0, freq:220, gain:0.7)  pm.SFFormantM
   // 0 input, 1 output
 
 SFFormantModelFofSmooth_ui  pm.SFFormantModelFofSmooth_ui
-  output.min:-0.299215
-  output.max:0.398477
+  output.min:-0.299213
+  output.max:0.398473
   output.measure:no-input
   // 0 input, 1 output
 
@@ -586,6 +613,12 @@ SVFTPT  fi.SVFTPT
 T  ma.T
   // CONSTANT OUTPUT: the output does not move from 2.08333e-05
   // 0 input, 1 output
+
+TF2(b0:0.2, b1:0.4, b2:0.2, a1:-0.5, a2:0.3)  fi.TF2(b0, b1, b2, a1, a2)
+  output.min:-1.18318
+  output.max:1.15719
+  output.measure:silence-and-noise
+  // 1 input, 1 output
 
 Y0  ma.Y0
   faustwasm.unavailable:y0
@@ -713,6 +746,14 @@ acosh2  aa.acosh2(x)
   x.example:1.0 + abs(sig)
   // OUTPUT WITHOUT RANGE: still rising after 5 s on noise (peak 3057)
   // 1 input, 1 output
+
+adaptFIR(N:8, step:0.01)  fi.adaptFIR(N, step, x, d)
+  x.nature:signal
+  d.nature:signal
+  output.min:-1.22093
+  output.max:1.30475
+  output.measure:silence-and-noise
+  // 2 inputs, 2 outputs
 
 additiveDrum(freq:180, freqRatio, gain, harmDec:0.4, att:0.01, rel:0.4, gate:0)  sy.additiveDrum(freq, freqRatio, gain, harmDec, att, rel, gate)
   freq.unit:Hz
@@ -887,7 +928,7 @@ algorithm(algo:1)  dx.algorithm(algo)
   // algo cannot be adjusted live: the compiler demands a constant in this place
 
 algorithms  dx.algorithms
-  // DOES NOT COMPILE: ERROR : stack overflow
+  // DOES NOT COMPILE: the compiler fails: Aborted(native code called abort())
 
 allpass2(f0:1000, Q:1, dtune:0)  wa.allpass2(f0, Q, dtune, x)
   f0.unit:Hz
@@ -920,6 +961,18 @@ allpass_comb(maxdel:2048, N:64, aN:0.6)  fi.allpass_comb(maxdel, N, aN)
 allpass_fcomb(maxdel:2048, N:64.5, aN:0.6)  fi.allpass_fcomb(maxdel, N, aN)
   output.min:-1.54466
   output.max:1.58916
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+allpass_fcomb1a(maxdel, N:2, aN)  fi.allpass_fcomb1a(maxdel, N, aN)
+  aN.nature:function
+  // GUESSED: N:2, from the parameter name
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: maxdel has no starting value
+
+allpass_fcomb5(maxdel:2048, N:64.5, aN:0.6)  fi.allpass_fcomb5(maxdel, N, aN)
+  output.min:-1.88391
+  output.max:1.79412
   output.measure:silence-and-noise
   // 1 input, 1 output
 
@@ -1160,6 +1213,12 @@ asre(attT60:0.2, susLvl:0.6, relT60:0.4, gate:0)  en.asre(attT60, susLvl, relT60
   // CONSTANT OUTPUT: nothing comes out with the starting values
   // 0 input, 1 output
 
+asrfe(attT60:0.02, susLvl:0.8, relT60:0.4, finLvl:0, gate:0)  en.asrfe(attT60, susLvl, relT60, finLvl, gate)
+  attT60.unit:s
+  relT60.unit:s
+  // CONSTANT OUTPUT: nothing comes out with the starting values
+  // 0 input, 1 output
+
 atanh  ma.atanh
   output.min:-6.20801
   output.max:5.24566
@@ -1248,6 +1307,19 @@ avg_tau(period:0.1)  fi.avg_tau(period, x)
   output.measure:silence-and-noise
   // 1 input, 1 output
 
+band_center(M, ftop, N:2, i:0)  an.band_center(M, ftop, N, i)
+  // GUESSED: N:2, from the parameter name
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: M has no starting value
+  // TO COMPLETE: ftop has no starting value
+
+band_powers(O:3, M:3, ftop:8000, N:5, T:1)  an.band_powers(O, M, ftop, N, T)
+  output.min:0
+  output.max:0.223468
+  output.measure:silence-and-noise
+  // GUESSED: T:1, from the parameter name
+  // 1 input, 5 outputs
+
 bandpass(Nh:2, fl:500, fu:1500)  fi.bandpass(Nh, fl, fu)
   fl.unit:Hz
   fl.min:200
@@ -1279,9 +1351,11 @@ bandpass0_bandstop1(s:0, Nh:2, fl:500, fu:1500)  fi.bandpass0_bandstop1(s, Nh, f
   // 1 input, 1 output
 
 bandpass12e(fl:500, fu:2000)  fi.bandpass12e(fl, fu)
+  fl.unit:Hz
   fl.min:20
   fl.max:20000
   fl.scale:log
+  fu.unit:Hz
   fu.min:20
   fu.max:20000
   fu.scale:log
@@ -1319,7 +1393,7 @@ bandpass2Matched(CF:1200, Q:2.0)  ve.bandpass2Matched(CF, Q, x)
   Q.max:50
   Q.scale:log
   x.nature:signal
-  output.min:-0.452665
+  output.min:-0.452664
   output.max:0.486507
   output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: CF from 20 to 20000
@@ -1327,9 +1401,11 @@ bandpass2Matched(CF:1200, Q:2.0)  ve.bandpass2Matched(CF, Q, x)
   // 1 input, 1 output
 
 bandpass6e(fl:500, fu:2000)  fi.bandpass6e(fl, fu)
+  fl.unit:Hz
   fl.min:20
   fl.max:20000
   fl.scale:log
+  fu.unit:Hz
   fu.min:20
   fu.max:20000
   fu.scale:log
@@ -1343,9 +1419,11 @@ bandpass6e(fl:500, fu:2000)  fi.bandpass6e(fl, fu)
   // 1 input, 1 output
 
 bandstop(Nh:2, fl:500, fu:1500)  fi.bandstop(Nh, fl, fu)
+  fl.unit:Hz
   fl.min:20
   fl.max:20000
   fl.scale:log
+  fu.unit:Hz
   fu.min:20
   fu.max:20000
   fu.scale:log
@@ -1368,12 +1446,41 @@ beat(t:120)  ba.beat(t)
   output.measure:no-input
   // 0 input, 1 output
 
-biquad(a0:0.3, a1:-0.3, a2:0.2, b1:0.3, b2:0.2)  ve.biquad(x, a0, a1, a2, b1, b2)
-  x.nature:signal
-  output.min:-0.31182
-  output.max:0.32082
+binauralFir(hL, hR)  sp.binauralFir(hL, hR)
+  hL.nature:table
+  hL.example:(0.9, 0.05, 0.02)
+  hR.nature:table
+  hR.example:(0.4, 0.3, 0.1)
+  output.min:-0.962027
+  output.max:0.967345
   output.measure:silence-and-noise
+  // 1 input, 2 outputs
+
+binauralModel(az:45)  sp.binauralModel(az)
+  output.min:-2.01827
+  output.max:1.98214
+  output.measure:silence-and-noise
+  // 1 input, 2 outputs
+
+biquad(a0:0.5, a1:-0.3, a2:0.2, b1:0.3, b2:0.2)  ve.biquad(x, a0, a1, a2, b1, b2)
+  x.nature:signal
+  output.min:-0.285153
+  output.max:0.347487
+  output.measure:silence-and-noise
+  // at rest: 0.0266667 to 0.0266667; under noise: -0.285153 to 0.347487
   // 1 input, 1 output
+
+bit_reverse_selector(N:2, i:0)  an.bit_reverse_selector(N, i)
+  // CONSTANT OUTPUT: nothing comes out with the starting values
+  // GUESSED: N:2, from the parameter name
+  // 0 input, 1 output
+
+bit_reverse_shuffle(N:2)  an.bit_reverse_shuffle(N)
+  output.min:-0.999999
+  output.max:0.999977
+  output.measure:silence-and-noise
+  // GUESSED: N:2, from the parameter name
+  // 2 inputs, 2 outputs
 
 bitcrusher(nbits:8)  ba.bitcrusher(nbits, x)
   x.nature:signal
@@ -1381,6 +1488,19 @@ bitcrusher(nbits:8)  ba.bitcrusher(nbits, x)
   output.max:1
   output.measure:silence-and-noise
   // 1 input, 1 output
+
+bitonicSort(N:4)  ro.bitonicSort(N)
+  output.min:-0.999999
+  output.max:0.999997
+  output.measure:silence-and-noise
+  // 4 inputs, 4 outputs
+
+bitonicSortIdx(N:4)  ro.bitonicSortIdx(N)
+  output.min:0
+  output.max:3
+  output.measure:silence-and-noise
+  // at rest: 0 to 3; under noise: 0 to 3
+  // 4 inputs, 4 outputs
 
 block(n:1)  si.block(n)
   // 1 input, 0 output
@@ -1601,6 +1721,18 @@ bvav2nuv(bv, av)  fi.bvav2nuv(bv, av)
   output.measure:no-input
   // 0 input, 3 outputs
 
+bwMultMaxes  pm.bwMultMaxes
+  output.min:2.5
+  output.max:15
+  output.measure:no-input
+  // 0 input, 10 outputs
+
+bwMultMins  pm.bwMultMins
+  output.min:1
+  output.max:3
+  output.measure:no-input
+  // 0 input, 10 outputs
+
 bypass1(bpc:0, e)  ba.bypass1(bpc, e)
   e.nature:function
   e.example:*(0.5)
@@ -1629,6 +1761,34 @@ bypass_fade(n:128, b:0, e)  ba.bypass_fade(n, b, e)
   output.max:0.499988
   output.measure:silence-and-noise
   // 2 inputs, 2 outputs
+
+c_bit_reverse_shuffle(N:2)  an.c_bit_reverse_shuffle(N)
+  output.min:-0.999999
+  output.max:0.999997
+  output.measure:silence-and-noise
+  // GUESSED: N:2, from the parameter name
+  // 4 inputs, 4 outputs
+
+c_magdb(N:2)  an.c_magdb(N)
+  output.min:-69.2369
+  output.max:3.00259
+  output.measure:silence-and-noise
+  // at rest: -69.2369 to -69.2369; under noise: -51.5659 to 3.00259
+  // GUESSED: N:2, from the parameter name
+  // 4 inputs, 2 outputs
+
+c_magsq(N:2)  an.c_magsq(N)
+  output.min:0
+  output.max:1.99645
+  output.measure:silence-and-noise
+  // GUESSED: N:2, from the parameter name
+  // 4 inputs, 2 outputs
+
+c_select_pos_freqs(N:2)  an.c_select_pos_freqs(N)
+  output.min:-0.999999
+  output.max:0.999997
+  output.measure:silence-and-noise
+  // 4 inputs, 4 outputs
 
 capacitor(i, R:1e-7)  wd.capacitor(i, R)
   R.min:2.2e-09
@@ -1703,8 +1863,8 @@ churchBellModel(nModes:50, exPos:0, t60:30, t60DecayRatio:1, t60DecaySlope:2.5) 
   exPos.min:0
   exPos.max:6
   t60.unit:s
-  output.min:-36.5568
-  output.max:34.8143
+  output.min:-36.5576
+  output.max:34.8148
   output.measure:silence-and-noise
   // 1 input, 1 output
 
@@ -1955,6 +2115,15 @@ constantPowerPan(p:0.4)  sp.constantPowerPan(p, x, y)
   output.measure:silence-and-noise
   // 2 inputs, 2 outputs
 
+conv(kv)  fi.conv(kv)
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: kv has no starting value
+
+convN(N:3, kv)  fi.convN(N, kv)
+  kv.nature:table
+  kv.example:"(k1,k2,k3,...)"
+  // DOES NOT COMPILE: ERROR : syntax error, unexpected DOT
+
 copysign  ma.copysign
   output.min:-0.999991
   output.max:0.999974
@@ -1967,6 +2136,10 @@ cosh  ma.cosh
   output.measure:silence-and-noise
   // at rest: 1 to 1; under noise: 1 to 1.54307
   // 1 input, 1 output
+
+cosine  it.cosine
+  // CONSTANT OUTPUT: the output does not move from 1
+  // 0 input, 1 output
 
 cosine1  aa.cosine1(x)
   x.nature:signal
@@ -2023,6 +2196,12 @@ cross(n:3)  ro.cross(n)
   // n cannot be adjusted live: the compiler demands a constant in this place
 
 cross1n(N:3)  ro.cross1n(N)
+  output.min:-0.999999
+  output.max:0.999997
+  output.measure:silence-and-noise
+  // 4 inputs, 4 outputs
+
+cross2  ro.cross2
   output.min:-0.999999
   output.max:0.999997
   output.measure:silence-and-noise
@@ -2105,6 +2284,16 @@ crybaby_demo  dm.crybaby_demo
   output.measure:silence-and-noise
   // 1 input, 1 output
 
+cselector(i:1, n:2)  ba.cselector(i, n)
+  output.min:-0.999999
+  output.max:0.999993
+  output.measure:silence-and-noise
+  // 4 inputs, 2 outputs
+
+cubic  it.cubic
+  // CONSTANT OUTPUT: the output does not move from 2
+  // 0 input, 1 output
+
 cubic1  aa.cubic1(x)
   x.nature:signal
   x.example:os.osc(110)
@@ -2123,6 +2312,14 @@ cubicnl(drive:0.5, offset:0.0)  ef.cubicnl(drive, offset)
 
 cubicnl_demo  dm.cubicnl_demo
   output.min:-0.746181
+  output.max:0.741989
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+cubicnl_nodc(drive:0.0, offset:0)  ef.cubicnl_nodc(drive, offset)
+  drive.min:0
+  drive.max:1
+  output.min:-0.74618
   output.max:0.741989
   output.measure:silence-and-noise
   // 1 input, 1 output
@@ -2166,7 +2363,7 @@ dattorro_rev_default  re.dattorro_rev_default
 
 dattorro_rev_demo  dm.dattorro_rev_demo
   output.min:-0.562392
-  output.max:0.557098
+  output.max:0.557099
   output.measure:silence-and-noise
   // 2 inputs, 2 outputs
 
@@ -2186,8 +2383,19 @@ dcblocker  fi.dcblocker
 
 dcblockerat(fb:30)  fi.dcblockerat(fb)
   fb.unit:Hz
+  fb.min:10
+  fb.max:30
   output.min:-1.08536
   output.max:1.07736
+  output.measure:silence-and-noise
+  // BOUNDS FROM USAGE, the values the libraries pass to it: fb from 10 to 30
+  // 1 input, 1 output
+
+decimal  ma.decimal(x)
+  x.nature:signal
+  x.example:n
+  output.min:0
+  output.max:1
   output.measure:silence-and-noise
   // 1 input, 1 output
 
@@ -2262,6 +2470,20 @@ diodeLadder(normFreq:0.4, Q:4)  ve.diodeLadder(normFreq, Q)
   // BOUNDS GUESSED, from the parameter name: Q from 0.5 to 50
   // 1 input, 1 output
 
+dither(nbits:16)  ef.dither(nbits)
+  output.min:-1
+  output.max:0.999969
+  output.measure:silence-and-noise
+  // at rest: -3.05176e-05 to 3.05176e-05; under noise: -1 to 0.999969
+  // 1 input, 1 output
+
+dither_shaped(K:2, nbits:16)  ef.dither_shaped(K, nbits)
+  output.min:-1.00003
+  output.max:0.999908
+  output.measure:silence-and-noise
+  // at rest: -0.00012207 to 0.00012207; under noise: -1.00003 to 0.999908
+  // 1 input, 1 output
+
 djembe(freq:110, strikePosition:0.3, strikeSharpness:0.5, gain:0.8, trigger:0)  pm.djembe(freq, strikePosition, strikeSharpness, gain, trigger)
   freq.min:20
   freq.max:20000
@@ -2284,7 +2506,7 @@ djembeModel(freq:110)  pm.djembeModel(freq)
   freq.min:20
   freq.max:20000
   freq.scale:log
-  // OUTPUT WITHOUT RANGE: still rising after 5 s on noise (peak 5.594)
+  // OUTPUT WITHOUT RANGE: still rising after 5 s on noise (peak 5.595)
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
   // 1 input, 1 output
 
@@ -2490,8 +2712,8 @@ englishBellModel(nModes:50, exPos:0, t60:30, t60DecayRatio:1, t60DecaySlope:3)  
   exPos.min:0
   exPos.max:6
   t60.unit:s
-  output.min:-26.2695
-  output.max:25.9053
+  output.min:-26.269
+  output.max:25.9051
   output.measure:silence-and-noise
   // 1 input, 1 output
 
@@ -2635,6 +2857,12 @@ f2l(freq:440)  pm.f2l(freq)
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
   // 0 input, 1 output
 
+fabs  ma.fabs
+  output.min:0
+  output.max:0.999992
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
 fb_comb(maxdel:2048, N:64, b0:0.7, aN:0.6)  fi.fb_comb(maxdel, N, b0, aN)
   b0.min:0.7
   b0.max:1
@@ -2658,6 +2886,12 @@ fb_fcomb(maxdel:2048, N:64.5, b0:0.7, aN:0.6)  fi.fb_fcomb(maxdel, N, b0, aN)
   output.measure:silence-and-noise
   // 1 input, 1 output
 
+fbcombfilter(maxdel:2048, intdel:64, g:0.6)  fi.fbcombfilter(maxdel, intdel, g)
+  output.min:-2.17694
+  output.max:2.15422
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
 fdbkscalef(feedback:0.5)  dx.fdbkscalef(feedback)
   feedback.min:0
   feedback.max:1
@@ -2674,15 +2908,36 @@ fdbkscalef2(feedback:0.5)  dx.fdbkscalef2(feedback)
 
 fdelay(n:44100, d:22050.5)  de.fdelay(n, d, x)
   n.unit:samples
-  n.min:44100
+  n.min:512
   n.max:2.09715e+06
+  n.scale:log
   d.unit:samples
   x.nature:signal
   output.min:-0.995684
   output.max:0.998017
   output.measure:silence-and-noise
-  // BOUNDS FROM USAGE, the values the libraries pass to it: n from 44100 to 2.09715e+06
+  // BOUNDS FROM USAGE, the values the libraries pass to it: n from 512 to 2.09715e+06
   // 1 input, 1 output
+
+fdelaylti(N:3, n:44100, d:22050.5)  de.fdelaylti(N, n, d, x)
+  n.unit:samples
+  d.unit:samples
+  x.nature:signal
+  output.min:-1.22112
+  output.max:1.2174
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+fdelayltv(N:2, n:2, d)  de.fdelayltv(N, n, d, x)
+  N.min:1
+  N.max:5
+  n.unit:samples
+  d.unit:samples
+  x.nature:signal
+  // GUESSED: n:2, from the parameter name
+  // BOUNDS FROM USAGE, the values the libraries pass to it: N from 1 to 5
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: d has no starting value
 
 fdnrev0(MAXDELAY:4096, delays, BBSO:1, freqs, durs, loopgainmax:0.8, nonl:0.0)  re.fdnrev0(MAXDELAY, delays, BBSO, freqs, durs, loopgainmax, nonl)
   loopgainmax.min:0
@@ -2718,17 +2973,36 @@ ff_fcomb(maxdel:2048, M:64.5, b0:1, bM:0.7)  fi.ff_fcomb(maxdel, M, b0, bM)
   output.measure:silence-and-noise
   // 1 input, 1 output
 
+ffbcombfilter(maxdel:65536, del:22050.5, g:1)  fi.ffbcombfilter(maxdel, del, g)
+  output.min:-3.68274
+  output.max:3.61313
+  output.measure:silence-and-noise
+  // GUESSED: g:1, from the parameter name
+  // 1 input, 1 output
+
 ffcombfilter(maxdel:2048, del:64, g:0.7)  fi.ffcombfilter(maxdel, del, g)
   output.min:-1.69457
   output.max:1.69308
   output.measure:silence-and-noise
   // 1 input, 1 output
 
+fft(N:8)  an.fft(N)
+  output.min:-7.16725
+  output.max:7.117
+  output.measure:silence-and-noise
+  // 16 inputs, 16 outputs
+
 fft_spectral_level_demo(N:256)  dm.fft_spectral_level_demo(N)
   output.min:-0.999992
   output.max:0.999944
   output.measure:silence-and-noise
   // 1 input, 1 output
+
+fftb(N:1)  an.fftb(N)
+  output.min:-0.999999
+  output.max:0.999977
+  output.measure:silence-and-noise
+  // 2 inputs, 2 outputs
 
 fibonacci(order:2)  ef.fibonacci(order)
   // OUTPUT NOT FINITE: NaN or infinity on noise (191872 samples out of 191872)
@@ -2753,6 +3027,12 @@ filterbank(O:3, lfreqs)  fi.filterbank(O, lfreqs)
   output.max:1.7642
   output.measure:silence-and-noise
   // 1 input, 3 outputs
+
+filterbank_demo  dm.filterbank_demo
+  output.min:-0.813359
+  output.max:0.744256
+  output.measure:silence-and-noise
+  // 1 input, 1 output
 
 filterbanki(O:3, lfreqs)  fi.filterbanki(O, lfreqs)
   lfreqs.nature:table
@@ -2861,11 +3141,23 @@ fm(freqs, indices)  sy.fm(freqs, indices)
   output.measure:no-input
   // 0 input, 1 output
 
+fmax  ma.fmax
+  output.min:-0.996924
+  output.max:0.999977
+  output.measure:silence-and-noise
+  // 2 inputs, 1 output
+
+fmin  ma.fmin
+  output.min:-0.999999
+  output.max:0.995626
+  output.measure:silence-and-noise
+  // 2 inputs, 1 output
+
 fof(fc:0.3, bw:440, sw:880, g:0.5)  pm.fof(fc, bw, sw, g)
   bw.unit:Hz
   sw.unit:Hz
-  output.min:-0.0889855
-  output.max:0.0927168
+  output.min:-0.0889861
+  output.max:0.0927166
   output.measure:silence-and-noise
   // 1 input, 1 output
 
@@ -2887,8 +3179,8 @@ fofSmooth(fc:0.3, bw:440, sw:880, g:0.5, tau:0.2)  pm.fofSmooth(fc, bw, sw, g, t
   bw.unit:Hz
   sw.unit:Hz
   tau.unit:s
-  output.min:-0.0889574
-  output.max:0.0927002
+  output.min:-0.0889581
+  output.max:0.0927
   output.measure:silence-and-noise
   // 1 input, 1 output
 
@@ -2914,8 +3206,8 @@ formantFilterFofSmooth(voiceType:0, vowel:0, nFormants:5, i:0, freq:200)  pm.for
   freq.min:20
   freq.max:20000
   freq.scale:log
-  output.min:-0.122639
-  output.max:0.126865
+  output.min:-0.122638
+  output.max:0.126864
   output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
   // 1 input, 1 output
@@ -2954,8 +3246,8 @@ formantFilterbankFofSmooth(voiceType:0, vowel:0, freq:200)  pm.formantFilterbank
   freq.min:20
   freq.max:20000
   freq.scale:log
-  output.min:-0.194195
-  output.max:0.193258
+  output.min:-0.194193
+  output.max:0.193256
   output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
   // 1 input, 1 output
@@ -3004,8 +3296,8 @@ frenchBellModel(nModes:50, exPos:0, t60:30, t60DecayRatio:1, t60DecaySlope:3)  p
   exPos.min:0
   exPos.max:6
   t60.unit:s
-  output.min:-37.3353
-  output.max:34.3057
+  output.min:-37.3355
+  output.max:34.3056
   output.measure:silence-and-noise
   // 1 input, 1 output
 
@@ -3067,6 +3359,27 @@ gate_demo  dm.gate_demo
   output.max:0.999977
   output.measure:silence-and-noise
   // 2 inputs, 2 outputs
+
+gate_gain_mono(thresh:-60, att:0.0001, hold:0.1, rel:0.02)  ef.gate_gain_mono(thresh, att, hold, rel, x)
+  thresh.min:-80
+  thresh.max:0
+  att.unit:s
+  hold.unit:s
+  hold.min:0.001
+  hold.max:10
+  hold.scale:log
+  rel.unit:s
+  rel.min:0.001
+  rel.max:10
+  rel.scale:log
+  x.nature:signal
+  output.min:0
+  output.max:1
+  output.measure:silence-and-noise
+  // BOUNDS GUESSED, from the parameter name: thresh from -80 to 0
+  // BOUNDS GUESSED, from the parameter name: hold from 0.001 to 10
+  // BOUNDS GUESSED, from the parameter name: rel from 0.001 to 10
+  // 1 input, 1 output
 
 gate_mono(thresh:-60, att:0.0001, hold:0.1, rel:0.02)  ef.gate_mono(thresh, att, hold, rel, x)
   thresh.min:-80
@@ -3149,7 +3462,7 @@ germanBellModel(nModes:50, exPos:0, t60:30, t60DecayRatio:1, t60DecaySlope:2.5) 
   exPos.min:0
   exPos.max:6
   t60.unit:s
-  output.min:-33.5015
+  output.min:-33.5021
   output.max:32.8255
   output.measure:silence-and-noise
   // 1 input, 1 output
@@ -3168,6 +3481,62 @@ gnoise(N:8)  no.gnoise(N)
   output.max:3.75055
   output.measure:no-input
   // 0 input, 1 output
+
+gnoisem(N:2)  no.gnoisem(N)
+  output.min:-1.52774
+  output.max:1.52335
+  output.measure:no-input
+  // GUESSED: N:2, from the parameter name
+  // 0 input, 1 output
+
+goertzel(freq:440, n:128)  an.goertzel(freq, n, x)
+  freq.min:20
+  freq.max:20000
+  freq.scale:log
+  x.nature:signal
+  x.example:os.osc(440)
+  output.min:0
+  output.max:18.6689
+  output.measure:silence-and-noise
+  // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
+  // 1 input, 1 output
+
+goertzelComp(freq:440, n:128)  an.goertzelComp(freq, n, x)
+  freq.min:20
+  freq.max:20000
+  freq.scale:log
+  x.nature:signal
+  x.example:os.osc(440)
+  output.min:0
+  output.max:227.076
+  output.measure:silence-and-noise
+  // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
+  // 1 input, 1 output
+
+goertzelOpt(freq:440, n:128)  an.goertzelOpt(freq, n, x)
+  freq.min:20
+  freq.max:20000
+  freq.scale:log
+  x.nature:signal
+  x.example:os.osc(440)
+  output.min:0
+  output.max:18.6689
+  output.measure:silence-and-noise
+  // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
+  // 1 input, 1 output
+
+granular(P:4, dur:0.05, ratio:1.5, pos:0.2, jit:0.1)  ef.granular(P, dur, ratio, pos, jit, sig)
+  dur.unit:s
+  ratio.min:1
+  ratio.max:20
+  pos.unit:s
+  jit.unit:s
+  sig.nature:signal
+  output.min:-0.92216
+  output.max:0.912656
+  output.measure:silence-and-noise
+  // BOUNDS GUESSED, from the parameter name: ratio from 1 to 20
+  // 1 input, 1 output
 
 greyhole(dt:2.0, damp:0.3, size:1.0, early_diff:0.6, feedback:0.5, mod_depth:0.4, mod_freq:0.2)  re.greyhole(dt, damp, size, early_diff, feedback, mod_depth, mod_freq)
   dt.unit:s
@@ -3312,6 +3681,17 @@ hadamard(n:4)  ro.hadamard(n)
   output.measure:silence-and-noise
   // 4 inputs, 4 outputs
 
+half_octave_analyzer(N:2)  an.half_octave_analyzer(N)
+  output.min:-1.57296
+  output.max:1.59762
+  output.measure:silence-and-noise
+  // GUESSED: N:2, from the parameter name
+  // 1 input, 2 outputs
+
+half_octave_filterbank(N:2)  an.half_octave_filterbank(N)
+  // GUESSED: N:2, from the parameter name
+  // DOES NOT COMPILE: ERROR : undefined symbol : mth_octave_filterbank_default
+
 hammer(coeff:0.1, omega0Sqr:1000, sigma0:0.01, kH:1e5, alpha:2.0, k:1.0/48000, offset:0.001, fIn:0)  fd.hammer(coeff, omega0Sqr, sigma0, kH, alpha, k, offset, fIn)
   output.min:-13702.9
   output.max:0
@@ -3353,8 +3733,10 @@ hat(pitch:800, tone:5000, attack:0.005, decay:0.3, gate:0)  sy.hat(pitch, tone, 
   // 0 input, 1 output
 
 high_shelf(Lpi:6, fx:2000)  fi.high_shelf(Lpi, fx)
+  Lpi.unit:dB
   Lpi.min:-60
   Lpi.max:12
+  fx.unit:Hz
   fx.min:20
   fx.max:20000
   fx.scale:log
@@ -3366,8 +3748,10 @@ high_shelf(Lpi:6, fx:2000)  fi.high_shelf(Lpi, fx)
   // 1 input, 1 output
 
 high_shelf1(Lpi:6, fx:2000)  fi.high_shelf1(Lpi, fx, x)
+  Lpi.unit:dB
   Lpi.min:-60
   Lpi.max:12
+  fx.unit:Hz
   fx.min:20
   fx.max:20000
   fx.scale:log
@@ -3381,6 +3765,7 @@ high_shelf1(Lpi:6, fx:2000)  fi.high_shelf1(Lpi, fx, x)
   // 1 input, 1 output
 
 high_shelf1_l(Gpi:2, fx:2000)  fi.high_shelf1_l(Gpi, fx, x)
+  fx.unit:Hz
   fx.min:20
   fx.max:20000
   fx.scale:log
@@ -3471,6 +3856,7 @@ highpassLR4(cf:1000)  fi.highpassLR4(cf, x)
   // 1 input, 1 output
 
 highpass_minus_lowpass(N:3, fc:1000)  fi.highpass_minus_lowpass(N, fc)
+  fc.unit:Hz
   fc.min:20
   fc.max:20000
   fc.scale:log
@@ -3481,6 +3867,7 @@ highpass_minus_lowpass(N:3, fc:1000)  fi.highpass_minus_lowpass(N, fc)
   // 1 input, 1 output
 
 highpass_minus_lowpass_even(N:4, fc:1000)  fi.highpass_minus_lowpass_even(N, fc)
+  fc.unit:Hz
   fc.min:20
   fc.max:20000
   fc.scale:log
@@ -3502,6 +3889,7 @@ highpass_minus_lowpass_odd(N:3, fc:1000)  fi.highpass_minus_lowpass_odd(N, fc)
   // 2 inputs, 1 output
 
 highpass_plus_lowpass(N:3, fc:1000)  fi.highpass_plus_lowpass(N, fc)
+  fc.unit:Hz
   fc.min:20
   fc.max:20000
   fc.scale:log
@@ -3513,6 +3901,7 @@ highpass_plus_lowpass(N:3, fc:1000)  fi.highpass_plus_lowpass(N, fc)
   // N cannot be adjusted live: the compiler demands a constant in this place
 
 highpass_plus_lowpass_even(N:4, fc:1000)  fi.highpass_plus_lowpass_even(N, fc)
+  fc.unit:Hz
   fc.min:20
   fc.max:20000
   fc.scale:log
@@ -3554,8 +3943,8 @@ highshelf2(f0:2000, gain:-6, dtune:0)  wa.highshelf2(f0, gain, dtune, x)
   f0.scale:log
   gain.unit:dB
   x.nature:signal
-  output.min:-1.28251
-  output.max:1.24804
+  output.min:-0.812178
+  output.max:0.842963
   output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: f0 from 20 to 20000
   // 1 input, 1 output
@@ -3573,8 +3962,10 @@ highshelf2Matched(G:1.5, CF:1500)  ve.highshelf2Matched(G, CF, x)
   // 1 input, 1 output
 
 highshelf_other_freq(N:3, Lpi:6, fx:2000)  fi.highshelf_other_freq(N, Lpi, fx)
+  Lpi.unit:dB
   Lpi.min:-60
   Lpi.max:12
+  fx.unit:Hz
   fx.min:20
   fx.max:20000
   fx.scale:log
@@ -3582,6 +3973,17 @@ highshelf_other_freq(N:3, Lpi:6, fx:2000)  fi.highshelf_other_freq(N, Lpi, fx)
   // BOUNDS GUESSED, from the parameter name: Lpi from -60 to 12
   // BOUNDS GUESSED, from the parameter name: fx from 20 to 20000
   // 0 input, 1 output
+
+hilbert(N:4, fc:20)  fi.hilbert(N, fc)
+  fc.unit:Hz
+  fc.min:20
+  fc.max:20000
+  fc.scale:log
+  output.min:-1.41698
+  output.max:1.37668
+  output.measure:silence-and-noise
+  // BOUNDS GUESSED, from the parameter name: fc from 20 to 20000
+  // 1 input, 1 output
 
 hs_osccos(freq:440, reset:0)  os.hs_osccos(freq, reset)
   freq.unit:Hz
@@ -3719,11 +4121,11 @@ identity(N:3)  la.identity(N)
 
 if(cond:1, then:0.5, else:-0.5)  ba.if(cond, then, else)
   then.min:-4.28
-  then.max:1
+  then.max:1.41
   else.min:-2.633
   else.max:1e+10
   // CONSTANT OUTPUT: the output does not move from 0.5
-  // BOUNDS FROM USAGE, the values the libraries pass to it: then from -4.28 to 1
+  // BOUNDS FROM USAGE, the values the libraries pass to it: then from -4.28 to 1.41
   // BOUNDS FROM USAGE, the values the libraries pass to it: else from -2.633 to 1e+10
   // 0 input, 1 output
 
@@ -3744,6 +4146,12 @@ ifft(N:8)  an.ifft(N)
   output.max:0.889625
   output.measure:silence-and-noise
   // 16 inputs, 16 outputs
+
+ifftb(N:1)  an.ifftb(N)
+  output.min:-0.999999
+  output.max:0.999977
+  output.measure:silence-and-noise
+  // 2 inputs, 2 outputs
 
 iir(bv, av:0.3)  fi.iir(bv, av)
   bv.nature:table
@@ -4034,6 +4442,12 @@ interpolator_linear(idv)  it.interpolator_linear(gen, idv)
   idv.example:it.make_idv(idxFloat)
   // NOT VERIFIABLE: the parameter's example relies on `idxFloat`, defined nowhere else
 
+interpolator_null(gen, idv)  it.interpolator_null(gen, idv)
+  gen.nature:function
+  idv.nature:function
+  idv.example:it.make_idv(idxFloat)
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+
 interpolator_select(idv, sel:2)  it.interpolator_select(gen, idv, sel)
   sel.min:0
   sel.max:3
@@ -4218,14 +4632,14 @@ kb_rom_rev1(rt:0.7, damp:0.3)  re.kb_rom_rev1(rt, damp)
   rt.max:1
   damp.min:0
   damp.max:1
-  output.min:-3.45546
-  output.max:3.28492
+  output.min:-3.4554
+  output.max:3.28503
   output.measure:silence-and-noise
   // 2 inputs, 2 outputs
 
 kb_rom_rev1_demo  dm.kb_rom_rev1_demo
   output.min:-2.72746
-  output.max:2.87777
+  output.max:2.87784
   output.measure:silence-and-noise
   // 2 inputs, 2 outputs
 
@@ -4344,6 +4758,12 @@ lTermination(a, b)  pm.lTermination(a, b)
   // 3 inputs, 3 outputs
   // b is not an input: the compiler accepts it only in the form of its example
 
+lag_ud(up:0.05, dn:0.2)  si.lag_ud(up, dn)
+  output.min:0
+  output.max:0.353671
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
 lagrangeCoeffs(N:2, xCoords)  it.lagrangeCoeffs(N, xCoords, x)
   xCoords.nature:table
   xCoords.example:(0.0, 0.5, 1.0)
@@ -4358,6 +4778,23 @@ lagrangeInterpolation(N:3, xCoords)  it.lagrangeInterpolation(N, xCoords, x)
   xCoords.nature:table
   x.nature:signal
   // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+
+lagrangeN(N:3)  it.lagrangeN(N, x)
+  x.nature:signal
+  x.example:N / 2.0
+  output.min:-12.5219
+  output.max:13.7982
+  output.measure:silence-and-noise
+  // 5 inputs, 1 output
+
+lagrange_h(N:2)  it.lagrange_h(N, x)
+  x.nature:signal
+  output.min:-2.99997
+  output.max:2.99998
+  output.measure:silence-and-noise
+  // at rest: 0 to 1; under noise: -2.99997 to 2.99998
+  // GUESSED: N:2, from the parameter name
+  // 1 input, 3 outputs
 
 lambert(itr:6)  wd.lambert(z, itr)
   z.nature:signal
@@ -4527,6 +4964,24 @@ lf_trianglepos(freq:3)  os.lf_trianglepos(freq)
   output.measure:no-input
   // 0 input, 1 output
 
+lfnoise(freq:10.1)  no.lfnoise(freq)
+  output.min:-0.859927
+  output.max:0.842526
+  output.measure:no-input
+  // 0 input, 1 output
+
+lfnoise0(freq:10.1)  no.lfnoise0(freq)
+  output.min:-0.979363
+  output.max:0.925248
+  output.measure:no-input
+  // 0 input, 1 output
+
+lfnoiseN(N:3, freq:10.1)  no.lfnoiseN(N, freq)
+  output.min:-0.929113
+  output.max:0.898254
+  output.measure:no-input
+  // 0 input, 1 output
+
 lfo(lfoWave:1, lfoDelay:50, lfoSync:0, lfoSpeed:35, gate:0)  dx.lfo(lfoWave, lfoDelay, lfoSync, lfoSpeed, gate)
   lfoWave.min:0
   lfoWave.max:5
@@ -4536,7 +4991,7 @@ lfo(lfoWave:1, lfoDelay:50, lfoSync:0, lfoSpeed:35, gate:0)  dx.lfo(lfoWave, lfo
   lfoSync.max:1
   lfoSpeed.min:0
   lfoSpeed.max:99
-  output.min:7.24813e-06
+  output.min:7.39098e-06
   output.max:1
   output.measure:no-input
   // 0 input, 2 outputs
@@ -4648,6 +5103,10 @@ line(n:256)  ba.line(n, x)
   output.measure:silence-and-noise
   // 1 input, 1 output
 
+linear  it.linear
+  // CONSTANT OUTPUT: nothing comes out with the starting values
+  // 0 input, 1 output
+
 linear2db(g:0.5)  ba.linear2db(g)
   // CONSTANT OUTPUT: the output does not move from -6.0206
   // 0 input, 1 output
@@ -4669,6 +5128,14 @@ listInterp(v)  ba.listInterp(v)
   output.measure:silence-and-noise
   // at rest: 800 to 800; under noise: 400.022 to 800
   // 1 input, 1 output
+
+lms(N:8, mu:0.01)  fi.lms(N, mu, x, d)
+  x.nature:signal
+  d.nature:signal
+  output.min:-1.22093
+  output.max:1.30475
+  output.measure:silence-and-noise
+  // 2 inputs, 2 outputs
 
 locrian  qu.locrian
   output.min:1
@@ -4734,9 +5201,40 @@ loop_speed_level(sf, part:0, speed:1, level:0.5)  so.loop_speed_level(sf, part, 
   // 0 input, 1 output
   // sf is not an input: the compiler accepts it only in the form of its example
 
+loudness_integrated(N:2)  an.loudness_integrated(N)
+  output.min:-100
+  output.max:1.19876
+  output.measure:silence-and-noise
+  // at rest: -100 to -100; under noise: 0.4388 to 1.19876
+  // 2 inputs, 1 output
+
+loudness_meansquare(T:0.400, N:2)  an.loudness_meansquare(T, N)
+  T.unit:s
+  output.min:0
+  output.max:1.3846
+  output.measure:silence-and-noise
+  // GUESSED: N:2, from the parameter name
+  // 2 inputs, 1 output
+
+loudness_momentary(N:2)  an.loudness_momentary(N)
+  output.min:-100
+  output.max:1.41323
+  output.measure:silence-and-noise
+  // at rest: -100 to -100; under noise: 1.334 to 1.41323
+  // 2 inputs, 1 output
+
+loudness_shortterm(N:2)  an.loudness_shortterm(N)
+  output.min:-100
+  output.max:1.3806
+  output.measure:silence-and-noise
+  // at rest: -100 to -100; under noise: -3.36004 to 1.3806
+  // 2 inputs, 1 output
+
 low_shelf(L0:6, fx:500)  fi.low_shelf(L0, fx)
+  L0.unit:dB
   L0.min:-60
   L0.max:12
+  fx.unit:Hz
   fx.min:20
   fx.max:20000
   fx.scale:log
@@ -4747,23 +5245,25 @@ low_shelf(L0:6, fx:500)  fi.low_shelf(L0, fx)
   // BOUNDS GUESSED, from the parameter name: fx from 20 to 20000
   // 1 input, 1 output
 
-low_shelf1(L0:0, fx:1000)  fi.low_shelf1(L0, fx, x)
+low_shelf1(L0:2, fx:500)  fi.low_shelf1(L0, fx, x)
+  L0.unit:dB
   L0.min:-60
   L0.max:12
+  fx.unit:Hz
   fx.min:20
   fx.max:20000
   fx.scale:log
   x.nature:signal
-  output.min:-0.999992
-  output.max:0.999944
+  x.example:os.osc(440)
+  output.min:-1.07827
+  output.max:1.09887
   output.measure:silence-and-noise
-  // GUESSED: L0:0, from the parameter name
-  // GUESSED: fx:1000, from the parameter name
   // BOUNDS GUESSED, from the parameter name: L0 from -60 to 12
   // BOUNDS GUESSED, from the parameter name: fx from 20 to 20000
   // 1 input, 1 output
 
 low_shelf1_l(G0:2, fx:500)  fi.low_shelf1_l(G0, fx, x)
+  fx.unit:Hz
   fx.min:20
   fx.max:20000
   fx.scale:log
@@ -4788,6 +5288,7 @@ lowpass(N:4, fc:2000)  fi.lowpass(N, fc)
   // N cannot be adjusted live: the compiler demands a constant in this place
 
 lowpass0_highpass1(s:0, N:2, fc:1000)  fi.lowpass0_highpass1(s, N, fc)
+  fc.unit:Hz
   fc.min:20
   fc.max:20000
   fc.scale:log
@@ -4822,7 +5323,7 @@ lowpass2Matched(CF:1000, Q:0.707)  ve.lowpass2Matched(CF, Q, x)
   Q.max:50
   Q.scale:log
   x.nature:signal
-  output.min:-0.490054
+  output.min:-0.490055
   output.max:0.500832
   output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: CF from 20 to 20000
@@ -4917,8 +5418,10 @@ lowshelf2Matched(G:1.5, CF:500)  ve.lowshelf2Matched(G, CF, x)
   // 1 input, 1 output
 
 lowshelf_other_freq(N:3, L0:6, fx:500)  fi.lowshelf_other_freq(N, L0, fx)
+  L0.unit:dB
   L0.min:-60
   L0.max:12
+  fx.unit:Hz
   fx.min:20
   fx.max:20000
   fx.scale:log
@@ -5050,7 +5553,7 @@ mass(m:1.0, grav:0.0)  mi.mass(m, grav, x0, x1)
   x0.nature:signal
   x1.nature:signal
   x1.example:xr0
-  // OUTPUT WITHOUT RANGE: still rising after 5 s on noise (peak 2.726e+07)
+  // OUTPUT WITHOUT RANGE: still rising after 5 s on noise (peak 5.221e+07)
   // 3 inputs, 1 output
 
 matMul(J:2, K:2, L:2, M:2)  la.matMul(J, K, L, M)
@@ -5059,9 +5562,36 @@ matMul(J:2, K:2, L:2, M:2)  la.matMul(J, K, L, M)
   output.measure:silence-and-noise
   // 8 inputs, 4 outputs
 
+maxGenderFreq  pm.maxGenderFreq
+  output.min:523.25
+  output.max:1046.5
+  output.measure:no-input
+  // 0 input, 2 outputs
+
 maxLength  pm.maxLength
   // CONSTANT OUTPUT: the output does not move from 3
   // 0 input, 1 output
+
+maxn(n:64)  rm.maxn(n)
+  n.unit:samples
+  output.min:0
+  output.max:0.999944
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+mean(n:64)  rm.mean(n)
+  n.unit:samples
+  output.min:-0.223884
+  output.max:0.229145
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+meansquare2lufs  an.meansquare2lufs
+  output.min:-100
+  output.max:-0.000241264
+  output.measure:silence-and-noise
+  // at rest: -100 to -100; under noise: -100 to -0.000241264
+  // 1 input, 1 output
 
 mel2hz(mel:1000.0)  ba.mel2hz(mel)
   // CONSTANT OUTPUT: the output does not move from 1000.02
@@ -5076,6 +5606,23 @@ mesh_square(N:1)  ef.mesh_square(N)
 midikey2hz(mk:60)  ba.midikey2hz(mk)
   // CONSTANT OUTPUT: the output does not move from 261.626
   // 0 input, 1 output
+
+millisec  ba.millisec
+  // CONSTANT OUTPUT: the output does not move from 48
+  // 0 input, 1 output
+
+minGenderFreq  pm.minGenderFreq
+  output.min:82.41
+  output.max:174.61
+  output.measure:no-input
+  // 0 input, 2 outputs
+
+minn(n:64)  rm.minn(n)
+  n.unit:samples
+  output.min:-0.999992
+  output.max:0
+  output.measure:silence-and-noise
+  // 1 input, 1 output
 
 minor(N:3, ROW:1, COL:1)  la.minor(N, ROW, COL)
   output.min:-1.82377
@@ -5135,8 +5682,8 @@ modalModel(n:3, modeFreqs, modeRes, modeGains)  pm.modalModel(n, modeFreqs, mode
   modeRes.example:(0.5,0.4,0.3)
   modeGains.nature:table
   modeGains.example:(0.8,0.6,0.4)
-  output.min:-123.787
-  output.max:140.718
+  output.min:-123.791
+  output.max:140.72
   output.measure:silence-and-noise
   // 1 input, 1 output
 
@@ -5166,8 +5713,8 @@ model2D(pointsX:2, pointsY:2, R:0, T:0, scheme:1, 0.5, 0.25, 0.125)  fd.model2D(
   // 4 inputs, 4 outputs
 
 modularInterpBody(nModes:20, shape:1.0, scale:1.5)  pm.modularInterpBody(nModes, shape, scale)
-  output.min:-5.50353
-  output.max:5.72687
+  output.min:-5.5036
+  output.max:5.72696
   output.measure:silence-and-noise
   // 3 inputs, 3 outputs
 
@@ -5201,6 +5748,15 @@ modulo  ma.modulo(x, y)
   y.nature:signal
   // OUTPUT NOT FINITE: NaN or infinity on silence (191872 samples out of 191872)
   // 2 inputs, 1 output
+
+moment(M, ftop, N:2, K:0)  an.moment(M, ftop, N, K)
+  K.min:0
+  K.max:2
+  // GUESSED: N:2, from the parameter name
+  // BOUNDS FROM USAGE, the values the libraries pass to it: K from 0 to 2
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: M has no starting value
+  // TO COMPLETE: ftop has no starting value
 
 mono_freeverb(fb1:0.7, fb2:0.5, damp:0.3, spread:30)  re.mono_freeverb(fb1, fb2, damp, spread)
   fb1.min:0
@@ -5252,6 +5808,34 @@ moog_vcf(res:0.5, fr:1000)  ve.moog_vcf(res, fr)
   // BOUNDS GUESSED, from the parameter name: fr from 20 to 20000
   // 1 input, 1 output
 
+moog_vcf_2b(res:0.4, fr:1200)  ve.moog_vcf_2b(res, fr)
+  res.min:0
+  res.max:1
+  fr.unit:Hz
+  fr.min:20
+  fr.max:20000
+  fr.scale:log
+  output.min:-0.308335
+  output.max:0.379063
+  output.measure:silence-and-noise
+  // BOUNDS GUESSED, from the parameter name: fr from 20 to 20000
+  // 1 input, 1 output
+
+moog_vcf_2bn(res:0.5, fr:440)  ve.moog_vcf_2bn(res, fr)
+  res.min:0
+  res.max:1
+  fr.unit:Hz
+  fr.min:20
+  fr.max:20000
+  fr.scale:log
+  output.min:-0.180427
+  output.max:0.207219
+  output.measure:silence-and-noise
+  // GUESSED: res:0.5, from the parameter name
+  // GUESSED: fr:440, from the parameter name
+  // BOUNDS GUESSED, from the parameter name: fr from 20 to 20000
+  // 1 input, 1 output
+
 moog_vcf_demo  dm.moog_vcf_demo
   output.min:-0.1521
   output.max:0.166385
@@ -5270,9 +5854,46 @@ motionEnvelope(thr:0.05, gain:1.25, envUpMs:15, envDownMs:25)  mo.motionEnvelope
   // BOUNDS GUESSED, from the parameter name: gain from 0 to 2
   // 1 input, 1 output
 
+motionEnvelopeRange(lo:0.2, hi:0.5, envUpMs:15, envDownMs:25)  mo.motionEnvelopeRange(lo, hi, envUpMs, envDownMs, sig)
+  lo.min:0
+  lo.max:1
+  envUpMs.unit:ms
+  envDownMs.unit:ms
+  sig.nature:signal
+  sig.example:os.sawtooth(0.5) * 0.5 + 0.5
+  output.min:0
+  output.max:0.476278
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+motionEnvelopeUD(thr:0.05, gain:1.25, envUpMs:120, envDownMs:40)  mo.motionEnvelopeUD(thr, gain, envUpMs, envDownMs, sig)
+  gain.min:0
+  gain.max:2
+  envUpMs.unit:ms
+  envDownMs.unit:ms
+  sig.nature:signal
+  sig.example:os.triangle(0.4) * 0.5 + 0.5
+  output.min:0
+  output.max:0.995651
+  output.measure:silence-and-noise
+  // BOUNDS GUESSED, from the parameter name: gain from 0 to 2
+  // 1 input, 1 output
+
 motion_wrapper_demo  dm.motion_wrapper_demo
   // CONSTANT OUTPUT: nothing comes out with the starting values
   // 18 inputs, 92 outputs
+
+ms_dec  ef.ms_dec
+  output.min:-1.99822
+  output.max:1.9936
+  output.measure:silence-and-noise
+  // 2 inputs, 2 outputs
+
+ms_enc  ef.ms_enc
+  output.min:-0.999112
+  output.max:0.996798
+  output.measure:silence-and-noise
+  // 2 inputs, 2 outputs
 
 ms_envelope_rect(period:0.05)  an.ms_envelope_rect(period, x)
   x.nature:signal
@@ -5312,6 +5933,40 @@ mth_octave_analyzer(O:3, M:3, ftop:8000, N:5)  an.mth_octave_analyzer(O, M, ftop
   output.measure:silence-and-noise
   // 1 input, 5 outputs
 
+mth_octave_analyzer3(M, ftop, N:2)  an.mth_octave_analyzer3(M, ftop, N)
+  // GUESSED: N:2, from the parameter name
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: M has no starting value
+  // TO COMPLETE: ftop has no starting value
+
+mth_octave_analyzer5(M, ftop, N:2)  an.mth_octave_analyzer5(M, ftop, N)
+  // GUESSED: N:2, from the parameter name
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: M has no starting value
+  // TO COMPLETE: ftop has no starting value
+
+mth_octave_analyzer6e(M, ftop, N:2)  an.mth_octave_analyzer6e(M, ftop, N)
+  // GUESSED: N:2, from the parameter name
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: M has no starting value
+  // TO COMPLETE: ftop has no starting value
+
+mth_octave_analyzer_default(M:3, ftop:10000, N:2)  an.mth_octave_analyzer_default(M, ftop, N)
+  M.min:1
+  M.max:3
+  output.min:-1.57296
+  output.max:1.59762
+  output.measure:silence-and-noise
+  // GUESSED: N:2, from the parameter name
+  // BOUNDS FROM USAGE, the values the libraries pass to it: M from 1 to 3
+  // 1 input, 2 outputs
+
+mth_octave_filterbank(O:3, M:2, ftop:8000, N:2)  fi.mth_octave_filterbank(O, M, ftop, N)
+  output.min:-1.43726
+  output.max:1.45457
+  output.measure:silence-and-noise
+  // 1 input, 2 outputs
+
 mth_octave_filterbank3(M:2, ftop:8000, N:2)  fi.mth_octave_filterbank3(M, ftop, N)
   output.min:-1.43726
   output.max:2
@@ -5335,11 +5990,18 @@ mth_octave_filterbank_alt(O:3, M:2, ftop:8000, N:2)  fi.mth_octave_filterbank_al
 mth_octave_filterbank_default(M:2, ftop:8000, N:2)  fi.mth_octave_filterbank_default(M, ftop, N)
   M.min:1
   M.max:3
+  ftop.unit:Hz
   output.min:-1.61905
   output.max:1.55313
   output.measure:silence-and-noise
   // BOUNDS FROM USAGE, the values the libraries pass to it: M from 1 to 3
   // 1 input, 2 outputs
+
+mth_octave_filterbank_demo(O:1)  dm.mth_octave_filterbank_demo(O)
+  output.min:-0.813359
+  output.max:0.744256
+  output.measure:silence-and-noise
+  // 1 input, 1 output
 
 mth_octave_spectral_level6e(M:3, ftop:8000, N:5, tau:0.05, dB_offset:0)  an.mth_octave_spectral_level6e(M, ftop, N, tau, dB_offset)
   tau.unit:s
@@ -5347,6 +6009,14 @@ mth_octave_spectral_level6e(M:3, ftop:8000, N:5, tau:0.05, dB_offset:0)  an.mth_
   output.max:0.999944
   output.measure:silence-and-noise
   // 1 input, 1 output
+
+mth_octave_spectral_level_default(M, ftop:16000, N:2, tau, dB_offset)  an.mth_octave_spectral_level_default(M, ftop, N, tau, dB_offset)
+  tau.unit:s
+  // GUESSED: N:2, from the parameter name
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: M has no starting value
+  // TO COMPLETE: tau has no starting value
+  // TO COMPLETE: dB_offset has no starting value
 
 mth_octave_spectral_level_demo(BPO:1.5)  dm.mth_octave_spectral_level_demo(BPO)
   output.min:-0.999992
@@ -5408,6 +6078,10 @@ neg  ma.neg(x)
   output.max:0.999992
   output.measure:silence-and-noise
   // 1 input, 1 output
+
+nextafter  ma.nextafter
+  faustwasm.unavailable:nextafter
+  // DOES NOT COMPILE: ERROR : calling foreign function 'nextafter' is not allowed in this compilation mode
 
 nextpow2  ma.nextpow2(x)
   x.nature:signal
@@ -5486,6 +6160,18 @@ nlf2(f:440, r:0.995)  fi.nlf2(f, r, x)
   output.measure:silence-and-noise
   // 1 input, 2 outputs
 
+nlms(N:8, mu:0.5)  fi.nlms(N, mu, x, d)
+  x.nature:signal
+  d.nature:signal
+  output.min:-2.53575
+  output.max:2.5787
+  output.measure:silence-and-noise
+  // 2 inputs, 2 outputs
+
+nointerp  it.nointerp
+  // CONSTANT OUTPUT: the output does not move from 3
+  // 0 input, 1 output
+
 noise  no.noise
   output.min:-0.999986
   output.max:0.99998
@@ -5497,6 +6183,7 @@ noises(N:4, i:2)  no.noises(N, i)
   output.max:0.999985
   output.measure:no-input
   // 0 input, 1 output
+  // i cannot be adjusted live: the compiler demands a constant in this place
 
 not  ma.not(x)
   x.nature:signal
@@ -5626,6 +6313,17 @@ oberheimLPF(normFreq:0.4, Q:1.5)  ve.oberheimLPF(normFreq, Q)
   output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: Q from 0.5 to 50
   // 1 input, 1 output
+
+octave_analyzer(N:2)  an.octave_analyzer(N)
+  output.min:-1.57296
+  output.max:1.59762
+  output.measure:silence-and-noise
+  // GUESSED: N:2, from the parameter name
+  // 1 input, 2 outputs
+
+octave_filterbank(N:2)  an.octave_filterbank(N)
+  // GUESSED: N:2, from the parameter name
+  // DOES NOT COMPILE: ERROR : undefined symbol : mth_octave_filterbank_default
 
 omega  wd.omega(x)
   x.nature:signal
@@ -5908,12 +6606,12 @@ orientationWeight(targetX:0, targetY:1, targetZ:0, shape:1, xs:0, ys:1, zs:0, sm
 osc(freq:440)  os.osc(freq)
   freq.unit:Hz
   freq.min:0.1
-  freq.max:8000
+  freq.max:12000
   freq.scale:log
   output.min:-1
   output.max:1
   output.measure:no-input
-  // BOUNDS FROM USAGE, the values the libraries pass to it: freq from 0.1 to 8000
+  // BOUNDS FROM USAGE, the values the libraries pass to it: freq from 0.1 to 12000
   // 0 input, 1 output
 
 oscb(f:440)  os.oscb(f)
@@ -5975,6 +6673,19 @@ oscq(fr:440)  os.oscq(fr)
   // BOUNDS GUESSED, from the parameter name: fr from 20 to 20000
   // 0 input, 2 outputs
 
+oscr(f:440)  os.oscr(f)
+  f.unit:Hz
+  output.min:-0.999137
+  output.max:0.999126
+  output.measure:no-input
+  // 0 input, 1 output
+
+oscr_demo  dm.oscr_demo
+  output.min:-0.100486
+  output.max:0.100484
+  output.measure:no-input
+  // 0 input, 1 output
+
 oscrc(f:440)  os.oscrc(f)
   f.unit:Hz
   f.min:100
@@ -5983,6 +6694,13 @@ oscrc(f:440)  os.oscrc(f)
   output.max:0.99912
   output.measure:no-input
   // BOUNDS FROM USAGE, the values the libraries pass to it: f from 100 to 1000
+  // 0 input, 1 output
+
+oscrp(f:440, p:0.5)  os.oscrp(f, p)
+  f.unit:Hz
+  output.min:-0.99912
+  output.max:0.999131
+  output.measure:no-input
   // 0 input, 1 output
 
 oscrq(f:440)  os.oscrq(f)
@@ -5996,6 +6714,12 @@ oscrs(f:440)  os.oscrs(f)
   f.unit:Hz
   output.min:-0.999137
   output.max:0.999126
+  output.measure:no-input
+  // 0 input, 1 output
+
+oscrs_demo  dm.oscrs_demo
+  output.min:-0.100486
+  output.max:0.100484
   output.measure:no-input
   // 0 input, 1 output
 
@@ -6254,6 +6978,17 @@ peak_compression_gain_mono_db(strength:0.5, thresh:-12, att:0.01, rel:0.1, knee:
   // BOUNDS GUESSED, from the parameter name: rel from 0.001 to 10
   // 1 input, 1 output
 
+peak_envelope(rel:0.1)  an.peak_envelope(rel)
+  rel.unit:s
+  rel.min:0.001
+  rel.max:10
+  rel.scale:log
+  output.min:0
+  output.max:0.999992
+  output.measure:silence-and-noise
+  // BOUNDS GUESSED, from the parameter name: rel from 0.001 to 10
+  // 1 input, 1 output
+
 peak_eq(Lfx:6, fx:1000, B:200)  fi.peak_eq(Lfx, fx, B)
   Lfx.unit:dB
   Lfx.min:-60
@@ -6331,6 +7066,33 @@ peak_expansion_gain_N_chan_db(strength:0.5, thresh:-40, range:20, att:0.05, hold
   // BOUNDS GUESSED, from the parameter name: hold from 0.001 to 10
   // BOUNDS GUESSED, from the parameter name: rel from 0.001 to 10
   // 2 inputs, 2 outputs
+
+peak_expansion_gain_mono_db(maxHold:2048, strength:0.5, thresh:-40, range:20, attack:0.05, hold:0.01, release:0.2, knee:6, prePost:0)  co.peak_expansion_gain_mono_db(maxHold, strength, thresh, range, attack, hold, release, knee, prePost)
+  maxHold.unit:samples
+  strength.min:0
+  strength.max:2
+  thresh.min:-80
+  thresh.max:0
+  range.unit:dB
+  attack.unit:s
+  attack.min:0.001
+  attack.max:10
+  attack.scale:log
+  hold.unit:s
+  hold.min:0.001
+  hold.max:10
+  hold.scale:log
+  release.unit:s
+  release.min:0.001
+  release.max:10
+  release.scale:log
+  // CONSTANT OUTPUT: the output does not move from 20
+  // BOUNDS GUESSED, from the parameter name: strength from 0 to 2
+  // BOUNDS GUESSED, from the parameter name: thresh from -80 to 0
+  // BOUNDS GUESSED, from the parameter name: attack from 0.001 to 10
+  // BOUNDS GUESSED, from the parameter name: hold from 0.001 to 10
+  // BOUNDS GUESSED, from the parameter name: release from 0.001 to 10
+  // 1 input, 1 output
 
 peakhold(mode:1)  ba.peakhold(mode)
   output.min:0
@@ -6456,7 +7218,7 @@ phaser2_stereo(Notches:4, width:50, frqmin:200, fratio:1.5, frqmax:4000, speed:0
   depth.max:1
   fb.min:-1
   fb.max:1
-  output.min:-1.22339
+  output.min:-1.2234
   output.max:1.25419
   output.measure:silence-and-noise
   // BOUNDS FROM INTERFACE, from the slider the libraries put on it: width from 10 to 5000
@@ -6528,9 +7290,21 @@ piecewise(xList, yList)  it.piecewise(xList, yList, x)
   // at rest: 4 to 4; under noise: 2.00002 to 4
   // 1 input, 1 output
 
+pink_filter  no.pink_filter
+  output.min:-0.193047
+  output.max:0.198784
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
 pink_noise  no.pink_noise
   output.min:-0.206333
   output.max:0.207954
+  output.measure:no-input
+  // 0 input, 1 output
+
+pink_noise_m  no.pink_noise_m
+  output.min:-2.57916
+  output.max:2.59943
   output.measure:no-input
   // 0 input, 1 output
 
@@ -6665,6 +7439,17 @@ pospass(N:2, fc:1000)  fi.pospass(N, fc)
   output.measure:silence-and-noise
   // GUESSED: N:2, from the parameter name
   // GUESSED: fc:1000, from the parameter name
+  // BOUNDS GUESSED, from the parameter name: fc from 20 to 20000
+  // 1 input, 2 outputs
+
+pospass6e(fc:100)  fi.pospass6e(fc)
+  fc.unit:Hz
+  fc.min:20
+  fc.max:20000
+  fc.scale:log
+  output.min:-1.08605
+  output.max:1.13216
+  output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: fc from 20 to 20000
   // 1 input, 2 outputs
 
@@ -6937,6 +7722,25 @@ probe_spectral_centroid(id:43, hide:1)  db.probe_spectral_centroid(id, hide, x)
   output.measure:silence-and-noise
   // 1 input, 1 output
 
+probe_tap(f)  db.probe_tap(f, x)
+  f.nature:expression
+  f.example:db.probe_rms_db(16, 1)
+  x.nature:signal
+  x.example:os.osc(220)
+  output.min:-0.999992
+  output.max:0.999944
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+  // f is not an input: the compiler accepts it only in the form of its example
+
+probe_tap_n(n:2, f)  db.probe_tap_n(n, f)
+  f.nature:function
+  f.example:+ : db.probe_rms_db(100, 1)
+  output.min:-0.999991
+  output.max:0.999953
+  output.measure:silence-and-noise
+  // 2 inputs, 2 outputs
+
 probe_time_ms(id:59, hide:1)  db.probe_time_ms(id, hide, x)
   x.nature:signal
   x.example:os.osc(220)
@@ -7143,6 +7947,13 @@ ratio2semi(ratio:2.0)  ba.ratio2semi(ratio)
   // BOUNDS GUESSED, from the parameter name: ratio from 1 to 20
   // 0 input, 1 output
 
+ratio2strength(ratio:4)  co.ratio2strength(ratio)
+  ratio.min:1
+  ratio.max:20
+  // CONSTANT OUTPUT: the output does not move from 0.75
+  // BOUNDS GUESSED, from the parameter name: ratio from 1 to 20
+  // 0 input, 1 output
+
 recursivize(p, q)  ro.recursivize(p, q)
   p.nature:function
   p.example:*(0.5)
@@ -7254,6 +8065,13 @@ resistor_Vout(i, R:820)  wd.resistor_Vout(i, R)
   // BOUNDS FROM USAGE, the values the libraries pass to it: R from 820 to 10000
   // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
 
+resonator(N:2, f:440)  an.resonator(N, f)
+  f.unit:Hz
+  output.min:-3.14159
+  output.max:3.14157
+  output.measure:silence-and-noise
+  // 1 input, 2 outputs
+
 resonbp(fc:1000, Q:2, gain:0.8)  fi.resonbp(fc, Q, gain)
   fc.unit:Hz
   fc.min:20
@@ -7315,6 +8133,7 @@ rev(n:32)  si.rev(n)
   // 1 input, 1 output
 
 rev1(maxdel:2048, N:64, g:0.6)  fi.rev1(maxdel, N, g)
+  N.unit:samples
   output.min:-2.2068
   output.max:2.2681
   output.measure:silence-and-noise
@@ -7323,6 +8142,7 @@ rev1(maxdel:2048, N:64, g:0.6)  fi.rev1(maxdel, N, g)
 rev2(maxlen:2048, len:64, g:0.6)  fi.rev2(maxlen, len, g)
   maxlen.min:64
   maxlen.max:2048
+  len.unit:samples
   len.min:37
   len.max:347
   output.min:-1.91829
@@ -7334,7 +8154,7 @@ rev2(maxlen:2048, len:64, g:0.6)  fi.rev2(maxlen, len, g)
 
 reverbTank_demo  dm.reverbTank_demo
   output.min:-0.251942
-  output.max:0.248142
+  output.max:0.248141
   output.measure:silence-and-noise
   // 2 inputs, 2 outputs
 
@@ -7352,7 +8172,56 @@ reverseEchoN(N:2, delMax:32)  ef.reverseEchoN(N, delMax)
   output.measure:silence-and-noise
   // 1 input, 2 outputs
 
+reverse_echo_demo(nChans:3)  dm.reverse_echo_demo(nChans)
+  output.min:-1.33807
+  output.max:1.34105
+  output.measure:silence-and-noise
+  // 1 input, 2 outputs
+
+rfft_analyzer_c(N:2)  an.rfft_analyzer_c(N)
+  output.min:-1.99402
+  output.max:1.99747
+  output.measure:silence-and-noise
+  // GUESSED: N:2, from the parameter name
+  // 1 input, 4 outputs
+
+rfft_analyzer_db(N:8)  an.rfft_analyzer_db(N)
+  output.min:-69.2369
+  output.max:16.4707
+  output.measure:silence-and-noise
+  // at rest: -69.2369 to -69.2369; under noise: -69.2369 to 16.4707
+  // 1 input, 5 outputs
+
+rfft_analyzer_magsq(N:2)  an.rfft_analyzer_magsq(N)
+  output.min:0
+  output.max:3.98989
+  output.measure:silence-and-noise
+  // GUESSED: N:2, from the parameter name
+  // 1 input, 2 outputs
+
+rfft_spectral_level(N:3, tau, dB_offset)  an.rfft_spectral_level(N, tau, dB_offset)
+  tau.unit:s
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: tau has no starting value
+  // TO COMPLETE: dB_offset has no starting value
+
 rk_solve(ts:0, ks:1, ni:1, h:1.0/ma.SR, eq, iv:1)  pm.rk_solve(ts, ks, ni, h, eq, iv)
+  eq.nature:table
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+
+rk_solve_1(h:1.0/ma.SR, eq, iv:1)  pm.rk_solve_1(h, eq, iv)
+  eq.nature:table
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+
+rk_solve_2(h:1.0/ma.SR, eq, iv:1)  pm.rk_solve_2(h, eq, iv)
+  eq.nature:table
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+
+rk_solve_3(h:1.0/ma.SR, eq, iv:1)  pm.rk_solve_3(h, eq, iv)
+  eq.nature:table
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+
+rk_solve_4(h:1.0/ma.SR, eq, iv:1)  pm.rk_solve_4(h, eq, iv)
   eq.nature:table
   // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
 
@@ -7428,6 +8297,22 @@ route2D(pointsX:1, pointsY:1, R:0, T:0)  fd.route2D(pointsX, pointsY, R, T)
 rpm  os.rpm
   // a set of definitions: sawtooth(freq, beta), square(freq, beta)
 
+rtocv(N:8)  an.rtocv(N, x)
+  x.nature:signal
+  x.example:os.osc(220)
+  output.min:-0.999992
+  output.max:0.999944
+  output.measure:silence-and-noise
+  // 1 input, 16 outputs
+
+rtorv(N:2)  an.rtorv(N, x)
+  x.nature:signal
+  output.min:-0.999992
+  output.max:0.999944
+  output.measure:silence-and-noise
+  // GUESSED: N:2, from the parameter name
+  // 1 input, 2 outputs
+
 russianBell(strikePosition:0.4, strikeCutoff:2000, strikeSharpness:0.5, gain:0.8, trigger:0)  pm.russianBell(strikePosition, strikeCutoff, strikeSharpness, gain, trigger)
   strikePosition.min:0
   strikePosition.max:6
@@ -7455,11 +8340,23 @@ russianBell_ui  pm.russianBell_ui
   // CONSTANT OUTPUT: nothing comes out with the starting values
   // 0 input, 1 output
 
+rvtocv(N:2)  an.rvtocv(N)
+  output.min:-0.999999
+  output.max:0.999977
+  output.measure:silence-and-noise
+  // GUESSED: N:2, from the parameter name
+  // 2 inputs, 4 outputs
+
 sAndH  ba.sAndH(trig)
   trig.nature:signal
   trig.example:ba.pulse(32)
   // CONSTANT OUTPUT: nothing comes out with the starting values
   // 2 inputs, 1 output
+
+safe_div(num, den)  an.safe_div(num, den)
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: num has no starting value
+  // TO COMPLETE: den has no starting value
 
 sallenKey2ndOrder(normFreq:0.3, Q:1.0)  ve.sallenKey2ndOrder(normFreq, Q)
   normFreq.min:0
@@ -7543,13 +8440,25 @@ satrev  re.satrev
   output.measure:silence-and-noise
   // 1 input, 2 outputs
 
+saw1(freq:440)  os.saw1(freq)
+  freq.unit:Hz
+  freq.min:20
+  freq.max:20000
+  freq.scale:log
+  output.min:-0.999991
+  output.max:0.999995
+  output.measure:no-input
+  // GUESSED: freq:440, from the parameter name
+  // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
+  // 0 input, 1 output
+
 saw2(freq:220)  os.saw2(freq)
   freq.unit:Hz
   freq.min:20
   freq.max:20000
   freq.scale:log
-  output.min:-0.990825
-  output.max:0.999972
+  output.min:-0.990817
+  output.max:0.999994
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
   // 0 input, 1 output
@@ -7582,7 +8491,7 @@ saw2f4(freq:220)  os.saw2f4(freq)
   freq.max:20000
   freq.scale:log
   output.min:-1.30537
-  output.max:0.996502
+  output.max:0.996503
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
   // 0 input, 1 output
@@ -7592,8 +8501,8 @@ saw2ptr(freq:220)  os.saw2ptr(freq)
   freq.min:20
   freq.max:20000
   freq.scale:log
-  output.min:-0.990825
-  output.max:0.999972
+  output.min:-0.990817
+  output.max:0.999994
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
   // 0 input, 1 output
@@ -7662,8 +8571,8 @@ sawtooth(freq:220)  os.sawtooth(freq)
   freq.min:0.08
   freq.max:220
   freq.scale:log
-  output.min:-0.990825
-  output.max:0.999972
+  output.min:-0.990817
+  output.max:0.999994
   output.measure:no-input
   // BOUNDS FROM USAGE, the values the libraries pass to it: freq from 0.08 to 220
   // 0 input, 1 output
@@ -7770,14 +8679,20 @@ selectn(N:4, i:2)  ba.selectn(N, i)
   // 4 inputs, 1 output
   // N cannot be adjusted live: the compiler demands a constant in this place
 
-selector(i:2, n:4)  ba.selector(i, n)
-  i.min:0
-  i.max:3
+selectnX(N:4, i:2, sel)  ba.selectnX(N, i, sel)
+  sel.nature:function
+  sel.example:"\(i,j,x,y).(select2((i >= j), x, y))"
   output.min:-0.999987
   output.max:0.999993
   output.measure:silence-and-noise
-  // BOUNDS FROM USAGE, the values the libraries pass to it: i from 0 to 3
   // 4 inputs, 1 output
+
+selector(i:2, n:4)  ba.selector(i, n)
+  output.min:-0.999987
+  output.max:0.999993
+  output.measure:silence-and-noise
+  // 4 inputs, 1 output
+  // i cannot be adjusted live: the compiler demands a constant in this place
 
 selectoutn(N:3, s:1)  ba.selectoutn(N, s)
   output.min:-0.999992
@@ -8017,6 +8932,9 @@ softclipQuadratic2  aa.softclipQuadratic2
   output.measure:silence-and-noise
   // 1 input, 1 output
 
+sound  so.sound
+  // a set of definitions: loop
+
 sparse_noise(f0:5.0)  no.sparse_noise(f0)
   output.min:-0.998832
   output.max:0.850182
@@ -8057,6 +8975,38 @@ spectralCentroid(nonlinearity:1, t:0.001)  an.spectralCentroid(nonlinearity, t, 
   output.max:12537.8
   output.measure:silence-and-noise
   // at rest: 20 to 20; under noise: 11335.3 to 12537.8
+  // 1 input, 1 output
+
+spectral_centroid(O:3, M:1, ftop:8000, N:6, T:0.1)  an.spectral_centroid(O, M, ftop, N, T)
+  ftop.unit:Hz
+  T.unit:s
+  output.min:0
+  output.max:10666.7
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+spectral_flux(O:3, M:1, ftop:8000, N:6, hop:0.02)  an.spectral_flux(O, M, ftop, N, hop)
+  hop.unit:s
+  output.min:0
+  output.max:0.132632
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+spectral_level  an.spectral_level
+  // DOES NOT COMPILE: ERROR : undefined symbol : mth_octave_spectral_level
+
+spectral_level_demo  dm.spectral_level_demo
+  output.min:-0.999992
+  output.max:0.999944
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+spectral_spread(O:3, M:1, ftop:8000, N:6, T:0.1)  an.spectral_spread(O, M, ftop, N, T)
+  ftop.unit:Hz
+  T.unit:s
+  output.min:0
+  output.max:5060.98
+  output.measure:silence-and-noise
   // 1 input, 1 output
 
 spectral_tilt(N:4, f0:200, bw:2000, alpha:-0.5)  fi.spectral_tilt(N, f0, bw, alpha)
@@ -8196,8 +9146,8 @@ standardBellModel(nModes:50, exPos:0, t60:30, t60DecayRatio:1, t60DecaySlope:2.5
   exPos.min:0
   exPos.max:6
   t60.unit:s
-  output.min:-31.075
-  output.max:33.2607
+  output.min:-31.0763
+  output.max:33.2606
   output.measure:silence-and-noise
   // 1 input, 1 output
 
@@ -8255,6 +9205,13 @@ stereoize(p)  sp.stereoize(p)
   output.measure:silence-and-noise
   // 2 inputs, 2 outputs
 
+strength2ratio(strength:0.75)  co.strength2ratio(strength)
+  strength.min:0
+  strength.max:2
+  // CONSTANT OUTPUT: the output does not move from 4
+  // BOUNDS GUESSED, from the parameter name: strength from 0 to 2
+  // 0 input, 1 output
+
 strike(exPos:0.4, sharpness:0.5, gain:0.8, trigger:0)  pm.strike(exPos, sharpness, gain, trigger)
   sharpness.min:0
   sharpness.max:1
@@ -8279,6 +9236,14 @@ stringSegment(maxLength:1.0, length:0.5)  pm.stringSegment(maxLength, length)
   output.measure:silence-and-noise
   // 3 inputs, 3 outputs
 
+sub  ma.sub(x, y)
+  x.nature:signal
+  y.nature:signal
+  output.min:-1.9936
+  output.max:1.99822
+  output.measure:silence-and-noise
+  // 2 inputs, 1 output
+
 subseq(a1, a2:1, a3:3)  ba.subseq(a1, a2, a3)
   a1.nature:table
   a1.example:(10,20,30,40,50)
@@ -8287,6 +9252,13 @@ subseq(a1, a2:1, a3:3)  ba.subseq(a1, a2, a3)
   output.measure:no-input
   // 0 input, 3 outputs
   // a2 cannot be adjusted live: the compiler demands a constant in this place
+
+sumn(n:64)  rm.sumn(n)
+  n.unit:samples
+  output.min:-14.3286
+  output.max:14.6653
+  output.measure:silence-and-noise
+  // 1 input, 1 output
 
 svf  fi.svf
   // a set of definitions: svf(T, F, Q, G), lp(f, q), bp(f, q), hp(f, q), notch(f, q), peak(f, q), ap(f, q), bell(f, q, g), ls(f, q, g), hs(f, q, g)
@@ -8452,6 +9424,12 @@ terminations(a, b, c)  pm.terminations(a, b, c)
   // 3 inputs, 3 outputs
   // b is not an input: the compiler accepts it only in the form of its example
 
+tf1(b0:0.5, b1:0.25, a1:-0.4)  fi.tf1(b0, b1, a1)
+  output.min:-1.1766
+  output.max:1.16994
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
 tf1s(b1:0, b0:1, a0:1, w1:ma.PI*ma.SR/2)  fi.tf1s(b1, b0, a0, w1)
   b1.min:-1
   b1.max:1
@@ -8476,9 +9454,55 @@ tf1snp(b1:0, b0:1, a0:1, w1:ma.PI*ma.SR/2)  fi.tf1snp(b1, b0, a0, w1)
   output.measure:silence-and-noise
   // 1 input, 1 output
 
+tf2(b0:1, b1:-1, b2:0, a1:0.823765146386639, a2:0.117420665547108)  fi.tf2(b0, b1, b2, a1, a2)
+  b1.min:-1
+  b1.max:0.745184
+  b2.min:0
+  b2.max:1
+  output.min:-5.82958
+  output.max:5.6701
+  output.measure:silence-and-noise
+  // BOUNDS FROM USAGE, the values the libraries pass to it: b1 from -1 to 0.745184
+  // BOUNDS FROM USAGE, the values the libraries pass to it: b2 from 0 to 1
+  // 1 input, 1 output
+
+tf21(b0:0.1, b1:0.2, b2:0.1, a1:-0.5, a2:0.06)  fi.tf21(b0, b1, b2, a1, a2)
+  output.min:-0.637171
+  output.max:0.653043
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+tf21t(b0, b1, b2, a1, a2)  fi.tf21t(b0, b1, b2, a1, a2)
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: b0 has no starting value
+  // TO COMPLETE: b1 has no starting value
+  // TO COMPLETE: b2 has no starting value
+  // TO COMPLETE: a1 has no starting value
+  // TO COMPLETE: a2 has no starting value
+
+tf22(b0, b1, b2, a1, a2)  fi.tf22(b0, b1, b2, a1, a2)
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: b0 has no starting value
+  // TO COMPLETE: b1 has no starting value
+  // TO COMPLETE: b2 has no starting value
+  // TO COMPLETE: a1 has no starting value
+  // TO COMPLETE: a2 has no starting value
+
+tf22t(b0:1, b1:0, b2:0, a1:0, a2:0)  fi.tf22t(b0, b1, b2, a1, a2)
+  output.min:-0.999992
+  output.max:0.999944
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
 tf2np(b0:0.6, b1:0.3, b2:0.2, a1:-0.5, a2:0.2)  fi.tf2np(b0, b1, b2, a1, a2)
   output.min:-1.59842
   output.max:1.60587
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+tf2s(b2:0, b1:0, b0:1, a1:sqrt(2), a0:1, w1:ma.PI*ma.SR/2)  fi.tf2s(b2, b1, b0, a1, a0, w1)
+  output.min:-1.21422
+  output.max:1.18838
   output.measure:silence-and-noise
   // 1 input, 1 output
 
@@ -8488,9 +9512,35 @@ tf2sb(b2:0, b1:0, b0:1, a1:sqrt(2), a0:1, w1:2*ma.PI*200, wc:2*ma.PI*1000)  fi.t
   output.measure:silence-and-noise
   // 1 input, 1 output
 
+tf2snp(b2:0, b1:0, b0:1, a1, a0:1, w1)  fi.tf2snp(b2, b1, b0, a1, a0, w1)
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: a1 has no starting value
+  // TO COMPLETE: w1 has no starting value
+
+tf3(b0, b1, b2, b3, a1, a2, a3)  fi.tf3(b0, b1, b2, b3, a1, a2, a3)
+  // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
+  // TO COMPLETE: b0 has no starting value
+  // TO COMPLETE: b1 has no starting value
+  // TO COMPLETE: b2 has no starting value
+  // TO COMPLETE: b3 has no starting value
+  // TO COMPLETE: a1 has no starting value
+  // TO COMPLETE: a2 has no starting value
+  // TO COMPLETE: a3 has no starting value
+
 tf3slf(b3:0, b2:0, b1:0, b0:1, a3:1, a2:2, a1:2, a0:1)  fi.tf3slf(b3, b2, b1, b0, a3, a2, a1, a0)
   // OUTPUT NOT FINITE: NaN or infinity on noise (191872 samples out of 191872)
   // 1 input, 1 output
+
+third_octave_analyzer(N:2)  an.third_octave_analyzer(N)
+  output.min:-1.57296
+  output.max:1.59762
+  output.measure:silence-and-noise
+  // GUESSED: N:2, from the parameter name
+  // 1 input, 2 outputs
+
+third_octave_filterbank(N:2)  an.third_octave_filterbank(N)
+  // GUESSED: N:2, from the parameter name
+  // DOES NOT COMPILE: ERROR : undefined symbol : mth_octave_filterbank_default
 
 time  ba.time
   // OUTPUT WITHOUT RANGE: still rising after 5 s on silence (peak 2.4e+05)
@@ -8533,6 +9583,42 @@ totalAccel(thr:0.05, gain:1.2, envUpMs:8, envDownMs:12)  mo.totalAccel(thr, gain
   // BOUNDS FROM INTERFACE, from the slider the libraries put on it: gain from 0 to 5
   // BOUNDS FROM INTERFACE, from the slider the libraries put on it: envUpMs from 0 to 5000
   // BOUNDS FROM INTERFACE, from the slider the libraries put on it: envDownMs from 0 to 5000
+  // 3 inputs, 1 output
+
+totalAccelRange(lo:0.1, hi:0.4, envUpMs:8, envDownMs:12)  mo.totalAccelRange(lo, hi, envUpMs, envDownMs, ax, ay, az)
+  lo.min:0
+  lo.max:1
+  hi.min:0.4
+  hi.max:1
+  envUpMs.unit:ms
+  envDownMs.unit:ms
+  ax.nature:signal
+  ax.example:os.sawtooth(0.2) * 0.2
+  ay.nature:signal
+  ay.example:os.triangle(0.15) * 0.1
+  az.nature:signal
+  az.example:os.sawtooth(0.12) * 0.3
+  output.min:0
+  output.max:0.997642
+  output.measure:silence-and-noise
+  // BOUNDS FROM USAGE, the values the libraries pass to it: hi from 0.4 to 1
+  // 3 inputs, 1 output
+
+totalAccelUD(thr:0.05, gain:1.2, envUpMs:120, envDownMs:40)  mo.totalAccelUD(thr, gain, envUpMs, envDownMs, ax, ay, az)
+  gain.min:0
+  gain.max:2
+  envUpMs.unit:ms
+  envDownMs.unit:ms
+  ax.nature:signal
+  ax.example:os.sawtooth(0.2) * 0.2
+  ay.nature:signal
+  ay.example:os.triangle(0.15) * 0.1
+  az.nature:signal
+  az.example:os.sawtooth(0.12) * 0.3
+  output.min:0
+  output.max:0.999828
+  output.measure:silence-and-noise
+  // BOUNDS GUESSED, from the parameter name: gain from 0 to 2
   // 3 inputs, 1 output
 
 totalEnvelope(thr:0.01, gain:0.79, envUpMs:50, envDownMs:50)  mo.totalEnvelope(thr, gain, envUpMs, envDownMs, x, y, z)
@@ -8609,6 +9695,14 @@ transpose2(N:2, M:3)  la.transpose2(N, M)
   output.measure:silence-and-noise
   // 6 inputs, 6 outputs
 
+transpose_windowed(P:2, w:1024, s:7)  ef.transpose_windowed(P, w, s, sig)
+  w.unit:samples
+  sig.nature:signal
+  output.min:-0.993726
+  output.max:0.993117
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
 triangle(freq:220)  os.triangle(freq)
   freq.unit:Hz
   freq.min:0.03
@@ -8631,13 +9725,18 @@ triangleN(N:3, freq:220)  os.triangleN(N, freq)
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
   // 0 input, 1 output
 
+true_peak  an.true_peak(x)
+  x.nature:signal
+  x.example:os.osc(12000)*0.97
+  // DOES NOT COMPILE: the compiler fails: Aborted(native code called abort())
+
 twin_osc(f:220, amt:0.5, detune:0, m:0)  os.twin_osc(f, amt, detune, m)
   f.unit:Hz
   amt.min:0
   amt.max:1
   detune.unit:samples
-  output.min:-1.5732
-  output.max:0.766768
+  output.min:-1.57338
+  output.max:0.766514
   output.measure:no-input
   // 0 input, 1 output
 
@@ -8723,6 +9822,13 @@ uniformPanToStereo(N:3)  ef.uniformPanToStereo(N)
   output.measure:silence-and-noise
   // 3 inputs, 2 outputs
 
+unwrap(pi:ma.PI)  ma.unwrap(pi, x)
+  x.nature:signal
+  output.min:-0.999992
+  output.max:0.999944
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
 vecOp(vectorsList, op)  si.vecOp(vectorsList, op)
   vectorsList.nature:table
   vectorsList.example:(v0, v1)
@@ -8746,10 +9852,38 @@ velvet_noise_demo  dm.velvet_noise_demo
   // 0 input, 1 output
 
 version  vl.version
-  output.min:0
-  output.max:71
+  output.min:2
+  output.max:74
   output.measure:no-input
   // 0 input, 3 outputs
+
+vibrato2_mono(sections:4, phase01:0, fb:0.5, width:1000, frqmin:100, fratio:1.5, frqmax:4800, speed:0.5)  pf.vibrato2_mono(sections, phase01, fb, width, frqmin, fratio, frqmax, speed)
+  phase01.min:0
+  phase01.max:1
+  fb.min:-1
+  fb.max:1
+  width.unit:Hz
+  width.min:10
+  width.max:5000
+  width.scale:log
+  frqmin.unit:Hz
+  frqmin.min:20
+  frqmin.max:5000
+  frqmin.scale:log
+  fratio.min:1.1
+  fratio.max:4
+  frqmax.unit:Hz
+  speed.unit:Hz
+  speed.min:0
+  speed.max:10
+  output.min:-2.80831
+  output.max:2.78373
+  output.measure:silence-and-noise
+  // BOUNDS FROM INTERFACE, from the slider the libraries put on it: width from 10 to 5000
+  // BOUNDS FROM INTERFACE, from the slider the libraries put on it: frqmin from 20 to 5000
+  // BOUNDS FROM INTERFACE, from the slider the libraries put on it: fratio from 1.1 to 4
+  // BOUNDS FROM INTERFACE, from the slider the libraries put on it: speed from 0 to 10
+  // 1 input, 1 output
 
 violinBody  pm.violinBody
   output.min:-0.999992
@@ -8904,7 +10038,7 @@ wah4(fr:800)  ve.wah4(fr)
   // 1 input, 1 output
 
 wah4_demo  dm.wah4_demo
-  output.min:-0.526299
+  output.min:-0.5263
   output.max:0.526713
   output.measure:silence-and-noise
   // 1 input, 1 output
@@ -8924,8 +10058,33 @@ waveguide(nMax:512, n:32)  pm.waveguide(nMax, n)
   output.measure:silence-and-noise
   // 3 inputs, 3 outputs
 
-waveguideN  pm.waveguideN
-  // a set of definitions: waveguideUd, waveguideFd, waveguideFd2, waveguideFd4
+waveguideFd(nMax:512, n:32)  pm.waveguideFd(nMax, n)
+  n.unit:samples
+  output.min:-0.999999
+  output.max:0.999997
+  output.measure:silence-and-noise
+  // 3 inputs, 3 outputs
+
+waveguideFd2(nMax:512, n:32)  pm.waveguideFd2(nMax, n)
+  n.unit:samples
+  output.min:-0.999999
+  output.max:0.999997
+  output.measure:silence-and-noise
+  // 3 inputs, 3 outputs
+
+waveguideFd4(nMax:512, n:32)  pm.waveguideFd4(nMax, n)
+  n.unit:samples
+  output.min:-0.999999
+  output.max:0.999997
+  output.measure:silence-and-noise
+  // 3 inputs, 3 outputs
+
+waveguideUd(nMax:512, n:32)  pm.waveguideUd(nMax, n)
+  n.unit:samples
+  output.min:-0.999999
+  output.max:0.999997
+  output.measure:silence-and-noise
+  // 3 inputs, 3 outputs
 
 wfs(xref:0, yref:1, zref:0, speakersDist:0.5, nSources:1, nSpeakers:2, inProc, xs, ys, zs)  sp.wfs(xref, yref, zref, speakersDist, nSources, nSpeakers, inProc, xs, ys, zs)
   inProc.nature:function
@@ -8948,8 +10107,8 @@ wgr(f:440, r:0.995)  fi.wgr(f, r, x)
   f.unit:Hz
   x.nature:signal
   x.example:os.osc(440)
-  output.min:-23.255
-  output.max:22.6939
+  output.min:-23.2551
+  output.max:22.694
   output.measure:silence-and-noise
   // 1 input, 2 outputs
 
@@ -8958,6 +10117,95 @@ wider(N:1, w:0.5)  ho.wider(N, w)
   output.max:1.34653
   output.measure:silence-and-noise
   // 3 inputs, 3 outputs
+
+window_bartlett  an.window_bartlett(x)
+  x.nature:signal
+  output.min:0
+  output.max:0.999959
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+window_blackman  an.window_blackman(x)
+  x.nature:signal
+  output.min:-2.23517e-08
+  output.max:1
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+window_blackman_harris  an.window_blackman_harris(x)
+  x.nature:signal
+  output.min:0
+  output.max:1
+  output.measure:silence-and-noise
+  // at rest: 5.99623e-05 to 5.99623e-05; under noise: 0 to 1
+  // 1 input, 1 output
+
+window_cosN(coeffs)  an.window_cosN(coeffs, x)
+  coeffs.nature:table
+  coeffs.example:(0.5, -0.5)
+  x.nature:signal
+  x.example:os.lf_sawpos(100)
+  output.min:0
+  output.max:1
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+window_flattop  an.window_flattop(x)
+  x.nature:signal
+  output.min:-0.0705611
+  output.max:1
+  output.measure:silence-and-noise
+  // at rest: -0.000421047 to -0.000421047; under noise: -0.0705611 to 1
+  // 1 input, 1 output
+
+window_hamming  an.window_hamming(x)
+  x.nature:signal
+  output.min:0
+  output.max:1
+  output.measure:silence-and-noise
+  // at rest: 0.08 to 0.08; under noise: 0 to 1
+  // 1 input, 1 output
+
+window_hann  an.window_hann(x)
+  x.nature:signal
+  x.example:os.lf_sawpos(100)
+  output.min:0
+  output.max:1
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+window_kaiser(beta:8.6)  an.window_kaiser(beta, x)
+  beta.min:2
+  beta.max:16
+  x.nature:signal
+  x.example:os.lf_sawpos(100)
+  // OUTPUT NOT FINITE: NaN or infinity on noise (68141 samples out of 191872)
+  // 1 input, 1 output
+
+window_nuttall  an.window_nuttall(x)
+  x.nature:signal
+  output.min:-2.98023e-08
+  output.max:1
+  output.measure:silence-and-noise
+  // 1 input, 1 output
+
+window_rect  an.window_rect(x)
+  x.nature:signal
+  output.min:0
+  output.max:1
+  output.measure:silence-and-noise
+  // at rest: 1 to 1; under noise: 0 to 1
+  // 1 input, 1 output
+
+window_tukey(a:0.5)  an.window_tukey(a, x)
+  a.min:0
+  a.max:1
+  x.nature:signal
+  x.example:os.lf_sawpos(100)
+  output.min:0
+  output.max:1
+  output.measure:silence-and-noise
+  // 1 input, 1 output
 
 zc  ma.zc
   output.min:0
@@ -8981,8 +10229,21 @@ zero  fi.zero(z)
   output.measure:silence-and-noise
   // 2 inputs, 1 output
 
+zita_distrib2(N:8)  re.zita_distrib2(N)
+  output.min:-0.999999
+  output.max:0.999999
+  output.measure:silence-and-noise
+  // 2 inputs, 8 outputs
+
+zita_in_delay(rdel:60)  re.zita_in_delay(rdel)
+  rdel.unit:ms
+  output.min:-0.3
+  output.max:0.299993
+  output.measure:silence-and-noise
+  // 2 inputs, 2 outputs
+
 zita_light  dm.zita_light
-  output.min:-0.530036
+  output.min:-0.530035
   output.max:0.500878
   output.measure:silence-and-noise
   // 2 inputs, 2 outputs
