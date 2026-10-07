@@ -21,8 +21,6 @@
 
 ## What FaustX adds
 
-**FaustX is a superset of Faust.** Every Faust program is a FaustX program. This document says **what
-FaustX adds**, and nothing else.
 
 **Tag: `fx:`.** A backtick `` `fx: …` `` carries FaustX.
 
@@ -41,8 +39,6 @@ A ~ B      recursion
 Its library carries **998 public functions** — oscillators, filters, envelopes, effects, analysis — of
 which **645 depend on recursion**, the construction that makes reverbs, delays and recursive filters.
 
-**FaustX adds no computing function.** What Faust lacks in order to patch live is not a function, it
-is two manipulations.
 
 ---
 
@@ -92,36 +88,19 @@ let lpf1 lowpass                     // lay down an instance
 **The name first, the body next, with no sign between them.** The first word is the name, all the
 rest is the body; it accepts any Faust expression.
 
-**`let` is the only exception to the principle of notation**, and it is justified: Faust already
-carries `letrec`, and it is the most classical word there is for single binding.
 
 **The name alone replaces the body.** `let` declares, the name without `let` reassigns — the
 distinction every binding language makes, carried here by the one word that declares, adding nothing.
 **Verified by compiling**: `lpf1 fi.lowpass(5,800)` is a syntax error in Faust, both as an expression
 and at the head of a line. The slot is free.
 
-**The `!` cancels the sign it precedes.** One rule, two uses: `saw1 !: lpf1` cancels the connection,
-`!let lpf1` cancels the binding.
 
 ### The rules
 
 **One declaration per name.** A second `let` on `lpf1` is an error — like Faust, like every binding
 language. To change an instance you replace it or you give it back; you do not redeclare it.
 
-**`let` shares, `=` duplicates.** That is the sentence that separates the two signs. `=` keeps its
-Faust meaning intact, and using a name bound by `let` in two places is **the same circuit patched
-twice**.
 
-**A shared instance sums its inputs and broadcasts its output** — what Faust writes `:>` and `<:`.
-This is the behavior of an effect send: two voices going into the same reverb resonate in the same
-space.
-
-**One line, never a block.** `letrec` takes a block because its equations are *mutually* recursive;
-our bindings are independent. And live, you send back one line, not a batch.
-
-**At the root only.** An instance named inside a `with{}`, a `letrec{}` or an `environment{}` would
-be unreachable from outside, which destroys the very point of `let`. Faust's local scopes keep their
-meaning and host no `let`.
 
 **The name prefixes the control paths.** Faust refuses two controls with the same path — a bank of
 eight identical filters gives `ERROR : path '/Filter_Bank/Band/Q' is already used` (`faq.md:180`),
@@ -149,10 +128,6 @@ lpf1 = fi.lowpass(3, hslider("cutoff", 800, 20, 20000, 1));   // 59 signs
 let lpf1 lowpass                                              // 16 signs
 ```
 
-**On the fallback**, when no declaration covers the function, a free identifier written in place of
-an argument becomes a port and **the coder is the one who names it** — `fi.lowpass(3, cutoff:800)`.
-Faust's own names cannot serve: they are the parameters of the definition, **out of scope at the call
-site**, and `fi.lowpass(N:3, fc:800)` answers `undefined symbol : fc`.
 
 **⚠️ This notation is not neutral for Faust, and that is measured.** With `fc` defined just above,
 `fi.lowpass(3, fc:800)` answers `ERROR : sequential composition fc:fc` — the same error, sign for
@@ -167,20 +142,8 @@ fi.lowpass(3, cutoff:800)   // cutoff is defined nowhere → a port
 fi.lowpass(3, saw1:lpf2)    // saw1 is an instance       → a connection
 ```
 
-**The rule that decides is the one we already have**: a free identifier is a port. But it leaves a
-door open that has to be closed — the day someone lays down `let cutoff …`, every `cutoff:800` line
-written elsewhere would change meaning with nothing moving on screen. **A port therefore cannot bear
-the name of an instance, nor the reverse: the collision is refused in both directions.**
 
-**The assigning `:` is not an invention**: Faust already uses it in widget modulation,
-`["cutoff": 400 -> lpf]`, and its documentation states that this `:` separates visually and is not
-the sequential composition operator (`syntax.md:3241`). **Verified by compiling**:
-the form is accepted, and the modulator takes a constant as readily as a signal —
-`["cutoff": os.osc(1) -> lpf]` compiles and adds the oscillator's state to the circuit.
 
-**What FaustX takes from it is the move.** In Faust the target is written **inside** the brackets and
-the expression is rebuilt; live, the target is already laid down and carries a name, so
-`lpf1.cutoff:400` is enough.
 
 ### What this does to the sound
 
@@ -220,11 +183,6 @@ Five signs compose circuits: `A : B` puts in series, `A , B` **stacks**, `A <: B
 merges, `A ~ B` loops back. They are frozen productions of the grammar (`faustparser.y:481-485`) — no
 library can declare a sixth.
 
-**⚠️ The comma is not the studio's parallel**, and Faust's documentation, which calls it *parallel
-composition*, invites confusion. It **stacks** two circuits that ignore each other: each keeps its
-own inputs and outputs. Measured — `A , B` has **2 inputs and 2 outputs**, where the musician's
-parallel, `A <: (X,Y) :> B`, has **one of each**. The latter is written with `<:` and `:>`, and it is
-precisely the one that naming an instance makes automatic.
 
 **Width — the number of input and output channels — is fixed at compile time, and the combinators
 require it strictly.** Measured, Faust 2.70.3:
@@ -242,8 +200,6 @@ require it strictly.** Measured, Faust 2.70.3:
 
 ### What live performance demands
 
-**Patching without counting.** A musician patching while it plays does not work out multiples; a
-width that does not come out even must not stop the music.
 
 **Writing a width in one sign.** Faust's multichannel is written by duplicating both sides:
 `par(i,8,os.sawtooth(100+i)) : par(i,8,fi.lowpass(3,800))` is **56 signs** against **12** for
@@ -254,34 +210,13 @@ reverb, every compressor, 109 filters out of 114.
 
 ### The adaptation rule — settled 2026-08-06
 
-**FaustX's `:` adapts instead of refusing, like a polyphonic cable in VCV Rack.**
 
-| what arrives | what FaustX does |
-| --- | --- |
-| one channel into several | it is **broadcast** to all of them |
-| several channels into a module's input | they are **summed** |
-| several channels into a named port | the **first** is taken |
-| widths with no whole ratio | we come back to the number the port accepts |
-
-**This distinction is VCV Rack's, to the letter.** Its voltage standards prescribe, for a
-one-channel module receiving a multi-channel cable: *"sum the voltages of all channels"* on an audio
-input, *"use the first channel's voltage"* on a modulation input.
-
-**And our notation already carries it, with nothing added.** `saw8 : lpf1` aims at the module's
-input, so at audio, so we sum — nothing falls silent. `lfo8 : lpf1.cutoff` aims at a named port, so
-at a control, which has only one value: the first channel is taken. The dot is enough to tell the two
-apart, where Faust knows only one kind of signal.
 
 **It costs Faust nothing.** FaustX translates: it emits the `<:`, the `:>` or the bus that fits the
 widths it sees. The compiler receives a program whose widths come out even, and never has to know
 that any adaptation took place.
 
-**No valid Faust program changes meaning** — FaustX only accepts what Faust used to reject.
 
-**What stays non-VCV, and is meant to**: in VCV Rack an input takes only one cable, and an effect
-send needs a mixer. In FaustX, several cables arriving at a port are summed, because the port belongs
-to a named instance. These are two distinct questions — the width of a cable, and the number of
-cables on a port.
 
 **What the adaptation does not make up for**: width stays **fixed at compile time**, where VCV
 changes it while playing. Varying it live means recompiling the module concerned — ~32 ms.
@@ -295,26 +230,10 @@ dly1 !~ fb1         // open the loop
 dly1 ~8 fb1         // loop eight channels back
 ```
 
-**Two decorations, learned once, valid everywhere: a `!` in front cancels, a digit after gives the
-width.** That is what separates a rule from three lucky finds — the `!` already serves on binding,
-`!let`.
 
 **Of the five signs, two get decorated, one stays as it is, and two disappear from everyday
 writing.**
 
-| sign | what it does | in FaustX |
-| --- | --- | --- |
-| `:` | put in series | `:8` the width, `!:` cut, and it adapts |
-| `,` | stack | **unchanged** |
-| `<:` | split | **implicit** |
-| `:>` | merge | **implicit** |
-| `~` | loop back | `!~` open, `~8` the width |
-
-**Stacking needs nothing**, and that is a result: what it serves to do live — add a branch — is
-already covered by the placement rule. In a file, a line describes the circuit; sent alone while it
-plays, it adds. The `,` keeps its role inside an expression written in one piece.
-
-**Split and merge disappear because the definition made them automatic.** A named instance connected
 twice is broadcast; two cables on the same port are summed. This is the first place where the element
 settled before this one pays off somewhere other than at home.
 
@@ -325,19 +244,6 @@ musical rule across every use of `!`.
 
 ### What `~8` means
 
-**The digit says how many channels come back** — and the measurement shows the question is a real
-one, because Faust does not loop everything back by default:
-
-| Faust notation | inputs | outputs |
-| --- | --- | --- |
-| `par(i,8,+) ~ par(i,8,_)` — eight channels looped back | 8 | 8 |
-| `par(i,8,+) ~ par(i,4,_)` — four looped back | 12 | 8 |
-| `par(i,8,+) ~ _` — **one only** looped back | 15 | 8 |
-| `+ ~ par(i,8,_)` — more returns than inputs | **refused** | |
-
-The inputs that are not looped back stay free, and their number changes with the width of the return.
-Writing `dly1 ~4 fb1` therefore says something no other notation says briefly: **four channels come
-back, the others stay open**.
 
 ---
 
@@ -370,9 +276,6 @@ lfo1 : lpf1.cutoff      // a named port      — already settled
 saw1.3 : lpf1.5         // channel 3 into channel 5
 ```
 
-No new sign: the dot already takes something from an instance, and what follows says what — a name
-for a control, a number for a channel. FaustX emits the matching `route(…)`, and writes only the
-channels being talked about.
 
 **The two primitives become gestures, written in front of the instance they aim at.**
 
@@ -381,20 +284,9 @@ _ lpf1        // neutralize: the signal passes through, the module stays alive
 ! lpf1        // delete: nothing comes out of it any more
 ```
 
-**The operator comes before its operand**, as everywhere else in programming, and as the `!` already
-does on `!:`, `!~` and `!let`. One single use of `!` in the whole language: **in front of what it
-cancels**.
 
-**And this is not the same thing as replacing a body.** `lpf1 lowpass(5, cutoff)` makes the filter
-another filter; `_ lpf1` does not touch the body, it changes the module's relation to the graph. Two
-distinct acts, two notations.
 
-**This is what replaces the `on` and `off` keywords of the first draft.** A keyword decorates
-nothing; `_` and `!` are primitives Faust already carries. **The gesture costs no new sign.**
 
-**The `_` requires the space.** `_lpf1` is a valid identifier in Faust — verified by compiling a
-definition that carries that name. Written flush, the gesture would become a name. So we write
-`_ lpf1` and, by symmetry, `! lpf1`; the `!` only sticks to compound signs.
 
 ### What this does to the sound
 
@@ -406,8 +298,6 @@ finishes coming out. A bypassed reverb is not cut off.
 its state**. FaustX's rule is musical, not technical, and it holds for every use of `!` and `_`:
 nothing is ever cut abruptly.
 
-**Channels are counted from 1, like Faust.** `saw1.1` is the first. VCV Rack counts from 0, but Faust
-is what receives the program, and `route(2,2, 1,2, 2,1)` counts this way.
 
 ---
 
@@ -503,7 +393,6 @@ unique is the name; what repeats is the circuit it designates.
 
 ### Multiplicity is written on the name
 
-**`:8` means *eight times*, and nothing else, wherever it appears.**
 
 ```faustx
 let lpf1    lowpass                  // one instance
@@ -514,12 +403,6 @@ let voix:8  sawtooth : lowpass       // eight complete chains
     lpfs.cutoff:400                  // all of them together
 ```
 
-**Stuck to the name being declared**, it says that this name designates eight of them; **between two
-names**, it says the connection is made in eight copies. One single idea, two positions.
-
-**Multiplicity belongs to the name, not to the body** — and that is what keeps the notation workable
-when the body gets complicated: `let voix:8 sawtooth : lowpass` needs no parentheses at all, where
-carrying the number at the end of the expression would require them.
 
 **And the eight are named with nothing added**: the dot takes from the instance, the number
 designates the channel, and for a bank of one-channel modules, the channel **is** the module.
@@ -534,9 +417,6 @@ eight drains as it does for every replacement.
 
 ### How the others get decorated
 
-**`seq`, `sum` and `prod` get no decoration.** Putting eight copies in series, adding them or
-multiplying them are writing constructions, not gestures: they are laid down once and do not change
-while you play. They stay available exactly as they are.
 
 ---
 
@@ -630,7 +510,6 @@ already declared with their parameter names, as everywhere else:
 voix(freq:110, cutoff:800)  sawtooth(freq:freq) : lowpass(cutoff:cutoff)
 ```
 
-The body accepts raw Faust just as well, through the fallback: `voix(freq:110) os.sawtooth(freq)`.
 
 **What this removes**: the imposed order and the argument positions. A declared module is
 instantiated without counting.
@@ -655,8 +534,6 @@ with its arguments in Faust's order and a port named on the fly:
 let lpf1 fi.lowpass(3, cutoff:800)   // no declaration: Faust's order, no defaults
 ```
 
-This is the only place in the language where two notations do the same thing, and it is owned:
-without it, Faust's 1,002 public functions would be out of reach until a declaration covers them.
 
 ### The declarations generate themselves
 
@@ -700,10 +577,6 @@ the generated file. **The generated declarations are a starting point, not a fin
 **A port that no library covers and that has not been given a range is a numeric entry.** Writing
 `min` and `max` makes it a slider.
 
-Faust requires five arguments, so FaustX has to invent four: the choice is forced, it is only a
-matter of making it well. A slider with arbitrary bounds is unusable — its travel means nothing —
-whereas a numeric entry stays correct whatever its bounds, since you **type** the value into it. That
-is precisely the live coding gesture.
 
 **The case is rare anyway and the choice is reversible**: as soon as a library covers the function,
 the range comes from it. Nothing that is written depends on this default.
@@ -754,12 +627,6 @@ saw1 : lpf1 : process        // it sounds
 saw1 !: process              // nothing comes out any more
 ```
 
-**No invention**: `process` is Faust's word, the `:` is the connection, the `!:` the cut. What FaustX
-adds is a point of view — where Faust makes it a definition you write once, FaustX makes it **the
-sink of the graph**, which you patch into and out of while it plays.
-
-**What the translation does with it**: it gathers everything arriving at `process` and emits
-`process = <what arrives there>`. Multiple connections are summed, as on any port.
 
 ### And an input is written both ways
 
@@ -783,8 +650,6 @@ ligne : rev1 : process
 language: `_` is a Faust expression, `let` binds it, and you come back to it afterwards as to any
 other instance — `micro !: lpf1` unplugs the guitar from the filter without touching the rest.
 
-**Both notations are allowed.** The first is Faust, the second is what live performance calls for;
-neither deprives you of the other.
 
 **The order of the inputs is the order of the declarations.** Faust numbers them without naming them,
 so something has to decide which one is `input0`: it is the order in which the `let … _` are laid
@@ -796,13 +661,6 @@ inputs, as in Faust. FaustX adds no format declaration.
 
 ### ⛔ What this corrects in our own texts
 
-**The `out` of our first drafts does not belong to FaustX.** It comes from the host stage — *"the
-sink of a chain designates the actor's output, whose channel is declared elsewhere"* — and FaustX
-knows neither actor nor channel. Writing it here would mean inventing a sign Faust does not have,
-which the principle of notation forbids.
-
-**A host stays free to define `out`** as another name for `process`; that is no business of the
-language.
 
 ---
 
@@ -850,10 +708,6 @@ therefore rare, and the prefix stays available to resolve them.
 **What the base does not do**: it hides nothing. `fi.lowpass` can still be written, and any Faust
 program that lays down its own imports behaves as before.
 
-**The catalogue stays compatible with `stdfaust.lib`, and that is verified.** The modules it declares
-carry **exactly Faust's names**, neither renamed nor translated, and their bodies call the functions
-by their usual prefixes — `fi.`, `os.`, `ba.`, `pm.` No name is declared twice in it. A musician who
-knows Faust recognizes everything they read; they simply write two characters fewer.
 
 ### What remains open
 
@@ -902,12 +756,6 @@ comes up often.
 
 ## What happens when the code is wrong — settled 2026-08-06
 
-**An error is reported, and the sound does not stop.** This is an absolute rule, and it is the one
-that separates a live language from a studio language.
-
-**Faust does the opposite, and it is right to**: an arity mismatch, an unknown name, a non-constant
-parameter stop the compilation and produce no program at all. In the studio, that is what you want.
-In concert, a compiler that refuses to return a program would leave the room in silence.
 
 **What this imposes on the implementation: nothing touches the live graph before compiling.** The
 module is compiled aside, and it replaces the old one only if the compilation succeeded. The thirty
@@ -922,8 +770,6 @@ milliseconds are therefore paid **before** the substitution, never during it.
 **In all three cases the rule is the same**: the faulty gesture does not take place, the error is
 returned to whoever wrote it, and what was playing goes on playing, without one missing sample.
 
-**What this does not cover**: a correct line that produces a wrong sound. Feedback written without a
-mistake is still feedback — FaustX checks that the code is valid, not that the music is good.
 
 ---
 
@@ -994,9 +840,6 @@ on the critical path is the body written at that very moment — the one no anti
 | a controlled port instead of a constant | **+17%** operations on a 3rd-order filter |
 | the instance name itself | **0** — an interface group is a label |
 
-**The name is free, the control is paid for.** This is what grounds the rule *name only what you
-control*: a declared port makes the control addressable and stops Faust from precomputing the
-coefficients, where a constant freezes them. The coder chooses, module by module.
 
 **Reading the total**: roughly 30% more computation than a monolithic Faust in which everything is
 constant, in exchange for hot patching. That is below what any object-graph modular system costs.
