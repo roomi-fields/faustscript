@@ -14,7 +14,10 @@ voice(f) = os.sawtooth(f)
   : fi.lowpass(2, 800);              // a Faust definition over two lines
 let lpf1 fi.lowpass(fc=800)          // a gesture, up to the newline
 let = 1;                             // a Faust definition of the identifier let
+voix2(f) = os.sawtooth(freq=f) : fi.lowpass(fc=800);  // named settings in a Faust definition
 ```
+
+A Faust definition gives a module's parameters by name, `freq=f`, as a gesture does: Faust's grammar refuses `=` in a call. The decorations of wiring stay on wiring lines (§4.1).
 
 A text sent while the sound plays is applied to the graph as it stands, and a file is the same sequence of lines applied to an empty graph.
 
@@ -44,6 +47,15 @@ FaustScript qualifies Faust's signs with three decorations, each with one meanin
 ### 1.4 Spaces
 
 Spaces separate words as in Faust, and a FaustScript sign is read by its place in the line. Two writings are fixed: `_lpf1` is one Faust identifier, so the bypass is written `_ lpf1`; the `!` that cancels a sign is stuck to it: `!:`, `!~`, `!let`, `!_`.
+
+On a wiring line, a number after `:`, stuck or spaced, is a number of copies (§4.1). A negative number follows only `=`.
+
+```faustscript
+let saw1 os.sawtooth
+let lpf1 fi.lowpass
+saw1 : 8 lpf1                        // eight copies, as saw1 :8 lpf1
+let gate1 ef.gate_mono(thresh=-40)   // a negative number, after =
+```
 
 ## 2. Placing an instance
 
@@ -174,7 +186,7 @@ saw1 !: lpf1                         // cuts
 saw1 :8 lpf1                         // connects as eight copies
 ```
 
-`saw1 :8 lpf1` is Faust's `par(i, 8, saw1) : par(i, 8, lpf1)`: it repeats the circuit, and declares no name. A number after the colon means eight times, whether it follows a declared name or stands between two names.
+`saw1 :8 lpf1` is Faust's `par(i, 8, saw1) : par(i, 8, lpf1)`: it repeats the circuit, and declares no name. A number after the colon, stuck or spaced, means that many copies, whether it follows a declared name or stands between two names.
 
 A line sent alone adds its wires to the graph: `voix2 : rev1` adds one branch and leaves the others. Faust's `,` stacks two circuits that keep their own inputs and outputs, and stays available inside an expression; the studio's parallel, Faust's `A <: (X, Y) :> B`, is what two wires to one instance write.
 

@@ -99,6 +99,7 @@ const AWAITING = {
   ticket: 'faustx-zj5.49',
   blocks: new Set([
     'gain = 0.5;',
+    'saw1 : 8 lpf1',
     'let lpf2 fi.lowpass(fc=400)',
     'let voix2 os.sawtooth(freq=165)',
     'let clic:6 fi.resonbp(fc=311 * 1.5^i, Q=40)',
