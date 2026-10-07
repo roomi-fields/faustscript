@@ -56,15 +56,8 @@ belongs to the host.
 
 **A gesture, not a file.** A line sent back while it plays does not describe the whole program: it
 says that a module appears, that a wire is cut, that a control changes. The transpiler therefore
-returns **what has changed**, with the Faust needed for it:
-
-| what one writes | what the transpiler returns |
-| --- | --- |
-| `let lpf1 lowpass` | *place* `lpf1`, with its Faust program |
-| `lpf1 lowpass(cutoff:400)` | *replace the body* of `lpf1`, with its program |
-| `saw1 : lpf1` | *place a wire*, with nothing to compile |
-| `lpf1.cutoff:400` | *write a control*, with nothing to compile |
-| `!let lpf1` | *give the name back* |
+returns **what has changed**, with the Faust needed for it. The result of each gesture is listed in
+`docs/INTERFACE.md` §4.
 
 **That is what makes it possible to recompile only one module** — some 32 ms instead of 620 for a
 fifty-module program — and it is measured in the specification.
