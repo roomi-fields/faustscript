@@ -12,6 +12,16 @@ FaustX is a superset of Faust for live coding, and its transpiler: a line of Fau
 - `docs/INTERFACE.md` — what crosses FaustX's boundary: read it before changing an export, a line's result or a refusal.
 - `docs/CADRE.md` — FaustX's role and boundary (R1…): cite its rules in a ticket.
 
+## How we arbitrate
+
+A decision or a question is settled by three questions, in this order:
+
+1. **What does the mature reference do?** For the transpiler: TypeScript (many internal modules, one published package), Babel (parsing, trees and printing apart) and the Faust compiler. For live play: SuperCollider's named proxies (`Ndef`, a name whose circuit is replaced while the sound plays) and Strudel (an error is shown, the sound goes on). What they do is the default answer; departing from it takes a written reason.
+2. **What already exists?** BPScript's conventions (numbered packages, guards, the framework's skills), Lezer for parsing, faustwasm for compiling, Faust's libraries for the catalogue. What exists is reused; nothing that exists is reinvented.
+3. **Does the domain require it?** Speed: a gesture plays on the beat, one applied line plus one instance's compilation within a measured, capped budget. The sound never stops: a fault is reported and the rest goes on. Determinism: the same text gives the same result. A choice that degrades one of them is measured and stated.
+
+The aim is a mature, professional product that holds its domain's requirements.
+
 ## The flow of a task
 
 1. `bd ready`, `bd update <id> --claim`, read the ticket and the frame of what it touches.
