@@ -177,9 +177,8 @@ faustx.apply('let lpf1 lowpass(fc:800)\n_ : lpf1 : process\n')
 faustx.write()          // the Faust
 ```
 
-Requires Node 22+. `npm test` additionally needs `faust` on your `PATH`
-(the tests run against 2.70.3; the timings quoted above were taken with
-libfaust-wasm 0.16.6, which carries Faust 2.86.2).
+Requires Node 22+. The tests compile with `@grame/faustwasm` 0.16.6, which
+carries Faust 2.86.2, the same Faust as the timings quoted above.
 
 ---
 

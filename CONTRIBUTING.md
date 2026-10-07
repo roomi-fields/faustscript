@@ -11,7 +11,7 @@ the Faust compiler.
 
 ## Development Setup
 
-Prerequisites: Node.js >= 22, the Faust compiler (`faust`) on the `PATH` for the tests.
+Prerequisites: Node.js >= 22. The tests compile with the Faust of `@grame/faustwasm`, installed by `npm install`.
 
 ```bash
 npm install

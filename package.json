@@ -55,7 +55,7 @@
     "prepublishOnly": "npm run lint && npm run typecheck && npm test"
   },
   "devDependencies": {
-    "@grame/faustwasm": "^0.16.6",
+    "@grame/faustwasm": "0.16.6",
     "@lezer/common": "^1.2.1",
     "@lezer/generator": "^1.7.1",
     "@lezer/lr": "^1.4.2",

@@ -27,7 +27,7 @@ function emettre(poses, expression) {
   return lines.join('\n')
 }
 
-test('a generator and an adjustable filter', () => {
+test('a generator and an adjustable filter', async () => {
   const faust = emettre(
     [
       ['osc1', 'sawtooth', 1, [['freq', '110']]],
@@ -35,22 +35,22 @@ test('a generator and an adjustable filter', () => {
     ],
     'osc1 : lpf1'
   )
-  assert.equal(compile(faust), null, faust)
+  assert.equal(await compile(faust), null, faust)
 })
 
-test('a structural parameter stays constant', () => {
+test('a structural parameter stays constant', async () => {
   // a filter's order cannot be a slider: Faust loops forever
   const faust = emettre([['lpf1', 'lowpass', 1, [['fc', '800']]]], '_ : lpf1')
   assert.ok(!faust.includes('nentry("N"'), 'N must not become a port')
-  assert.equal(compile(faust), null, faust)
+  assert.equal(await compile(faust), null, faust)
 })
 
-test('a bank of eight', () => {
+test('a bank of eight', async () => {
   const faust = emettre([['lpfs', 'lowpass', 8, [['fc', '1200']]]], 'lpfs')
-  assert.equal(compile(faust), null, faust)
+  assert.equal(await compile(faust), null, faust)
 })
 
-test('a reverb and its bounded settings', () => {
+test('a reverb and its bounded settings', async () => {
   const faust = emettre(
     [
       [
@@ -66,10 +66,10 @@ test('a reverb and its bounded settings', () => {
     '_ : rev1'
   )
   assert.ok(faust.includes('hslider'), 'a bounded setting gives a slider')
-  assert.equal(compile(faust), null, faust)
+  assert.equal(await compile(faust), null, faust)
 })
 
-test('two free expressions carrying the same setting do not collide', () => {
+test('two free expressions carrying the same setting do not collide', async () => {
   // whoever hosts FaustX reaches a setting at `/<program>/<instance>/<port>`;
   // an instance written as a free expression must therefore be grouped too,
   // or Faust answers `path '/…/gain' is already used`
@@ -81,5 +81,5 @@ test('two free expressions carrying the same setting do not collide', () => {
     'vol1 : vol2'
   )
   assert.ok(faust.includes('vgroup("vol1"'), 'the instance names its own setting')
-  assert.equal(compile(faust), null, faust)
+  assert.equal(await compile(faust), null, faust)
 })

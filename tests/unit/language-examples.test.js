@@ -2,7 +2,7 @@
  * The examples of docs/LANGUAGE.md, run. Each `faustx` block is applied to a new transpiler: each
  * example it applies gives results that are all applied; each example marked `// refused: CODE`
  * gives results that are all refused with that code; no line outside an example is applied;
- * and the Faust that write() returns for the block compiles with `faust`.
+ * and the Faust that write() returns for the block compiles with faustwasm.
  *
  * A check the transpiler does not hold yet is listed in KNOWN_DEFECTS with the ticket of the defect
  * that fixes it and what the check observes today. The test asserts that observation exactly, so
@@ -148,7 +148,8 @@ function checks(blocks) {
       out.push({
         block,
         title: `compiles: the block that opens with ${opening}`,
-        observe: () => compile(run(block).transpiler.write()),
+        // the first line of a refusal names the fault; the lines after it print the circuit
+        observe: async () => (await compile(run(block).transpiler.write()))?.split('\n')[0] ?? null,
         holds: seen => seen === null,
       })
     }
@@ -227,14 +228,14 @@ describe('the examples of docs/LANGUAGE.md', () => {
       for (const check of CHECKS.filter(c => c.block === block)) {
         const defect = KNOWN_DEFECTS.get(check.title)
         if (defect === undefined) {
-          it(check.title, () => {
-            const seen = check.observe()
+          it(check.title, async () => {
+            const seen = await check.observe()
             expect(check.holds(seen), JSON.stringify(seen)).toBe(true)
           })
         } else {
-          it(`${check.title} (known defect, ${defect.ticket})`, () => {
+          it(`${check.title} (known defect, ${defect.ticket})`, async () => {
             expect(
-              check.observe(),
+              await check.observe(),
               `if ${defect.ticket} is fixed, the entry leaves KNOWN_DEFECTS`
             ).toEqual(defect.now)
           })
