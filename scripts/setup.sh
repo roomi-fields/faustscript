@@ -16,6 +16,6 @@ command -v bd >/dev/null || { echo "bd (Beads) is required: npm install -g @bead
 (cd "$root" && bd init --init-if-missing --non-interactive --skip-agents --quiet --prefix "$prefix")
 git -C "$root" config beads.role maintainer
 
-npm --prefix "$root" install
+[ -f "$root/package.json" ] && npm --prefix "$root" install
 
-echo "Ready: tickets '$prefix-*' (bd ready), skills superviseur / developper / mesurer / rediger / release."
+echo "Ready: tickets '$prefix-*' (bd ready), skills: $(ls "$root/.claude/skills" | tr '\n' ' ')"

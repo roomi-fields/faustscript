@@ -13,7 +13,7 @@ fi
 missing=()
 
 [ -d "$root/.beads" ] || missing+=("le magasin de tickets (Beads)")
-[ -d "$root/node_modules" ] || missing+=("les dépendances npm")
+[ ! -f "$root/package.json" ] || [ -d "$root/node_modules" ] || missing+=("les dépendances npm")
 
 pending=()
 grep -q '<Nom du projet>' "$root/CLAUDE.md" 2>/dev/null && pending+=("la charte (CLAUDE.md)")
