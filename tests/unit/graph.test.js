@@ -7,7 +7,8 @@ import { readCatalogue } from '../../src/catalogue.js'
 import { Graph } from '../../src/graph.js'
 
 const catalogue = readCatalogue(
-  readFileSync(new URL('../../lib/faust.fx', import.meta.url), 'utf8'))
+  readFileSync(new URL('../../lib/faust.fx', import.meta.url), 'utf8')
+)
 
 const neuf = () => {
   const g = new Graph(catalogue)
@@ -21,7 +22,7 @@ test('the catalogue carries the 998 Faust modules', () => {
   assert.equal(catalogue.get('resonlp').attribute('fc', 'unit'), 'Hz')
 })
 
-test('un name ne se pose qu\'une fois', () => {
+test("un name ne se pose qu'une fois", () => {
   const g = neuf()
   assert.ok(g.place('saw1', 'sawtooth').done)
   assert.ok(!g.place('saw1', 'sawtooth').done)

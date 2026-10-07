@@ -43,10 +43,13 @@ function emettre(poses, expression) {
 }
 
 test('a generator and an adjustable filter', () => {
-  const faust = emettre([
-    ['osc1', 'sawtooth', 1, [['freq', '110']]],
-    ['lpf1', 'lowpass', 1, [['fc', '800']]],
-  ], 'osc1 : lpf1')
+  const faust = emettre(
+    [
+      ['osc1', 'sawtooth', 1, [['freq', '110']]],
+      ['lpf1', 'lowpass', 1, [['fc', '800']]],
+    ],
+    'osc1 : lpf1'
+  )
   assert.equal(compile(faust), null, faust)
 })
 
@@ -63,9 +66,20 @@ test('a bank of eight', () => {
 })
 
 test('a reverb and its bounded settings', () => {
-  const faust = emettre([
-    ['rev1', 'mono_freeverb', 1, [['fb1', '0.92'], ['damp', '0.45']]],
-  ], '_ : rev1')
+  const faust = emettre(
+    [
+      [
+        'rev1',
+        'mono_freeverb',
+        1,
+        [
+          ['fb1', '0.92'],
+          ['damp', '0.45'],
+        ],
+      ],
+    ],
+    '_ : rev1'
+  )
   assert.ok(faust.includes('hslider'), 'a bounded setting gives a slider')
   assert.equal(compile(faust), null, faust)
 })
@@ -74,10 +88,13 @@ test('two free expressions carrying the same setting do not collide', () => {
   // whoever hosts FaustX reaches a setting at `/<program>/<instance>/<port>`;
   // an instance written as a free expression must therefore be grouped too,
   // or Faust answers `path '/…/gain' is already used`
-  const faust = emettre([
-    ['vol1', '*(gain:0.35)', 1, []],
-    ['vol2', '*(gain:0.5)', 1, []],
-  ], 'vol1 : vol2')
+  const faust = emettre(
+    [
+      ['vol1', '*(gain:0.35)', 1, []],
+      ['vol2', '*(gain:0.5)', 1, []],
+    ],
+    'vol1 : vol2'
+  )
   assert.ok(faust.includes('vgroup("vol1"'), 'the instance names its own setting')
   assert.equal(compile(faust), null, faust)
 })

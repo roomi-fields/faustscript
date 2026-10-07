@@ -8,33 +8,46 @@ export function readTemplates(text) {
   const table = new Map()
   for (const line of text.split('\n')) {
     const bare = line.replace(/\/\/.*$/, '').trim()
-    if (!bare) continue
+    if (!bare) {
+      continue
+    }
     const split = bare.search(/\s/)
-    if (split < 0) continue
+    if (split < 0) {
+      continue
+    }
     table.set(bare.slice(0, split), bare.slice(split).trim())
   }
   return new Templates(table)
 }
 
 export class Templates {
-  constructor(table) { this.table = table }
+  constructor(table) {
+    this.table = table
+  }
 
   /** What a key is worth, as it stands. */
   value(key) {
     const found = this.table.get(key)
-    if (found === undefined) throw new Error(`template missing: ${key}`)
+    if (found === undefined) {
+      throw new Error(`template missing: ${key}`)
+    }
     return found
   }
 
   /** Fills a template: `{name}` takes the value of `values.name`. */
   fill(key, values = {}) {
     return this.value(key).replace(/\{(\w+)\}/g, (whole, name) =>
-      name in values ? String(values[name]) : whole)
+      name in values ? String(values[name]) : whole
+    )
   }
 
   /** A word the language reserves — the sink, the index, the input. */
-  reserved(what) { return this.value(`reserved.${what}`) }
+  reserved(what) {
+    return this.value(`reserved.${what}`)
+  }
 
   /** What a port takes when nothing bounds it. */
-  fallback(what) { return this.value(`fallback.${what}`) }
+  fallback(what) {
+    return this.value(`fallback.${what}`)
+  }
 }

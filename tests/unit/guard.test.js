@@ -14,15 +14,17 @@ const ENGENDRES = ['parser.js', 'parser.terms.js']
 
 /** The signs only the language knows, as they would be written in code. */
 const SIGNES = [
-  /"let"|'let'/,           // the declaration word
-  /"process"|'process'/,   // the sink's name
-  /"!:"|'!:'|"!~"|'!~'/,   // the cuts
-  /":8"|':8'/,             // a width written in place
-  /"_"(?!\s*\+)|'_'/,      // the identity
+  /"let"|'let'/, // the declaration word
+  /"process"|'process'/, // the sink's name
+  /"!:"|'!:'|"!~"|'!~'/, // the cuts
+  /":8"|':8'/, // a width written in place
+  /"_"(?!\s*\+)|'_'/, // the identity
 ]
 
 for (const name of readdirSync(dossier).filter(f => f.endsWith('.js'))) {
-  if (ENGENDRES.includes(name)) continue
+  if (ENGENDRES.includes(name)) {
+    continue
+  }
 
   test(`${name} writes no sign of the language`, () => {
     const code = readFileSync(new URL(name, dossier), 'utf8')
@@ -31,7 +33,10 @@ for (const name of readdirSync(dossier).filter(f => f.endsWith('.js'))) {
       .join('\n')
 
     const fautes = SIGNES.filter(sign => sign.test(code)).map(String)
-    assert.deepEqual(fautes, [],
-      `${name} carries a sign of the language: it should come from the templates`)
+    assert.deepEqual(
+      fautes,
+      [],
+      `${name} carries a sign of the language: it should come from the templates`
+    )
   })
 }

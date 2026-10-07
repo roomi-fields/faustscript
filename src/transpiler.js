@@ -8,7 +8,7 @@ import { readCatalogue } from './catalogue.js'
 import { readTemplates } from './templates.js'
 import { Graph } from './graph.js'
 import { apply } from './reading.js'
-import { writeInstance, writeExpression, corpsDe } from './emitter.js'
+import { writeInstance, writeExpression } from './emitter.js'
 import { writeInStages } from './stages.js'
 
 /** The gestures that change an instance's circuit, and so cost a compilation.
@@ -45,9 +45,13 @@ export class Transpiler {
    */
   apply(text) {
     return apply(text, this.graph, result => {
-      if (!result.outcome.done || !RECOMPILES.has(result.gesture)) return {}
+      if (!result.outcome.done || !RECOMPILES.has(result.gesture)) {
+        return {}
+      }
       const instance = this.graph.instance(result.name)
-      if (!instance) return {}
+      if (!instance) {
+        return {}
+      }
       const faust = writeInstance(instance, this.catalogue, this.templates, this.graph)
       return { faust, needs: this.citedIn(faust, instance.name) }
     })
@@ -62,8 +66,12 @@ export class Transpiler {
   citedIn(faust, itself) {
     const cited = []
     for (const name of this.graph.instances.keys()) {
-      if (name === itself) continue
-      if (new RegExp(`\\b${name}\\b`).test(faust)) cited.push(name)
+      if (name === itself) {
+        continue
+      }
+      if (new RegExp(`\\b${name}\\b`).test(faust)) {
+        cited.push(name)
+      }
     }
     return cited
   }
@@ -78,15 +86,19 @@ export class Transpiler {
   write() {
     const lines = [this.templates.value('template.Header')]
     for (const instance of this.graph.instances.values()) {
-      if (instance.removed) continue
+      if (instance.removed) {
+        continue
+      }
       lines.push(writeInstance(instance, this.catalogue, this.templates, this.graph))
     }
     const expression = this.shares()
       ? writeInStages(this.graph, this.catalogue, this.templates)
       : writeExpression(this.graph, this.catalogue, this.templates)
-    lines.push(this.templates.fill('template.Sink', {
-      expression: expression ?? this.templates.value('template.Silence'),
-    }))
+    lines.push(
+      this.templates.fill('template.Sink', {
+        expression: expression ?? this.templates.value('template.Silence'),
+      })
+    )
     return lines.join('\n') + '\n'
   }
 

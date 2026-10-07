@@ -23,7 +23,9 @@ function compile(faust) {
   try {
     execFileSync('faust', ['-lang', 'c', fichier, '-o', '/dev/null'], { stdio: 'pipe' })
     return null
-  } catch (erreur) { return String(erreur.stderr).split('\n')[0] }
+  } catch (erreur) {
+    return String(erreur.stderr).split('\n')[0]
+  }
 }
 
 test('a minimal synth translates and compiles', () => {
@@ -58,7 +60,10 @@ lpfs : process
 
 test('the first complete piece compiles', () => {
   const { faust, refus } = traduire(lire('../../examples/1-drone-that-plays-alone.fx'))
-  assert.deepEqual(refus.map(r => r.text), [])
+  assert.deepEqual(
+    refus.map(r => r.text),
+    []
+  )
   assert.equal(compile(faust), null, faust)
 })
 
@@ -66,23 +71,32 @@ test('a faulty line is refused without touching the graph', () => {
   const t = createTranspiler(lire('../../lib/faust.fx'), lire('../../lib/translation.fx'))
   t.apply('let osc1 sawtooth(freq:110)\nosc1 : process\n')
   const avant = t.write()
-  const refus = t.apply('zorg : process\nlet osc1 sawtooth(freq:55)\n')
-    .filter(g => !g.outcome.done)
+  const refus = t.apply('zorg : process\nlet osc1 sawtooth(freq:55)\n').filter(g => !g.outcome.done)
   assert.equal(refus.length, 2, 'both lines are refused')
   assert.equal(t.write(), avant, 'the graph has not moved')
 })
 
 test('all three pieces translate with nothing refused', () => {
-  for (const name of ['1-drone-that-plays-alone', '2-processed-guitar',
-                     '3-twenty-minute-session']) {
+  for (const name of [
+    '1-drone-that-plays-alone',
+    '2-processed-guitar',
+    '3-twenty-minute-session',
+  ]) {
     const { refus } = traduire(lire(`../../examples/${name}.fx`))
-    assert.deepEqual(refus.map(r => r.text.trim()), [], name)
+    assert.deepEqual(
+      refus.map(r => r.text.trim()),
+      [],
+      name
+    )
   }
 })
 
 test('the pieces compile', () => {
-  for (const name of ['1-drone-that-plays-alone', '2-processed-guitar',
-                     '3-twenty-minute-session']) {
+  for (const name of [
+    '1-drone-that-plays-alone',
+    '2-processed-guitar',
+    '3-twenty-minute-session',
+  ]) {
     const { faust } = traduire(lire(`../../examples/${name}.fx`))
     assert.equal(compile(faust), null, `${name} :\n${faust}`)
   }
@@ -111,14 +125,18 @@ saw1 : lpf1 : process
 `
   for (const [quoi, geste] of Object.entries({
     bypass: '_ lpf1',
-    remettre:   '_ lpf1\n!_ lpf1',
-    remove:    '! lpf1',
-    replace:  'lpf1 highpass(fc:2000)',
-    release:     '!let lpf1\nsaw1 : process',
-    set:     'lpf1.fc:400',
+    remettre: '_ lpf1\n!_ lpf1',
+    remove: '! lpf1',
+    replace: 'lpf1 highpass(fc:2000)',
+    release: '!let lpf1\nsaw1 : process',
+    set: 'lpf1.fc:400',
   })) {
     const { faust, refus } = traduire(debut + geste + '\n')
-    assert.deepEqual(refus.map(r => r.text), [], quoi)
+    assert.deepEqual(
+      refus.map(r => r.text),
+      [],
+      quoi
+    )
     assert.equal(compile(faust), null, `${quoi} :\n${faust}`)
   }
 })
@@ -153,10 +171,12 @@ let saw1 sawtooth(freq:110)
 lfo1 : lpf1.fc
 saw1 : lpf1 : process
 `)
-  assert.match(faust, /lfo1 : it\.remap/,
-    'the LFO must be rescaled to the port bounds')
-  assert.doesNotMatch(faust.split('\n').find(l => l.startsWith('lpf1')), /hslider/,
-    'a driven port carries no slider')
+  assert.match(faust, /lfo1 : it\.remap/, 'the LFO must be rescaled to the port bounds')
+  assert.doesNotMatch(
+    faust.split('\n').find(l => l.startsWith('lpf1')),
+    /hslider/,
+    'a driven port carries no slider'
+  )
   assert.equal(compile(faust), null, faust)
 })
 
@@ -191,11 +211,16 @@ _ rev1
 
 test('the command line translates a file', () => {
   const out = join(dossier, 'cli.dsp')
-  execFileSync('node', [
-    new URL('../../bin/faustx.js', import.meta.url).pathname,
-    new URL('../../examples/1-drone-that-plays-alone.fx', import.meta.url).pathname,
-    '-o', out,
-  ], { stdio: 'pipe' })
+  execFileSync(
+    'node',
+    [
+      new URL('../../bin/faustx.js', import.meta.url).pathname,
+      new URL('../../examples/1-drone-that-plays-alone.fx', import.meta.url).pathname,
+      '-o',
+      out,
+    ],
+    { stdio: 'pipe' }
+  )
   assert.equal(compile(readFileSync(out, 'utf8')), null)
 })
 
@@ -209,8 +234,9 @@ osc1 : lpf1
 lpf1.fc:400
 !let osc1
 `)
-  const vus = gestes.filter(g => g.gesture).map(g =>
-    [g.gesture, g.name, g.faust ? 'to compile' : 'nothing to compile'])
+  const vus = gestes
+    .filter(g => g.gesture)
+    .map(g => [g.gesture, g.name, g.faust ? 'to compile' : 'nothing to compile'])
 
   assert.deepEqual(vus, [
     ['place', 'osc1', 'to compile'],
@@ -233,6 +259,5 @@ lfo1 : lpf1.fc
 lpf1 lowpass(fc:900)
 `)
   const remplacement = gestes.find(g => g.gesture === 'replace')
-  assert.deepEqual(remplacement.needs, ['lfo1'],
-    'the host cannot compile lpf1 without lfo1')
+  assert.deepEqual(remplacement.needs, ['lfo1'], 'the host cannot compile lpf1 without lfo1')
 })

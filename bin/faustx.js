@@ -34,7 +34,8 @@ function main(argv) {
 
   const transpiler = createTranspiler(
     readFileSync(join(root, 'lib/faust.fx'), 'utf8'),
-    readFileSync(join(root, 'lib/translation.fx'), 'utf8'))
+    readFileSync(join(root, 'lib/translation.fx'), 'utf8')
+  )
 
   const gestures = transpiler.apply(readFileSync(source, 'utf8'))
   for (const { line, text, outcome } of gestures.filter(g => !g.outcome.done)) {
@@ -42,8 +43,11 @@ function main(argv) {
   }
 
   const faust = transpiler.write()
-  if (output) writeFileSync(output, faust)
-  else process.stdout.write(faust)
+  if (output) {
+    writeFileSync(output, faust)
+  } else {
+    process.stdout.write(faust)
+  }
 
   // a refused gesture is not a failure of the translation: the rest stands
   return 0
@@ -52,7 +56,9 @@ function main(argv) {
 /** Reads `-o value` out of the arguments and removes both. */
 function takeOption(argv, flag) {
   const at = argv.indexOf(flag)
-  if (at < 0) return null
+  if (at < 0) {
+    return null
+  }
   const [value] = argv.splice(at, 2).slice(1)
   return value ?? null
 }

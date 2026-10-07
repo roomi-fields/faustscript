@@ -26,17 +26,25 @@ export function stage(graph) {
     }
   }
 
-  const sourcesDe = name => graph.incomingTo(name)
-    .filter(c => !c.to.member && !c.loop && left.has(c.from.name))
-    .map(c => c.from.name)
+  const sourcesDe = name =>
+    graph
+      .incomingTo(name)
+      .filter(c => !c.to.member && !c.loop && left.has(c.from.name))
+      .map(c => c.from.name)
 
   const stages = []
   const placed = new Set()
   while (left.size) {
-    const stage = [...left.keys()]
-      .filter(name => sourcesDe(name).every(source => placed.has(source)))
-    if (!stage.length) break              // a cycle: we stop there
-    for (const name of stage) { placed.add(name); left.delete(name) }
+    const stage = [...left.keys()].filter(name =>
+      sourcesDe(name).every(source => placed.has(source))
+    )
+    if (!stage.length) {
+      break
+    } // a cycle: we stop there
+    for (const name of stage) {
+      placed.add(name)
+      left.delete(name)
+    }
     stages.push(stage)
   }
   return { stages, left: [...left.keys()], boucles }
@@ -54,13 +62,19 @@ function modulatorsOf(graph) {
   while (change) {
     change = false
     for (const name of graph.instances.keys()) {
-      if (modulateurs.has(name)) continue
+      if (modulateurs.has(name)) {
+        continue
+      }
       const sortants = graph.wires.filter(c => c.from.name === name)
-      if (!sortants.length) continue
+      if (!sortants.length) {
+        continue
+      }
       // are all its destinations settings, or other modulators?
-      const queDesReglages = sortants.every(c =>
-        c.to.member || modulateurs.has(c.to.name))
-      if (queDesReglages) { modulateurs.add(name); change = true }
+      const queDesReglages = sortants.every(c => c.to.member || modulateurs.has(c.to.name))
+      if (queDesReglages) {
+        modulateurs.add(name)
+        change = true
+      }
     }
   }
   return modulateurs
@@ -76,8 +90,12 @@ function citedInABody(graph) {
   for (const instance of graph.instances.values()) {
     const body = String(instance.module ?? '')
     for (const autre of graph.instances.keys()) {
-      if (autre === instance.name) continue
-      if (new RegExp(`\\b${autre}\\b`).test(body)) cites.add(autre)
+      if (autre === instance.name) {
+        continue
+      }
+      if (new RegExp(`\\b${autre}\\b`).test(body)) {
+        cites.add(autre)
+      }
     }
   }
   return cites
@@ -87,7 +105,9 @@ function citedInABody(graph) {
 export function loopsOf(graph) {
   const boucles = new Map()
   for (const wire of graph.wires) {
-    if (wire.loop) boucles.set(wire.to.name, wire.from.name)
+    if (wire.loop) {
+      boucles.set(wire.to.name, wire.from.name)
+    }
   }
   return boucles
 }
@@ -95,24 +115,30 @@ export function loopsOf(graph) {
 /** Writes the whole graph as one Faust expression, without duplicating a name. */
 export function writeInStages(graph, catalogue, templates) {
   const { stages, boucles } = stage(graph)
-  if (!stages.length) return null
+  if (!stages.length) {
+    return null
+  }
 
-  const retours = new Map()               // source -> return, the other way round
-  for (const [retour, source] of boucles) retours.set(source, retour)
+  const retours = new Map() // source -> return, the other way round
+  for (const [retour, source] of boucles) {
+    retours.set(source, retour)
+  }
 
   const block = name => {
     const instance = graph.instance(name)
     if (instance?.bypassed) {
       return templates.fill('template.Bypass', { module: name })
     }
-    if (!retours.has(name)) return name
+    if (!retours.has(name)) {
+      return name
+    }
     // does it also receive a signal from outside? then sum it with the return
     const dehors = graph.incomingTo(name).some(c => !c.to.member && !c.loop)
     const patron = dehors ? 'template.FedFeedback' : 'template.Feedback'
     return '(' + templates.fill(patron, { a: name, b: retours.get(name) }) + ')'
   }
 
-  let bus = []                            // the live channels, in order
+  let bus = [] // the live channels, in order
   const pieces = []
 
   stages.forEach((stage, rank) => {
@@ -122,10 +148,14 @@ export function writeInStages(graph, catalogue, templates) {
       const needs = stage.flatMap(name => wantedInputs(name, graph, catalogue, templates))
       const carried = bus.filter(channel => attendus.has(channel.name))
       const routage = route(bus, [...needs, ...carried])
-      if (routage) pieces.push(routage)
+      if (routage) {
+        pieces.push(routage)
+      }
 
       const blocks = stage.map(block)
-      if (carried.length) blocks.push(`si.bus(${carried.length})`)
+      if (carried.length) {
+        blocks.push(`si.bus(${carried.length})`)
+      }
       pieces.push(inParallel(blocks))
 
       bus = [...stage.flatMap(name => outputsOf(name, graph, catalogue)), ...carried]
@@ -141,8 +171,11 @@ export function writeInStages(graph, catalogue, templates) {
     .map((channel, slot) => ({ channel, slot }))
     .filter(({ channel }) => versLePuits.includes(channel.name))
   if (gardees.length && gardees.length < bus.length) {
-    pieces.push(`route(${bus.length}, ${gardees.length}, ` +
-      gardees.map(({ slot }, rank) => `${slot + 1},${rank + 1}`).join(', ') + ')')
+    pieces.push(
+      `route(${bus.length}, ${gardees.length}, ` +
+        gardees.map(({ slot }, rank) => `${slot + 1},${rank + 1}`).join(', ') +
+        ')'
+    )
   }
   return pieces.join(' : ')
 }
@@ -179,9 +212,15 @@ function howManyInputs(name, graph, catalogue, templates) {
   const body = (instance?.module ?? '').trim()
   const wires = graph.incomingTo(name).filter(c => !c.to.member).length
 
-  if (/^[*+\-\/^%]$/.test(body)) return 2 + parLesReglages
-  if (/^[*+\-\/^%]\s*\(/.test(body)) return 1 + parLesReglages
-  if (body === templates.reserved('input')) return 1  // a named input
+  if (/^[*+\-/^%]$/.test(body)) {
+    return 2 + parLesReglages
+  }
+  if (/^[*+\-/^%]\s*\(/.test(body)) {
+    return 1 + parLesReglages
+  }
+  if (body === templates.reserved('input')) {
+    return 1
+  } // a named input
   return (wires ? 1 : 0) + parLesReglages
 }
 
@@ -195,15 +234,25 @@ function inputsFromModulators(name, graph, templates) {
   const input = templates.reserved('input')
   let count = 0
   for (const wire of graph.wires) {
-    if (wire.to.name !== name || !wire.to.member) continue
+    if (wire.to.name !== name || !wire.to.member) {
+      continue
+    }
     const source = graph.instance(wire.from.name)
-    if (!source) continue
+    if (!source) {
+      continue
+    }
     const body = String(source.module ?? '')
     for (const autre of graph.instances.values()) {
-      if (String(autre.module ?? '').trim() !== input) continue
-      if (new RegExp(`\\b${autre.name}\\b`).test(body)) count++
+      if (String(autre.module ?? '').trim() !== input) {
+        continue
+      }
+      if (new RegExp(`\\b${autre.name}\\b`).test(body)) {
+        count++
+      }
     }
-    if (body.trim() === input) count++
+    if (body.trim() === input) {
+      count++
+    }
   }
   return count
 }
@@ -218,15 +267,21 @@ function wantedInputs(name, graph, catalogue, templates) {
 
   return Array.from({ length: count }, (_, slot) => {
     const wire = wires[slot % Math.max(wires.length, 1)]
-    if (!wire) return null
+    if (!wire) {
+      return null
+    }
     const source = wire.from.name
     const channels = outputsOf(source, graph, catalogue).length
 
     // as many channels on both sides: they are paired one to one.
     // more channels than slots: they sum onto the ones that remain.
     // fewer: the channel is spread, every slot receives the same one.
-    if (channels === count) return { name: source, rank: slot }
-    if (channels > count) return { name: source, rank: null }
+    if (channels === count) {
+      return { name: source, rank: slot }
+    }
+    if (channels > count) {
+      return { name: source, rank: null }
+    }
     return { name: source, rank: slot % channels }
   })
 }
@@ -236,27 +291,41 @@ function neededAfter(stages, rank, graph) {
   const attendus = new Set()
   for (const name of stages.slice(rank + 1).flat()) {
     for (const wire of graph.incomingTo(name)) {
-      if (!wire.to.member) attendus.add(wire.from.name)
+      if (!wire.to.member) {
+        attendus.add(wire.from.name)
+      }
     }
   }
-  for (const wire of graph.incomingTo(graph.sink)) attendus.add(wire.from.name)
+  for (const wire of graph.incomingTo(graph.sink)) {
+    attendus.add(wire.from.name)
+  }
   return attendus
 }
 
 /** Faust's routing: each wanted slot receives the channel that is due to it. */
 function route(bus, wanted) {
-  if (!wanted.length) return null
+  if (!wanted.length) {
+    return null
+  }
   const pairs = []
   wanted.forEach((wanted, slot) => {
-    if (!wanted) return                   // nothing here: the channel will be zero
+    if (!wanted) {
+      return
+    } // nothing here: the channel will be zero
     // a missing rank means "every channel of this name": Faust adds up what
     // arrives on the same slot
     bus.forEach((channel, source) => {
-      if (channel.name !== wanted.name) return
-      if (wanted.rank !== null && channel.rank !== wanted.rank) return
+      if (channel.name !== wanted.name) {
+        return
+      }
+      if (wanted.rank !== null && channel.rank !== wanted.rank) {
+        return
+      }
       pairs.push(`${source + 1},${slot + 1}`)
     })
   })
-  if (!pairs.length) return null
+  if (!pairs.length) {
+    return null
+  }
   return `route(${bus.length}, ${wanted.length}, ${pairs.join(', ')})`
 }

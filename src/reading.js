@@ -39,42 +39,66 @@ export function apply(text, graph, alsoNote = () => ({})) {
  * that, not on the shape of the line that expressed it.
  */
 const GESTURES = {
-  Declaration: 'place', Definition: 'replace', Release: 'release',
-  Removal: 'remove', Bypass: 'bypass', Setting: 'set', Expression: 'wire',
+  Declaration: 'place',
+  Definition: 'replace',
+  Release: 'release',
+  Removal: 'remove',
+  Bypass: 'bypass',
+  Setting: 'set',
+  Expression: 'wire',
 }
 
 function gestureOf(text, form) {
-  const gesture = form ? GESTURES[form.name] ?? null : null
+  const gesture = form ? (GESTURES[form.name] ?? null) : null
   return { gesture, name: gesture ? targetOf(text, form, gesture) : null }
 }
 
 /** The instance a gesture acts on. A wiring acts on no single one. */
 function targetOf(text, form, gesture) {
-  if (gesture === 'wire') return null
-  if (gesture === 'place') return declaredName(text, form)
+  if (gesture === 'wire') {
+    return null
+  }
+  if (gesture === 'place') {
+    return declaredName(text, form)
+  }
   if (gesture === 'set') {
     const prefix = form.getChild('Prefix')
     const key = form.getChild('Key')
-    if (!key) return null
-    return ((prefix ? contenu(text, prefix) : '') +
-            contenu(text, key).slice(0, -1)).split('.').filter(Boolean)[0] ?? null
+    if (!key) {
+      return null
+    }
+    return (
+      ((prefix ? contenu(text, prefix) : '') + contenu(text, key).slice(0, -1))
+        .split('.')
+        .filter(Boolean)[0] ?? null
+    )
   }
   return nameOf(text, form)
 }
 
 function applyLine(text, line, graph) {
   const form = line.firstChild
-  if (!form) return Outcome.refused('empty line')
+  if (!form) {
+    return Outcome.refused('empty line')
+  }
 
   switch (form.name) {
-    case 'Declaration':   return slot(text, form, graph)
-    case 'Release':       return graph.release(nameOf(text, form))
-    case 'Removal':   return graph.remove(nameOf(text, form))
-    case 'Bypass': return bypass(text, form, graph)
-    case 'Setting':       return set(text, form, graph)
-    case 'Definition':    return definir(text, form, graph)
-    case 'Expression':    return wire(text, form, graph)
-    default:              return Outcome.refused(`unknown form: ${form.name}`)
+    case 'Declaration':
+      return slot(text, form, graph)
+    case 'Release':
+      return graph.release(nameOf(text, form))
+    case 'Removal':
+      return graph.remove(nameOf(text, form))
+    case 'Bypass':
+      return bypass(text, form, graph)
+    case 'Setting':
+      return set(text, form, graph)
+    case 'Definition':
+      return definir(text, form, graph)
+    case 'Expression':
+      return wire(text, form, graph)
+    default:
+      return Outcome.refused(`unknown form: ${form.name}`)
   }
 }
 
@@ -91,9 +115,7 @@ function declaredName(text, form) {
 function slot(text, form, graph) {
   const multiple = form.getChild('MultipleName')
   const name = declaredName(text, form)
-  const multiplicity = multiple
-    ? Number(contenu(text, multiple.getChild('Number')))
-    : 1
+  const multiplicity = multiple ? Number(contenu(text, multiple.getChild('Number'))) : 1
 
   const body = form.getChild('FreeBody')
   const { module, settings } = readBody(text, body, graph)
@@ -124,12 +146,13 @@ function readBody(text, body, graph = null) {
 
 function readArguments(text, node) {
   const settings = new Map()
-  if (!node) return settings
+  if (!node) {
+    return settings
+  }
   for (const argument of childrenOf(node, 'Argument')) {
     const key = argument.getChild('Key')
     if (key) {
-      settings.set(contenu(text, key).slice(0, -1),
-                   contenu(text, argument.getChild('Value')))
+      settings.set(contenu(text, key).slice(0, -1), contenu(text, argument.getChild('Value')))
     }
   }
   return settings
@@ -147,7 +170,9 @@ function definir(text, form, graph) {
   const body = form.getChild('NamedBody')
   const { module, settings } = readBody(text, body, graph)
   // does the name designate a placed instance? then its body is replaced
-  if (graph.instance(name)) return graph.replace(name, module, settings)
+  if (graph.instance(name)) {
+    return graph.replace(name, module, settings)
+  }
   return Outcome.refused(`${name} is not a placed instance`)
 }
 
@@ -155,13 +180,17 @@ function set(text, form, graph) {
   const prefix = form.getChild('Prefix')
   const key = form.getChild('Key')
   const value = form.getChild('Value')
-  if (!key || !value) return Outcome.refused('incomplete setting')
+  if (!key || !value) {
+    return Outcome.refused('incomplete setting')
+  }
 
-  const membres = ((prefix ? contenu(text, prefix) : '') +
-                   contenu(text, key).slice(0, -1)).split('.').filter(Boolean)
-  if (membres.length < 2) return Outcome.refused('a setting targets a port')
-  return graph.set(membres[0], membres.slice(1).join('.'),
-                       contenu(text, value))
+  const membres = ((prefix ? contenu(text, prefix) : '') + contenu(text, key).slice(0, -1))
+    .split('.')
+    .filter(Boolean)
+  if (membres.length < 2) {
+    return Outcome.refused('a setting targets a port')
+  }
+  return graph.set(membres[0], membres.slice(1).join('.'), contenu(text, value))
 }
 
 // --- wiring ------------------------------------------------------------------
@@ -184,17 +213,17 @@ function wire(text, expression, graph) {
       const sign = piece.firstChild
       cutting = sign?.name === 'CutSeries' || sign?.name === 'CutFeedback'
       loop = sign?.name === 'Feedback' || sign?.name === 'WideFeedback'
-      width = sign?.name === 'WideSeries'
-        ? Number(contenu(text, sign).slice(1)) : null
+      width = sign?.name === 'WideSeries' ? Number(contenu(text, sign).slice(1)) : null
       continue
     }
     const right = pointsOf(text, piece)
     if (left) {
       for (const from of left) {
         for (const to of right) {
-          const r = cutting ? graph.cut(from, to)
-                          : graph.connect(from, to, width, loop)
-          if (!r.done) return r
+          const r = cutting ? graph.cut(from, to) : graph.connect(from, to, width, loop)
+          if (!r.done) {
+            return r
+          }
         }
       }
     }
@@ -207,7 +236,9 @@ function wire(text, expression, graph) {
  *  connection. The result is an instance without a name, placed in the graph. */
 function gatherComputations(text, expression, graph) {
   const bruts = []
-  for (let e = expression.firstChild; e; e = e.nextSibling) bruts.push(e)
+  for (let e = expression.firstChild; e; e = e.nextSibling) {
+    bruts.push(e)
+  }
 
   const out = []
   let computation = null
@@ -217,17 +248,28 @@ function gatherComputations(text, expression, graph) {
     const suivant = bruts[i + 1]
     const estCalcul = m => m?.name === 'Link' && m.firstChild?.name === 'Operator'
 
-    if (estCalcul(piece)) { computation.push(piece); continue }
-    if (computation) { computation.push(piece); }
-    else if (estCalcul(suivant)) { computation = [piece]; continue }
-    else { out.push(piece); continue }
+    if (estCalcul(piece)) {
+      computation.push(piece)
+      continue
+    }
+    if (computation) {
+      computation.push(piece)
+    } else if (estCalcul(suivant)) {
+      computation = [piece]
+      continue
+    } else {
+      out.push(piece)
+      continue
+    }
 
     if (!estCalcul(bruts[i + 1])) {
       out.push(placeComputation(text, computation, graph))
       computation = null
     }
   }
-  if (computation) out.push(placeComputation(text, computation, graph))
+  if (computation) {
+    out.push(placeComputation(text, computation, graph))
+  }
   return out
 }
 
@@ -242,18 +284,24 @@ function placeComputation(text, pieces, graph) {
 
 /** The points of a term: one name, or several if it is a group. */
 function pointsOf(text, terme) {
-  if (terme.computed) return [{ name: terme.computed }]
+  if (terme.computed) {
+    return [{ name: terme.computed }]
+  }
   const groupe = firstOf(terme, 'Group')
   if (groupe) {
     const inside = groupe.getChild('Expression')
     const points = []
     for (let e = inside?.firstChild; e; e = e.nextSibling) {
-      if (e.name !== 'Link') points.push(...pointsOf(text, e))
+      if (e.name !== 'Link') {
+        points.push(...pointsOf(text, e))
+      }
     }
     return points
   }
   const chemin = firstOf(terme, 'Path')
-  if (!chemin) return [{ name: contenu(text, terme) }]
+  if (!chemin) {
+    return [{ name: contenu(text, terme) }]
+  }
   const membres = contenu(text, chemin).split('.')
   return [{ name: membres[0], member: membres[1] ?? null }]
 }
@@ -270,18 +318,28 @@ function contenu(text, node) {
 
 function childrenOf(node, type) {
   const out = []
-  for (let e = node.firstChild; e; e = e.nextSibling) if (e.name === type) out.push(e)
+  for (let e = node.firstChild; e; e = e.nextSibling) {
+    if (e.name === type) {
+      out.push(e)
+    }
+  }
   return out
 }
 
 /** The first node of this type, going down. The forms the grammar nests —
  *  FreeBody > Expression > Term > Call — are traversed this way. */
 function firstOf(node, type) {
-  if (!node) return null
-  if (node.name === type) return node
+  if (!node) {
+    return null
+  }
+  if (node.name === type) {
+    return node
+  }
   for (let e = node.firstChild; e; e = e.nextSibling) {
     const trouve = firstOf(e, type)
-    if (trouve) return trouve
+    if (trouve) {
+      return trouve
+    }
   }
   return null
 }

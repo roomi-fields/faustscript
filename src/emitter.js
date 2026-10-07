@@ -22,7 +22,9 @@ export function writeInstance(instance, catalogue, templates, graph = null) {
     let body = translateExpression(instance.module, instance.name, catalogue, templates)
     if (instance.multiplicity > 1) {
       body = templates.fill('template.Multiple', {
-        i: templates.reserved('index'), n: instance.multiplicity, body,
+        i: templates.reserved('index'),
+        n: instance.multiplicity,
+        body,
       })
     }
     if (carriesAControl(body)) {
@@ -32,7 +34,8 @@ export function writeInstance(instance, catalogue, templates, graph = null) {
   }
 
   const arguments_ = module.parameters.map(parameter =>
-    writeArgument(instance, module, parameter, templates, graph))
+    writeArgument(instance, module, parameter, templates, graph)
+  )
 
   let body = arguments_.length
     ? templates.fill('template.Call', {
@@ -43,7 +46,9 @@ export function writeInstance(instance, catalogue, templates, graph = null) {
 
   if (instance.multiplicity > 1) {
     body = templates.fill('template.Multiple', {
-      i: templates.reserved('index'), n: instance.multiplicity, body,
+      i: templates.reserved('index'),
+      n: instance.multiplicity,
+      body,
     })
   }
   if (arguments_.some(carriesAControl)) {
@@ -76,22 +81,32 @@ function carriesAControl(faust) {
 function writeArgument(instance, module, parameter, templates, graph) {
   // a signal wired to this port drives it: it replaces any value
   const module_ = driver(instance, module, parameter, templates, graph)
-  if (module_) return module_
+  if (module_) {
+    return module_
+  }
 
   const pose = instance.settings.get(parameter.name)
   const start = pose ?? parameter.fallback
-  if (start === null || start === undefined) return parameter.name
-  if (pose === undefined) return start
+  if (start === null || start === undefined) {
+    return parameter.name
+  }
+  if (pose === undefined) {
+    return start
+  }
 
   // a parameter that is not a setting never becomes a port
-  if (module.attribute(parameter.name, 'nature')) return start
+  if (module.attribute(parameter.name, 'nature')) {
+    return start
+  }
 
   const min = module.attribute(parameter.name, 'min')
   const max = module.attribute(parameter.name, 'max')
   const bounded = min !== undefined && max !== undefined
 
   // the rule lives in the templates, not here: does a port require bounds?
-  if (!bounded && templates.value('rule.port.requiresBounds') === 'yes') return start
+  if (!bounded && templates.value('rule.port.requiresBounds') === 'yes') {
+    return start
+  }
 
   return templates.fill(templates.value(bounded ? 'rule.port.bounded' : 'rule.port.free'), {
     label: writeLabel(module, parameter.name, templates),
@@ -109,9 +124,13 @@ function writeArgument(instance, module, parameter, templates, graph) {
  * passes as it stands — nothing is guessed.
  */
 function driver(instance, module, parameter, templates, graph) {
-  if (!graph) return null
+  if (!graph) {
+    return null
+  }
   const wires = graph.incomingTo(instance.name, parameter.name)
-  if (!wires.length) return null
+  if (!wires.length) {
+    return null
+  }
 
   const signal = wires.map(c => c.from.name).join(', ')
   const source = graph.catalogue.get(graph.instance(wires[0].from.name)?.module)
@@ -121,11 +140,19 @@ function driver(instance, module, parameter, templates, graph) {
   const toStart = module.attribute(parameter.name, 'min')
   const toEnd = module.attribute(parameter.name, 'max')
 
-  if ([fromStart, fromEnd, toStart, toEnd].some(x => x === undefined)) return signal
-  if (fromStart === fromEnd) return signal
+  if ([fromStart, fromEnd, toStart, toEnd].some(x => x === undefined)) {
+    return signal
+  }
+  if (fromStart === fromEnd) {
+    return signal
+  }
 
   return templates.fill('template.Rescale', {
-    signal, fromStart, fromEnd, toStart, toEnd,
+    signal,
+    fromStart,
+    fromEnd,
+    toStart,
+    toEnd,
   })
 }
 
@@ -134,13 +161,20 @@ function writeLabel(module, nomDuPort, templates) {
   const metadata = []
   for (const [key, value] of module.attributes) {
     const [port, attribute] = key.split('.')
-    if (port !== nomDuPort) continue
-    if (attribute === 'min' || attribute === 'max' || attribute === 'nature') continue
-    if (attribute === 'example' || attribute === 'measure') continue
+    if (port !== nomDuPort) {
+      continue
+    }
+    if (attribute === 'min' || attribute === 'max' || attribute === 'nature') {
+      continue
+    }
+    if (attribute === 'example' || attribute === 'measure') {
+      continue
+    }
     metadata.push(templates.fill('template.Metadatum', { key: attribute, value }))
   }
   return templates.fill('template.Label', {
-    name: nomDuPort, metadata: metadata.join(''),
+    name: nomDuPort,
+    metadata: metadata.join(''),
   })
 }
 
@@ -159,29 +193,36 @@ function remonter(name, graph, catalogue, templates, seen) {
 
   // a bypassed instance lets the signal through; removed, it returns nothing
   const soi = instance?.removed
-      ? templates.fill('template.Removal', { module: name })
+    ? templates.fill('template.Removal', { module: name })
     : instance?.bypassed
       ? templates.fill('template.Bypass', { module: name })
-    : name
+      : name
 
-  if (!entrants.length) return name === graph.sink ? null : soi
-  if (seen.has(name)) return soi          // a cycle: we climb it only once
+  if (!entrants.length) {
+    return name === graph.sink ? null : soi
+  }
+  if (seen.has(name)) {
+    return soi
+  } // a cycle: we climb it only once
   seen.add(name)
 
-  const sources = entrants.map(c =>
-    remonter(c.from.name, graph, catalogue, templates, seen) ?? c.from.name)
+  const sources = entrants.map(
+    c => remonter(c.from.name, graph, catalogue, templates, seen) ?? c.from.name
+  )
 
-  const amont = sources.length === 1 ? sources[0]
-    : `(${sources.join(', ')})`
+  const amont = sources.length === 1 ? sources[0] : `(${sources.join(', ')})`
 
-  if (name === graph.sink) return amont
+  if (name === graph.sink) {
+    return amont
+  }
 
   // what several sources become is a rule of the language: we read it, we do
   // not decide it here
   const inputs = catalogue.get(instance?.module)?.inputs
-  const patron = sources.length > 1 && inputs === 1
-    ? templates.value('rule.multipleSources.singleInput')
-    : templates.value('rule.multipleSources.severalInputs')
+  const patron =
+    sources.length > 1 && inputs === 1
+      ? templates.value('rule.multipleSources.singleInput')
+      : templates.value('rule.multipleSources.severalInputs')
   return templates.fill(patron, { a: amont, b: soi })
 }
 
@@ -210,14 +251,15 @@ function translateExpression(text, instanceName, catalogue, templates) {
         const rendered = translateCall(text, node.node, instanceName, catalogue, templates)
         if (rendered !== null) {
           remplacements.push({ de: node.from, a: node.to, rendered })
-          return false            // do not go down: the call is already rendered
+          return false // do not go down: the call is already rendered
         }
       }
       if (node.name === 'Path') {
         const name = text.slice(node.from, node.to)
         if (catalogue.has(name)) {
           remplacements.push({
-            de: node.from, a: node.to,
+            de: node.from,
+            a: node.to,
             rendered: bodyOnly(instanceName, name, new Map(), catalogue, templates),
           })
         }
@@ -241,7 +283,9 @@ function translateCall(text, node, instanceName, catalogue, templates) {
 
   const settings = new Map()
   for (let e = listeDArguments?.firstChild; e; e = e.nextSibling) {
-    if (e.name !== 'Argument') continue
+    if (e.name !== 'Argument') {
+      continue
+    }
     const key = e.node.getChild('Key')
     const value = e.node.getChild('Value')
     if (key && value) {
@@ -254,13 +298,18 @@ function translateCall(text, node, instanceName, catalogue, templates) {
   }
 
   // an operator, or a module we do not know: its keys become free ports
-  if (!settings.size) return null
+  if (!settings.size) {
+    return null
+  }
   const rendus = [...settings].map(([key, value]) =>
     templates.fill('template.FreePort', {
-      label: key, default: value,
-      min: templates.fallback('min'), max: templates.fallback('max'),
+      label: key,
+      default: value,
+      min: templates.fallback('min'),
+      max: templates.fallback('max'),
       step: templates.fallback('step'),
-    }))
+    })
+  )
   return `${name}(${rendus.join(', ')})`
 }
 

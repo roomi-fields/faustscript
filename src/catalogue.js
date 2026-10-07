@@ -13,8 +13,8 @@ import { parser } from './parser.js'
 class Module {
   constructor(name) {
     this.name = name
-    this.parameters = []      // [{name, fallback}]
-    this.body = null         // the body's text, as written
+    this.parameters = [] // [{name, fallback}]
+    this.body = null // the body's text, as written
     this.attributes = new Map() // "cutoff.min" -> "20"
   }
 
@@ -43,7 +43,9 @@ export function readCatalogue(text) {
       continue
     }
     const setting = line.getChild('Setting')
-    if (setting && courant) readAttribute(text, setting, courant)
+    if (setting && courant) {
+      readAttribute(text, setting, courant)
+    }
   }
   readWidths(text, modules)
   inferMissingWidths(modules)
@@ -58,10 +60,17 @@ export function readCatalogue(text) {
  */
 function inferMissingWidths(modules) {
   for (const module of modules.values()) {
-    if (module.inputs !== undefined) continue
+    if (module.inputs !== undefined) {
+      continue
+    }
     const measure = module.attribute('output', 'measure')
-    if (measure === 'silence-and-noise') { module.inputs = 1; module.outputs ??= 1 }
-    else if (measure === 'no-input') { module.inputs = 0; module.outputs ??= 1 }
+    if (measure === 'silence-and-noise') {
+      module.inputs = 1
+      module.outputs ??= 1
+    } else if (measure === 'no-input') {
+      module.inputs = 0
+      module.outputs ??= 1
+    }
   }
 }
 
@@ -75,7 +84,9 @@ function readWidths(text, modules) {
   const form = /^(\w+)[^\n]*\n(?:[^\n]*\n)*?\s*\/\/ (\d+) inputs?, (\d+) outputs?/gm
   for (const trouve of text.matchAll(form)) {
     const module = modules.get(trouve[1])
-    if (!module) continue
+    if (!module) {
+      continue
+    }
     module.inputs = Number(trouve[2])
     module.outputs = Number(trouve[3])
   }
@@ -94,7 +105,9 @@ function readDefinition(text, node) {
     }
   }
   const body = node.getChild('NamedBody')
-  if (body) module.body = contenu(text, body)
+  if (body) {
+    module.body = contenu(text, body)
+  }
   return module
 }
 
@@ -103,14 +116,17 @@ function readAttribute(text, node, module) {
   const prefix = node.getChild('Prefix')
   const key = node.getChild('Key')
   const value = node.getChild('Value')
-  if (!key || !value) return
+  if (!key || !value) {
+    return
+  }
 
   const chemin = prefix ? contenu(text, prefix) : ''
-  const membres = (chemin + contenu(text, key).slice(0, -1))
-    .split('.').filter(Boolean)
+  const membres = (chemin + contenu(text, key).slice(0, -1)).split('.').filter(Boolean)
 
   // the last member names the attribute, what precedes it names the parameter
-  if (membres.length < 2) return
+  if (membres.length < 2) {
+    return
+  }
   const nomAttribut = membres.at(-1)
   const nomParametre = membres.at(-2)
   module.attributes.set(`${nomParametre}.${nomAttribut}`, contenu(text, value))
@@ -125,7 +141,9 @@ function contenu(text, node) {
 function childrenOf(node, type) {
   const out = []
   for (let e = node.firstChild; e; e = e.nextSibling) {
-    if (e.name === type) out.push(e)
+    if (e.name === type) {
+      out.push(e)
+    }
   }
   return out
 }

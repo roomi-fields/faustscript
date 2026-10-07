@@ -18,14 +18,17 @@ import { dirname, join } from 'node:path'
 
 const SIZES = [1, 5, 20, 50]
 const ROUNDS = 12
-const WARMUP = 3        // the first compiles pay for waking up; they are not the gesture
+const WARMUP = 3 // the first compiles pay for waking up; they are not the gesture
 
 /** A program of `n` independent filters, salted so no compiler cache can hit. */
 function program(n, salt) {
-  const modules = Array.from({ length: n }, (_, i) =>
-    `m${i + 1} = fi.lowpass(3, ${800 + i + 1} + ${salt} * 0);`).join('\n')
-  const chain = Array.from({ length: n }, (_, i) =>
-    `(os.sawtooth(${101 + i}) : m${i + 1})`).join(' , ')
+  const modules = Array.from(
+    { length: n },
+    (_, i) => `m${i + 1} = fi.lowpass(3, ${800 + i + 1} + ${salt} * 0);`
+  ).join('\n')
+  const chain = Array.from({ length: n }, (_, i) => `(os.sawtooth(${101 + i}) : m${i + 1})`).join(
+    ' , '
+  )
   return `import("stdfaust.lib");\nprocess = ${chain};\n${modules}\n`
 }
 
@@ -40,7 +43,9 @@ async function measure(compile) {
       const start = performance.now()
       await compile(program(n, `${n}-${round}`), `p${n}r${round}`)
       const took = performance.now() - start
-      if (round >= 0) times.push(took)
+      if (round >= 0) {
+        times.push(took)
+      }
     }
     rows.push({ n, ms: median(times), lo: Math.min(...times), hi: Math.max(...times) })
   }
@@ -50,8 +55,10 @@ async function measure(compile) {
 function report(title, rows) {
   console.log(`\n${title}`)
   for (const { n, ms, lo, hi } of rows) {
-    console.log(`  ${String(n).padStart(2)} modules  median ${ms.toFixed(1).padStart(6)} ms` +
-                `   (${lo.toFixed(1)} – ${hi.toFixed(1)})`)
+    console.log(
+      `  ${String(n).padStart(2)} modules  median ${ms.toFixed(1).padStart(6)} ms` +
+        `   (${lo.toFixed(1)} – ${hi.toFixed(1)})`
+    )
   }
   const ratio = rows.at(-1).ms / rows[0].ms
   console.log(`  one module is ${ratio.toFixed(1)}× cheaper than ${rows.at(-1).n}`)
@@ -64,16 +71,22 @@ const pkg = dirname(require.resolve('@grame/faustwasm/package.json'))
 const FaustWasm = await import(join(pkg, 'dist/esm/index.js'))
 
 const faustModule = await FaustWasm.instantiateFaustModuleFromFile(
-  join(pkg, 'libfaust-wasm/libfaust-wasm.js'))
+  join(pkg, 'libfaust-wasm/libfaust-wasm.js')
+)
 const compiler = new FaustWasm.FaustCompiler(new FaustWasm.LibFaust(faustModule))
 
 console.log(`libfaust-wasm carries Faust ${compiler.version()}, on node ${process.version}`)
 
-report('through libfaust-wasm, in the running process', await measure(async (code, name) => {
-  // the argument list is one string here, not an array: the wasm binding wants it that way
-  const factory = await compiler.createMonoDSPFactory(name, code, '-I libraries/')
-  if (!factory) throw new Error(compiler.getErrorMessage())
-}))
+report(
+  'through libfaust-wasm, in the running process',
+  await measure(async (code, name) => {
+    // the argument list is one string here, not an array: the wasm binding wants it that way
+    const factory = await compiler.createMonoDSPFactory(name, code, '-I libraries/')
+    if (!factory) {
+      throw new Error(compiler.getErrorMessage())
+    }
+  })
+)
 
 // --- natively, for comparison -----------------------------------------------
 
@@ -86,18 +99,25 @@ try {
 }
 
 const dir = mkdtempSync(join(tmpdir(), 'faustx-measure-'))
-const floor = median(Array.from({ length: 12 }, () => {
-  const file = join(dir, 'floor.dsp')
-  writeFileSync(file, 'import("stdfaust.lib");\nprocess = _;\n')
-  const start = performance.now()
-  execFileSync('faust', ['-lang', 'wasm', '-o', '/dev/null', file], { stdio: 'ignore' })
-  return performance.now() - start
-}))
+const floor = median(
+  Array.from({ length: 12 }, () => {
+    const file = join(dir, 'floor.dsp')
+    writeFileSync(file, 'import("stdfaust.lib");\nprocess = _;\n')
+    const start = performance.now()
+    execFileSync('faust', ['-lang', 'wasm', '-o', '/dev/null', file], { stdio: 'ignore' })
+    return performance.now() - start
+  })
+)
 
 console.log(`\n${native} — process startup measured at ${floor.toFixed(1)} ms, subtracted below`)
 
-report('natively, same backend, startup subtracted', (await measure(async (code, name) => {
-  const file = join(dir, `${name}.dsp`)
-  writeFileSync(file, code)
-  execFileSync('faust', ['-lang', 'wasm', '-o', '/dev/null', file], { stdio: 'ignore' })
-})).map(r => ({ ...r, ms: r.ms - floor, lo: r.lo - floor, hi: r.hi - floor })))
+report(
+  'natively, same backend, startup subtracted',
+  (
+    await measure(async (code, name) => {
+      const file = join(dir, `${name}.dsp`)
+      writeFileSync(file, code)
+      execFileSync('faust', ['-lang', 'wasm', '-o', '/dev/null', file], { stdio: 'ignore' })
+    })
+  ).map(r => ({ ...r, ms: r.ms - floor, lo: r.lo - floor, hi: r.hi - floor }))
+)

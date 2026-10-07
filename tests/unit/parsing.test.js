@@ -13,7 +13,11 @@ for (const name of readdirSync(dossier).filter(f => f.endsWith('.fx'))) {
     const text = readFileSync(new URL(name, dossier), 'utf8')
     const erreurs = []
     parser.parse(text).iterate({
-      enter: n => { if (n.type.isError) erreurs.push(lineNumber(text, n.from)) }
+      enter: n => {
+        if (n.type.isError) {
+          erreurs.push(lineNumber(text, n.from))
+        }
+      },
     })
     assert.deepEqual(erreurs, [], `errors at lines ${erreurs.join(', ')}`)
   })
@@ -28,8 +32,15 @@ test('the catalogue parses in full', () => {
   const text = readFileSync(new URL('../../lib/faust.fx', import.meta.url), 'utf8')
   const erreurs = []
   parser.parse(text).iterate({
-    enter: n => { if (n.type.isError) erreurs.push(lineNumber(text, n.from)) },
+    enter: n => {
+      if (n.type.isError) {
+        erreurs.push(lineNumber(text, n.from))
+      }
+    },
   })
-  assert.deepEqual([...new Set(erreurs)], [],
-    'the catalogue carries forms the grammar does not recognise')
+  assert.deepEqual(
+    [...new Set(erreurs)],
+    [],
+    'the catalogue carries forms the grammar does not recognise'
+  )
 })

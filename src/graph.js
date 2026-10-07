@@ -11,9 +11,9 @@
 class Instance {
   constructor(name, module, multiplicity = 1) {
     this.name = name
-    this.module = module          // the module's name, or an expression
+    this.module = module // the module's name, or an expression
     this.multiplicity = multiplicity
-    this.settings = new Map()     // "cutoff" -> "400"
+    this.settings = new Map() // "cutoff" -> "400"
     this.bypassed = false
     this.removed = false
   }
@@ -22,10 +22,10 @@ class Instance {
 /** A wire between two points, each a name and possibly a channel. */
 class Wire {
   constructor(from, to, width = null, loop = false) {
-    this.from = from              // {name, member}
+    this.from = from // {name, member}
     this.to = to
-    this.width = width            // how many instances, if the wire places any
-    this.loop = loop              // feedback: the output comes back to the input
+    this.width = width // how many instances, if the wire places any
+    this.loop = loop // feedback: the output comes back to the input
   }
 
   sameAs(other) {
@@ -43,8 +43,12 @@ export class Outcome {
     this.done = done
     this.reason = reason
   }
-  static ok() { return new Outcome(true) }
-  static refused(reason) { return new Outcome(false, reason) }
+  static ok() {
+    return new Outcome(true)
+  }
+  static refused(reason) {
+    return new Outcome(false, reason)
+  }
 }
 
 export class Graph {
@@ -56,8 +60,12 @@ export class Graph {
 
   // --- what exists -----------------------------------------------------------
 
-  instance(name) { return this.instances.get(name) }
-  module(name) { return this.catalogue.get(name) }
+  instance(name) {
+    return this.instances.get(name)
+  }
+  module(name) {
+    return this.catalogue.get(name)
+  }
 
   /** A name is free if it designates neither an instance nor a module. */
   free(name) {
@@ -78,7 +86,9 @@ export class Graph {
 
   /** The name is given back; whatever was ringing inside drains elsewhere. */
   release(name) {
-    if (!this.instances.has(name)) return Outcome.refused(`${name} does not exist`)
+    if (!this.instances.has(name)) {
+      return Outcome.refused(`${name} does not exist`)
+    }
     this.instances.delete(name)
     this.wires = this.wires.filter(w => w.from.name !== name && w.to.name !== name)
     return Outcome.ok()
@@ -87,9 +97,13 @@ export class Graph {
   /** The body changes, the memory stays: it is the same instance. */
   replace(name, module, settings = new Map()) {
     const instance = this.instances.get(name)
-    if (!instance) return Outcome.refused(`${name} does not exist`)
+    if (!instance) {
+      return Outcome.refused(`${name} does not exist`)
+    }
     instance.module = module
-    for (const [port, value] of settings) instance.settings.set(port, value)
+    for (const [port, value] of settings) {
+      instance.settings.set(port, value)
+    }
     return Outcome.ok()
   }
 
@@ -97,7 +111,9 @@ export class Graph {
 
   bypass(name, bypassed = true) {
     const instance = this.instances.get(name)
-    if (!instance) return Outcome.refused(`${name} does not exist`)
+    if (!instance) {
+      return Outcome.refused(`${name} does not exist`)
+    }
     instance.bypassed = bypassed
     return Outcome.ok()
   }
@@ -105,7 +121,9 @@ export class Graph {
   /** Take an instance out of the flow: it and its wires, but its name stays taken. */
   remove(name) {
     const instance = this.instances.get(name)
-    if (!instance) return Outcome.refused(`${name} does not exist`)
+    if (!instance) {
+      return Outcome.refused(`${name} does not exist`)
+    }
     instance.removed = true
     this.wires = this.wires.filter(w => w.from.name !== name && w.to.name !== name)
     return Outcome.ok()
@@ -115,16 +133,21 @@ export class Graph {
 
   connect(from, to, width = null, loop = false) {
     for (const end of [from, to]) {
-      if (!this.known(end.name)) return Outcome.refused(`${end.name} does not exist`)
+      if (!this.known(end.name)) {
+        return Outcome.refused(`${end.name} does not exist`)
+      }
     }
     // a setting is driven by a signal, not by what travels through the program
     if (to.member && this.carriesAnInput(from.name)) {
       return Outcome.refused(
         `${from.name} carries one of the program's inputs: ` +
-        `a setting can only be driven by a signal`)
+          `a setting can only be driven by a signal`
+      )
     }
     const wire = new Wire(from, to, width, loop)
-    if (this.wires.some(w => w.sameAs(wire))) return Outcome.ok()
+    if (this.wires.some(w => w.sameAs(wire))) {
+      return Outcome.ok()
+    }
     this.wires.push(wire)
     return Outcome.ok()
   }
@@ -148,38 +171,52 @@ export class Graph {
    * where `calc` has one does not compile. Better say so here, plainly.
    */
   carriesAnInput(name, seen = new Set()) {
-    if (seen.has(name)) return false
+    if (seen.has(name)) {
+      return false
+    }
     seen.add(name)
     const instance = this.instances.get(name)
-    if (!instance) return false
+    if (!instance) {
+      return false
+    }
     const body = String(instance.module ?? '').trim()
-    if (body === this.inputSign) return true
+    if (body === this.inputSign) {
+      return true
+    }
     for (const other of this.instances.keys()) {
-      if (other === name) continue
+      if (other === name) {
+        continue
+      }
       if (new RegExp(`\\b${other}\\b`).test(body) && this.carriesAnInput(other, seen)) {
         return true
       }
     }
-    return this.wires.some(w =>
-      w.to.name === name && !w.to.member && this.carriesAnInput(w.from.name, seen))
+    return this.wires.some(
+      w => w.to.name === name && !w.to.member && this.carriesAnInput(w.from.name, seen)
+    )
   }
 
   // --- setting -----------------------------------------------------------------
 
   set(name, port, value) {
     const instance = this.instances.get(name)
-    if (!instance) return Outcome.refused(`${name} does not exist`)
+    if (!instance) {
+      return Outcome.refused(`${name} does not exist`)
+    }
     instance.settings.set(port, value)
     return Outcome.ok()
   }
 
   /** The sink bears the name the language gives it; the graph does not choose it. */
-  set sink(name) { this.sinkName = name }
-  get sink() { return this.sinkName }
+  set sink(name) {
+    this.sinkName = name
+  }
+  get sink() {
+    return this.sinkName
+  }
 
   /** What arrives at a given point, in the order it was wired. */
   incomingTo(name, member = null) {
-    return this.wires.filter(w =>
-      w.to.name === name && (member === null || w.to.member === member))
+    return this.wires.filter(w => w.to.name === name && (member === null || w.to.member === member))
   }
 }
