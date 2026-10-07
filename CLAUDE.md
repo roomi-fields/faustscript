@@ -1,69 +1,46 @@
-# FaustX — the language
+# FaustX
 
-You carry **FaustX**, a superset of Faust for live coding. This repository carries **the language**
-and nothing else.
+FaustX is a superset of Faust for live coding, and its transpiler: a line of FaustX places a named instance or acts on it while the sound plays, and the transpiler writes the Faust that the host compiles and plays. This repository carries the language and its transpiler, as one TypeScript library with its command line.
 
-## ⛔ The principle of notation, settled by Romain on 2026-08-05
+**Owner**: Romain. He validates `docs/LANGUAGE.md`, `docs/PRINCIPES.md`, `docs/ARCHITECTURE.md`, `docs/CADRE.md` and `docs/INTERFACE.md`; the supervisor validates the other documents.
 
-**We DECORATE Faust's signs, we do not invent others.** The `:` stays the connection, and what
-surrounds it qualifies it: `:8` over eight channels, `!:` cuts.
+## What decides
 
-**The test before proposing a sign**: *does it decorate something that exists in Faust?* If not, it
-goes out. One rule applied everywhere is worth more than three finds — the first draft carried three
-and was thrown out for that.
+`docs/PRINCIPES.md`, then the specification (`docs/LANGUAGE.md`), then the frame (`docs/CADRE.md`, `docs/INTERFACE.md`, `docs/ARCHITECTURE.md`), then the code. A gap between the specification and the transpiler is a defect of the transpiler. A decision lives in the document it settles; a rule is affirmative, in the present, without date or author. `CONTEXT.md` gives each word of the domain its one sense.
 
-**Accepted exception**: `let`, because Faust already carries `letrec` and because it is the most
-classic word for a single binding.
+- `docs/LANGUAGE.md` — how FaustX is written: read it before touching the grammar, a gesture or a translation.
+- `docs/INTERFACE.md` — what crosses FaustX's boundary: read it before changing an export, a line's result or a refusal.
+- `docs/CADRE.md` — FaustX's role and boundary (R1…): cite its rules in a ticket.
 
-## ⛔ What you do not do
+## The flow of a task
 
-**You compute nothing.** All DSP is Faust, compiled by Faust.
+1. `bd ready`, `bd update <id> --claim`, read the ticket and the frame of what it touches.
+2. A decision remains to be taken: `/grill-me` before writing, its questions in the ticket.
+3. The plan goes in the ticket (`bd update <id> -d`), the work is done in `/tdd`. A commit that changes a behaviour corrects in the same commit every text that describes it.
+4. The ticket closes on its targeted tests, the review (`mattpocock-skills:code-review`, which asks: does this notion already exist elsewhere?) and a commit.
+5. `/handoff` in the ticket, then `bd close`, with what is not done and why.
 
-**You know neither the output, nor musical time, nor scenes.** FaustX knows nothing of whatever hosts
-it. A dependent knows you; you know no one.
+A supervision session loads the `superviseur` skill; a development agent loads `developper`.
 
-**You do not modify the Faust compiler.** The licence exception on its 304 architecture files holds
-**on the condition that they are not modified**.
+## What keeps the repository straight
 
-## The work in progress
+- **Faust stays as GRAME ships it.** The licence exception on Faust's architecture files holds on the condition that they are unmodified; FaustX writes Faust and calls the compiler as published.
+- **Signs live in the grammar and in `lib/`**, never in the code; a guard checks it.
+- **A neighbour reads only FaustX's published package**, and FaustX reads only its neighbours' published packages. A consumer that needs a fresher state asks for a publication.
+- **One subject, one address.** What a document already describes is poured into it.
+- **A replacement deletes what it replaces** in the same commit, with its consumers and its guards.
+- **A comment says what the thing is**, in the present.
+- **A rule of this charter enters in place of another.** The charter fits on one page.
 
-**The review of the eight elements is done** — the definition, the five composition operators, the
-routing primitives, substitution, the iterators, the interface parameters, the entry point, imports.
-It is in `docs/LANGUAGE.md`, the specification, and the reasons of substance in
-`docs/PRINCIPES.md`.
+## Tools
 
-**The transpiler translates**: the three pieces in `examples/` become Faust that compiles. The
-grammar generates the parser (`src/faustx.grammar`), the catalogue declares Faust's 998 functions,
-and no sign of the language is written in the code — a guard checks it.
+- ⛔ **No command that can ask for a validation**: a prompt freezes the session. Every temporary file goes in the session scratchpad; no `cd` (`env -C <dir>` or `git -C`); a deletion targets a named path that was read.
+- **The index first**: every exploratory search starts with `rtfm_search` (mode `hybrid`), then `rtfm_expand` on the relevant results.
+- Tickets: Beads (`bd`), prefix `faustx-`, see `docs/agents/issue-tracker.md`.
+- Repository skills: `superviseur`, `developper`, `mesurer`, `rediger` (human reader), `release`. Flow: the `mattpocock-skills` plugin, prefix required; a document for an agent is written with `mattpocock-skills:writing-for-agents`.
+- Answers in French; documents, code and API names in English.
 
-**What is left**: the fade of a bypass, and the sound — which belongs to the host.
+## Commands
 
-**Next operation: migrate the code to TypeScript.** The project tooling (`_project-structure`
-template) is in place and accepts JS meanwhile; the migration renames each `.js` to `.ts`,
-types it, and keeps the `.js` import specifiers.
-
-## The sources
-
-In this repository:
-
-`docs/LANGUAGE.md` — **the reference: how one writes FaustX.**
-`docs/ARCHITECTURE.md` — how the transpiler is built.
-`docs/PRINCIPES.md` — the directives every document, rule and ticket conforms to.
-`lib/faust.fx` — the catalogue of the 998 declared modules, generated by `tools/`.
-`docs/INTERFACE.md` — **what crosses FaustX's boundary**: read it before changing an export, a
-gesture's result or a refusal.
-
-## RTFM — Indexed Knowledge Base
-
-This project has been indexed with RTFM.
-
-For any **exploratory search** (finding which files/modules/classes are relevant
-to a topic), use `rtfm_search` instead of Glob, find, ls, or broad Grep.
-Then use `rtfm_expand` to read easily most relevant files/sections.
-
-## ⛔ A neighbour reads only the published package
-
-**A neighbour reads only FaustX's published package**, never this repository's working tree: what
-is not published has not reached anyone. **FaustX reads only its neighbours' published packages.**
-A consumer that needs a fresher state asks for a publication.
-
+- `npm test` · `npm run typecheck` · `npm run lint` · `npm run format:check` · `npm run grammaire` (regenerates the parser from `src/faustx.grammar`).
+- Conventional commits, message by file (`git commit -F`), trailer `Co-Authored-By: Claude`. Every commit is pushed.
