@@ -1,6 +1,6 @@
 # FaustX — the vocabulary
 
-This file defines the words of FaustX: the language, and the transpiler that reads it and writes Faust. Each definition sums up what `docs/LANGUAGE.md` says of the language and what `docs/INTERFACE.md` says of the transpiler's boundary; on a gap, those two documents decide. A word whose definition changes here changes code.
+This file defines the words of FaustX: the language, and the transpiler that reads it and writes Faust. Each definition sums up what `docs/LANGUAGE.md` says of the language and what `packages/040-faustx/docs/INTERFACE.md` says of the transpiler's boundary; on a gap, those two documents decide. A word whose definition changes here changes code.
 
 ## 1. The language
 

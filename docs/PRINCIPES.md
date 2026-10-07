@@ -17,7 +17,7 @@ This document states the directives that apply to the whole project: every refer
 
 ## 2. The transpiler
 
-- The transpiler writes Faust, and Faust compiles it; all signal computation is Faust's. Its role and its boundary are in `CADRE.md`.
+- The transpiler writes Faust, and Faust compiles it; all signal computation is Faust's. Its role and its boundary are in `packages/040-faustx/docs/CADRE.md`.
 - The signs of the language live in the grammar and in the files under `lib/`, read by the code; renaming a sign changes those files only.
 - The catalogue is generated from Faust's libraries by `tools/`; it is corrected in its generator, then generated again.
 

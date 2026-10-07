@@ -314,7 +314,7 @@ import("mes-modules.fx")             // as in Faust
 
 ## 10. A refused line
 
-A line that the transpiler refuses changes nothing in the graph, and the lines after it are applied; what plays keeps playing. A line that is accepted and sounds wrong is still accepted: FaustX checks the writing, not the music. The refusals and their codes are listed in `INTERFACE.md` §5.
+A line that the transpiler refuses changes nothing in the graph, and the lines after it are applied; what plays keeps playing. A line that is accepted and sounds wrong is still accepted: FaustX checks the writing, not the music. The refusals and their codes are listed in `packages/040-faustx/docs/INTERFACE.md` §5.
 
 ## 11. Quick reference
 
