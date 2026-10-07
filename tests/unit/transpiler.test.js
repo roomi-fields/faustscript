@@ -2,11 +2,12 @@
 // This is the only test that proves the whole chain holds.
 import { test } from 'vitest'
 import assert from 'node:assert'
-import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs'
+import { readFileSync, mkdtempSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createTranspiler } from '../../src/transpiler.js'
+import { compile } from './faust.js'
 
 const lire = f => readFileSync(new URL(f, import.meta.url), 'utf8')
 const dossier = mkdtempSync(join(tmpdir(), 'faustx-'))
@@ -15,17 +16,6 @@ function traduire(source) {
   const t = createTranspiler(lire('../../lib/faust.fx'), lire('../../lib/translation.fx'))
   const gestes = t.apply(source)
   return { faust: t.write(), refus: gestes.filter(g => !g.outcome.done), gestes }
-}
-
-function compile(faust) {
-  const fichier = join(dossier, 'essai.dsp')
-  writeFileSync(fichier, faust)
-  try {
-    execFileSync('faust', ['-lang', 'c', fichier, '-o', '/dev/null'], { stdio: 'pipe' })
-    return null
-  } catch (erreur) {
-    return String(erreur.stderr).split('\n')[0]
-  }
 }
 
 test('a minimal synth translates and compiles', () => {

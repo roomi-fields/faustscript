@@ -2,31 +2,16 @@
 // actually compile the result: that is the only judge.
 import { test } from 'vitest'
 import assert from 'node:assert'
-import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs'
-import { execFileSync } from 'node:child_process'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { readFileSync } from 'node:fs'
 import { readCatalogue } from '../../src/catalogue.js'
 import { readTemplates } from '../../src/templates.js'
 import { Graph } from '../../src/graph.js'
 import { writeInstance } from '../../src/emitter.js'
+import { compile } from './faust.js'
 
 const lire = f => readFileSync(new URL(f, import.meta.url), 'utf8')
 const catalogue = readCatalogue(lire('../../lib/faust.fx'))
 const templates = readTemplates(lire('../../lib/translation.fx'))
-const dossier = mkdtempSync(join(tmpdir(), 'faustx-'))
-
-/** Returns Faust's error message, or null if it accepts. */
-function compile(faust) {
-  const fichier = join(dossier, 'essai.dsp')
-  writeFileSync(fichier, faust)
-  try {
-    execFileSync('faust', ['-lang', 'c', fichier, '-o', '/dev/null'], { stdio: 'pipe' })
-    return null
-  } catch (erreur) {
-    return String(erreur.stderr).split('\n')[0]
-  }
-}
 
 function emettre(poses, expression) {
   const g = new Graph(catalogue)
