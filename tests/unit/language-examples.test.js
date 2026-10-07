@@ -12,10 +12,10 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { readFileSync } from 'node:fs'
 import { createTranspiler } from '../../src/transpiler.js'
 import { compile } from './faust.js'
 import { LANGUAGE, read } from './language-examples.js'
+import { CATALOGUE, TEMPLATES } from './library.js'
 
 const applied = { done: true, code: null, reason: null }
 const refused = (code, reason) => ({ done: false, code, reason })
@@ -82,10 +82,6 @@ const KNOWN_DEFECTS = new Map([
 const NOT_PROGRAMS = new Map([
   ['import("mes-modules.fsc")', 'it imports a file the document does not give'],
 ])
-
-const libraryFile = f => readFileSync(new URL(f, import.meta.url), 'utf8')
-const CATALOGUE = libraryFile('../../lib/faust.fsc')
-const TEMPLATES = libraryFile('../../lib/translation.fsc')
 
 const runs = new Map()
 

@@ -44,3 +44,5 @@ measured output ranges of that libfaust.
 
 Tests live in `tests/unit/` (`*.test.js`). The guard test checks that no sign of the
 language is written in the code: signs live in the grammar and the templates.
+The old-name test checks that no file writes the language's old name or its old extension;
+its header lists the places that may. A test reads `lib/` through `tests/unit/library.js`.

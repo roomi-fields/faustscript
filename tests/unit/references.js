@@ -11,13 +11,12 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { createTranspiler } from '../../src/transpiler.js'
 import { LANGUAGE, read } from './language-examples.js'
+import { CATALOGUE, TEMPLATES } from './library.js'
 
 const ROOT = new URL('../../', import.meta.url)
 export const REFERENCES = new URL('../references/', import.meta.url)
 
 const text = path => readFileSync(new URL(path, ROOT), 'utf8')
-const CATALOGUE = text('lib/faust.fsc')
-const TEMPLATES = text('lib/translation.fsc')
 
 const pieces = readdirSync(new URL('examples/', ROOT))
   .filter(f => f.endsWith('.fsc'))

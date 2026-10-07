@@ -3,14 +3,13 @@
 // every function a documentation title of those libraries names, and it marks the modules that
 // faustwasm refuses to compile.
 
-import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { expect, it } from 'vitest'
 import { readCatalogue } from '../../src/catalogue.js'
 import { compile, instantiate } from './faust.js'
+import { CATALOGUE } from './library.js'
 
 const require = createRequire(import.meta.url)
-const CATALOGUE = readFileSync(new URL('../../lib/faust.fsc', import.meta.url), 'utf8')
 
 /** Where libfaust-wasm keeps its libraries, in its virtual file system. */
 const LIBRARIES = '/usr/share/faust'

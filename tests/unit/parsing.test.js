@@ -4,6 +4,7 @@ import { test } from 'vitest'
 import assert from 'node:assert'
 import { readFileSync, readdirSync } from 'node:fs'
 import { parser } from '../../src/parser.js'
+import { CATALOGUE } from './library.js'
 
 const dossier = new URL('../../examples/', import.meta.url)
 
@@ -28,12 +29,11 @@ function lineNumber(text, position) {
 
 test('the catalogue parses in full', () => {
   // it is written in FaustScript: our own parser must read it without a single fault
-  const text = readFileSync(new URL('../../lib/faust.fsc', import.meta.url), 'utf8')
   const erreurs = []
-  parser.parse(text).iterate({
+  parser.parse(CATALOGUE).iterate({
     enter: n => {
       if (n.type.isError) {
-        erreurs.push(lineNumber(text, n.from))
+        erreurs.push(lineNumber(CATALOGUE, n.from))
       }
     },
   })

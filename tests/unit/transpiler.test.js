@@ -8,12 +8,13 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createTranspiler } from '../../src/transpiler.js'
 import { compile } from './faust.js'
+import { CATALOGUE, TEMPLATES } from './library.js'
 
 const lire = f => readFileSync(new URL(f, import.meta.url), 'utf8')
 const dossier = mkdtempSync(join(tmpdir(), 'faustscript-'))
 
 function traduire(source) {
-  const t = createTranspiler(lire('../../lib/faust.fsc'), lire('../../lib/translation.fsc'))
+  const t = createTranspiler(CATALOGUE, TEMPLATES)
   const gestes = t.apply(source)
   return { faust: t.write(), refus: gestes.filter(g => !g.outcome.done), gestes }
 }
@@ -58,7 +59,7 @@ test('the first complete piece compiles', async () => {
 })
 
 test('a faulty line is refused without touching the graph', () => {
-  const t = createTranspiler(lire('../../lib/faust.fsc'), lire('../../lib/translation.fsc'))
+  const t = createTranspiler(CATALOGUE, TEMPLATES)
   t.apply('let osc1 os.sawtooth(freq:110)\nosc1 : process\n')
   const avant = t.write()
   const refus = t
@@ -266,7 +267,7 @@ saw1 : lpf1 : process
 })
 
 test('a short name is refused, and the refusal names the module', () => {
-  const t = createTranspiler(lire('../../lib/faust.fsc'), lire('../../lib/translation.fsc'))
+  const t = createTranspiler(CATALOGUE, TEMPLATES)
   t.apply('let lpf1 fi.lowpass\n')
   const avant = t.write()
   const gestes = t.apply(

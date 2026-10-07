@@ -14,12 +14,12 @@
   "author": "Romain Peyrichou",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/roomi-fields/faustx.git"
+    "url": "git+https://github.com/roomi-fields/faustscript.git"
   },
   "bugs": {
-    "url": "https://github.com/roomi-fields/faustx/issues"
+    "url": "https://github.com/roomi-fields/faustscript/issues"
   },
-  "homepage": "https://github.com/roomi-fields/faustx#readme",
+  "homepage": "https://github.com/roomi-fields/faustscript#readme",
   "type": "module",
   "exports": {
     ".": "./src/transpiler.js",

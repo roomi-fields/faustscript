@@ -2,16 +2,15 @@
 // actually compile the result: that is the only judge.
 import { test } from 'vitest'
 import assert from 'node:assert'
-import { readFileSync } from 'node:fs'
 import { readCatalogue } from '../../src/catalogue.js'
 import { readTemplates } from '../../src/templates.js'
 import { Graph } from '../../src/graph.js'
 import { writeInstance } from '../../src/emitter.js'
 import { compile } from './faust.js'
+import { CATALOGUE, TEMPLATES } from './library.js'
 
-const lire = f => readFileSync(new URL(f, import.meta.url), 'utf8')
-const catalogue = readCatalogue(lire('../../lib/faust.fsc'))
-const templates = readTemplates(lire('../../lib/translation.fsc'))
+const catalogue = readCatalogue(CATALOGUE)
+const templates = readTemplates(TEMPLATES)
 
 function emettre(poses, expression) {
   const g = new Graph(catalogue)

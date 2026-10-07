@@ -2,12 +2,11 @@
 // c'est ce qui garantit qu'une line fautive n'interrompt pas le son.
 import { test } from 'vitest'
 import assert from 'node:assert'
-import { readFileSync } from 'node:fs'
 import { readCatalogue } from '../../src/catalogue.js'
 import { Graph } from '../../src/graph.js'
+import { CATALOGUE } from './library.js'
 
-const text = readFileSync(new URL('../../lib/faust.fsc', import.meta.url), 'utf8')
-const catalogue = readCatalogue(text)
+const catalogue = readCatalogue(CATALOGUE)
 
 const neuf = () => {
   const g = new Graph(catalogue)
@@ -16,7 +15,7 @@ const neuf = () => {
 }
 
 test('the catalogue carries every module its header counts', () => {
-  assert.equal(catalogue.size, Number(text.match(/^\/\/ (\d+) modules\.$/m)[1]))
+  assert.equal(catalogue.size, Number(CATALOGUE.match(/^\/\/ (\d+) modules\.$/m)[1]))
   assert.equal(catalogue.get('fi.lowpass').parameters.length, 2)
   assert.equal(catalogue.get('fi.resonlp').attribute('fc', 'unit'), 'Hz')
 })

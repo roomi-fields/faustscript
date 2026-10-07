@@ -2,7 +2,7 @@
 
 # FaustScript — live coding on top of Faust
 
-**[roomi-fields.github.io/faustx](https://roomi-fields.github.io/faustx/)** — the five Faust
+**[roomi-fields.github.io/faustscript](https://roomi-fields.github.io/faustscript/)** — the five Faust
 signs, and what happens to each one.
 
 **FaustScript is a language for patching while the sound is playing.** It adds to
