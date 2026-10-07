@@ -1,0 +1,138 @@
+FaustX reference output of examples/2-processed-guitar.fx.
+Engraved by `npm run references -- --update`, in a commit that names the gap.
+
+--- apply
+
+27  let guitare _
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: guitare
+    faust: guitare = _;
+    needs: []
+
+28  let pedale  hslider("pedale", 0.5, 0, 1, 0.01)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: pedale
+    faust: pedale = vgroup("pedale", hslider("pedale", 0.5, 0, 1, 0.01));
+    needs: []
+
+31  let porte1 gate_mono(thresh:-55, att:0.001, hold:0.15, rel:0.05)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: porte1
+    faust: porte1 = vgroup("porte1", ef.gate_mono(hslider("thresh", -55, -80, 0, 0.001), 0.001, hslider("hold[unit:s][scale:log]", 0.15, 0.001, 10, 0.001), hslider("rel[unit:s][scale:log]", 0.05, 0.001, 10, 0.001)));
+    needs: []
+
+32  let comp1  compressor_mono(ratio:4, thresh:-18, att:0.005, rel:0.15)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: comp1
+    faust: comp1 = vgroup("comp1", co.compressor_mono(hslider("ratio", 4, 1, 20, 0.001), hslider("thresh", -18, -80, 0, 0.001), hslider("att[unit:s][scale:log]", 0.005, 0.001, 10, 0.001), hslider("rel[unit:s][scale:log]", 0.15, 0.001, 10, 0.001)));
+    needs: []
+
+33  let drive1 cubicnl(drive:0.6, offset:0)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: drive1
+    faust: drive1 = vgroup("drive1", ef.cubicnl(hslider("drive", 0.6, 0, 1, 0.001), 0));
+    needs: []
+
+34  let creux1 resonhp(fc:180, Q:0.8, gain:1)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: creux1
+    faust: creux1 = vgroup("creux1", fi.resonhp(hslider("fc[unit:Hz][scale:log]", 180, 20, 20000, 0.001), hslider("Q[scale:log]", 0.8, 0.5, 50, 0.001), hslider("gain", 1, 0, 1, 0.001)));
+    needs: []
+
+36  let corps1 lowpass(N:3, fc:4200)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: corps1
+    faust: corps1 = vgroup("corps1", fi.lowpass(3, hslider("fc[unit:Hz][scale:log]", 4200, 2, 8000, 0.001)));
+    needs: []
+
+37  corps1.fc.min:400
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: corps1
+
+38  corps1.fc.max:4200
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: corps1
+
+39  corps1.fc.scale:log
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: corps1
+
+40  corps1.fc.unit:Hz
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: corps1
+
+42  let dly1   echo(maxDuration:2, duration:0.375, feedback:0.42)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: dly1
+    faust: dly1 = vgroup("dly1", ef.echo(2, 0.375, hslider("feedback", 0.42, 0, 1, 0.001)));
+    needs: []
+
+43  let rev1   mono_freeverb(fb1:0.86, fb2:0.66, damp:0.5, spread:17)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: rev1
+    faust: rev1 = vgroup("rev1", re.mono_freeverb(hslider("fb1", 0.86, 0, 1, 0.001), hslider("fb2", 0.66, 0, 1, 0.001), hslider("damp", 0.5, 0, 1, 0.001), 17));
+    needs: []
+
+45  let envoi1 *(niveau:0.3)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: envoi1
+    faust: envoi1 = vgroup("envoi1", *(nentry("niveau", 0.3, 0, 1e6, 0.001)));
+    needs: []
+
+46  let sortie *(gain:0.8)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: sortie
+    faust: sortie = vgroup("sortie", *(nentry("gain", 0.8, 0, 1e6, 0.001)));
+    needs: []
+
+49  pedale * 3800 + 400 : corps1.fc
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+51  guitare : porte1 : comp1 : drive1 : creux1 : corps1 : dly1
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+52  dly1 : sortie : process
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+53  dly1 : envoi1 : rev1 : process
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+--- write
+
+import("stdfaust.lib");
+guitare = _;
+pedale = vgroup("pedale", hslider("pedale", 0.5, 0, 1, 0.01));
+porte1 = vgroup("porte1", ef.gate_mono(hslider("thresh", -55, -80, 0, 0.001), 0.001, hslider("hold[unit:s][scale:log]", 0.15, 0.001, 10, 0.001), hslider("rel[unit:s][scale:log]", 0.05, 0.001, 10, 0.001)));
+comp1 = vgroup("comp1", co.compressor_mono(hslider("ratio", 4, 1, 20, 0.001), hslider("thresh", -18, -80, 0, 0.001), hslider("att[unit:s][scale:log]", 0.005, 0.001, 10, 0.001), hslider("rel[unit:s][scale:log]", 0.15, 0.001, 10, 0.001)));
+drive1 = vgroup("drive1", ef.cubicnl(hslider("drive", 0.6, 0, 1, 0.001), 0));
+creux1 = vgroup("creux1", fi.resonhp(hslider("fc[unit:Hz][scale:log]", 180, 20, 20000, 0.001), hslider("Q[scale:log]", 0.8, 0.5, 50, 0.001), hslider("gain", 1, 0, 1, 0.001)));
+corps1 = fi.lowpass(3, computation1);
+dly1 = vgroup("dly1", ef.echo(2, 0.375, hslider("feedback", 0.42, 0, 1, 0.001)));
+rev1 = vgroup("rev1", re.mono_freeverb(hslider("fb1", 0.86, 0, 1, 0.001), hslider("fb2", 0.66, 0, 1, 0.001), hslider("damp", 0.5, 0, 1, 0.001), 17));
+envoi1 = vgroup("envoi1", *(nentry("niveau", 0.3, 0, 1e6, 0.001)));
+sortie = vgroup("sortie", *(nentry("gain", 0.8, 0, 1e6, 0.001)));
+computation1 = pedale * 3800 + 400;
+process = guitare : route(1, 1, 1,1) : porte1 : route(1, 1, 1,1) : comp1 : route(1, 1, 1,1) : drive1 : route(1, 1, 1,1) : creux1 : route(1, 1, 1,1) : corps1 : route(1, 1, 1,1) : dly1 : route(1, 2, 1,1, 1,2) : (envoi1, sortie) : route(2, 2, 1,1, 2,2) : (rev1, si.bus(1));

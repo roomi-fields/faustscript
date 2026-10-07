@@ -132,7 +132,7 @@ An error the Faust compiler raises on the Faust that FaustX writes is the compil
 
 `write` returns the whole Faust program of the graph at this instant: the library import, one definition per instance in the flow, and `process`. As soon as one instance feeds more than one destination, the program is written in stages. An empty graph gives a valid program that outputs silence.
 
-**Guard** — `tests/unit/transpiler.test.js` (the pieces compile; an emptied graph stays a valid, silent program; a shared signal is written only once); target, faustx-zj5.8: one engraved reference output per example.
+**Guard** — `tests/unit/transpiler.test.js` (the pieces compile; an emptied graph stays a valid, silent program; a shared signal is written only once); `tests/unit/references.test.js` (each piece of `examples/` and each example block of `LANGUAGE.md` gives the results and the program engraved under `tests/references/`).
 
 ## 7. `graph`
 

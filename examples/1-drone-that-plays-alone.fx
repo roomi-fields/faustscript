@@ -5,19 +5,18 @@
 // retriggered on the beat, a reverb, an output volume. No audio input at all:
 // the program sounds by itself as soon as it is loaded.
 //
-// What it exercises in the specification:
-//   - `let` and the ports the catalogue declares (elements 1 and 6)
-//   - the bounds and the scale written once, at the declaration (element 6)
+// What it exercises in docs/LANGUAGE.md:
+//   - `let` and the ports the catalogue declares (§2.1, §3.4)
+//   - the bounds and the scale written on the instance (§3.4, §6)
 //   - several channels summing into one input: the three oscillators arrive
-//     at a single filter (element 2, the adaptation rule)
-//   - a port driven by a signal: `lfo1 : lpf1.fc` (element 3)
-//   - `process` as the sink one connects to (element 7)
+//     at a single filter (§4.2)
+//   - a port driven by a signal: `lfo1 : lpf1.fc` (§6)
+//   - `process` as the sink one connects to (§8)
 //
-// GAP MET WHILE WRITING IT — see the report:
-//   `N:3` is the filter order. Faust requires a compile-time constant there;
-//   the specification gives no way of saying that a declared parameter is NOT
-//   a port. Emitted as a slider, it makes the compilation fail. The
-//   translation alongside therefore freezes `3` by hand.
+// `N:3` is the filter order: Faust requires a compile-time constant there,
+// and a port without bounds stays one (§3.4).
+// The Faust that FaustX writes for this piece is engraved in
+// tests/references/examples/1-drone-that-plays-alone.fx.txt.
 //
 // The instance names are the musician's own and are left untouched:
 //   `bat1` is the beat (French *battement*), `vca1` the amplifier the

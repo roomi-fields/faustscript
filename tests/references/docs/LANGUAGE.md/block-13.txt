@@ -1,0 +1,36 @@
+FaustX reference output of the faustx block 13 of docs/LANGUAGE.md, which opens with let rev1 mono_freeverb.
+Engraved by `npm run references -- --update`, in a commit that names the gap.
+
+--- apply
+
+1  let rev1 mono_freeverb
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: rev1
+    faust: rev1 = re.mono_freeverb(0.7, 0.5, 0.3, 30);
+    needs: []
+
+2  rev1 mono_freeverb(damp:0.9)
+    outcome: {"done":true,"reason":null}
+    gesture: replace
+    name: rev1
+    faust: rev1 = vgroup("rev1", re.mono_freeverb(0.7, 0.5, hslider("damp", 0.9, 0, 1, 0.001), 30));
+    needs: []
+
+3  !let rev1
+    outcome: {"done":true,"reason":null}
+    gesture: release
+    name: rev1
+
+4  let rev1 mono_freeverb(damp:0.9)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: rev1
+    faust: rev1 = vgroup("rev1", re.mono_freeverb(0.7, 0.5, hslider("damp", 0.9, 0, 1, 0.001), 30));
+    needs: []
+
+--- write
+
+import("stdfaust.lib");
+rev1 = vgroup("rev1", re.mono_freeverb(0.7, 0.5, hslider("damp", 0.9, 0, 1, 0.001), 30));
+process = 0;

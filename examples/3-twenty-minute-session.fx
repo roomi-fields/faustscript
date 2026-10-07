@@ -5,22 +5,17 @@
 // line after line, while the sound is playing. The starting state fits in the
 // first block; all the rest arrives one line at a time.
 //
-// The corresponding Faust is written in five snapshots, taken at the moments
-// where the graph changes shape:
-//   3-session-t00-start.dsp   the state at load time
-//   3-session-t03-bank.dsp    the filter inserted, swept, and the bank of six
-//   3-session-t08-loop.dsp    the feedback loop opened
-//   3-session-t15-reverb.dsp  the widened bank, the eight voices, the reverb
-//   3-session-t19-end.dsp     the loop opened again, the bass cut
+// What FaustX returns for each line, and the Faust it writes at the end of the
+// session, are engraved in tests/references/examples/3-twenty-minute-session.fx.txt.
 //
-// What it exercises in the specification: everything that exists only live --
+// What it exercises in docs/LANGUAGE.md: everything that exists only live --
 // laying down, repatching, removing, setting, replacing a body, opening a
 // loop, giving a name back, and the dot that takes one channel from a bank.
 //
-// The lines marked ⛔ are the ones we wanted to write and that the
-// specification does not allow, or allows in two ways. Each of them is taken
-// up in the report. Where the specification has settled the question since,
-// a SETTLED SINCE line says so and names where to read it.
+// The lines marked ⛔ are the ones the musician wanted to write and that the
+// language did not allow, or allowed in two ways, when the session was played.
+// Where docs/LANGUAGE.md settles the question, a SETTLED SINCE line says so and
+// names where to read it.
 //
 // The instance names are the musician's own and are left as they were
 // written, in French: basse = bass, bruit = noise, clic = click, voix =
@@ -73,7 +68,7 @@ vcab !: sortie
 //    SETTLED SINCE: a signal patched into a port is rescaled on its own.
 //    FaustX places Faust's `it.remap` between the two when both ranges are
 //    known, and lets the signal through as it is otherwise -- nothing is
-//    guessed. (LANGUAGE.md, "Setting".)
+//    guessed. (LANGUAGE.md §6.)
 
 let lfo1 osc(freq:0.13) * 380 + 520
 lfo1 : lpf1.fc
@@ -96,7 +91,7 @@ lpf1.Q:16
 //
 //    SETTLED SINCE: `i` is the rank of the copy, taken over from Faust's
 //    `par(i,6,…)`, and this exact line is now the one to write.
-//    (LANGUAGE.md, "Placing a module".)
+//    (LANGUAGE.md §2.3.)
 //
 // ⛔ GAP: `let bruit noise` and a second `let bruit2 noise` are, in the Faust
 //    emitted, THE SAME circuit -- measured, the two outputs are the same
@@ -126,7 +121,11 @@ clic.6.fc:1866
 //
 // ⛔ AMBIGUOUS: the new body carries the same `freq` port. Does it take over
 //    the current value (55) or the one `square`'s declaration gives (220)?
-//    The specification says the memory stays; it says nothing about ports.
+//    The language said the memory stays; it said nothing about ports.
+//
+//    SETTLED SINCE: a replacement keeps the instance and its other settings,
+//    and a setting written in the new body is the one that applies.
+//    (LANGUAGE.md §5.)
 
 basse square(freq:55)
 
@@ -136,10 +135,11 @@ basse square(freq:55)
 // ⛔ GAP: in Faust, `A ~ B` TAKES A's first inputs to bring B back into them;
 //    `dly1` has only one input, already taken by `lpf1`. For the line below
 //    to mean what a musician thinks it means, FaustX has to insert a summing
-//    that nothing in the specification mentions.
+//    that nothing in docs/LANGUAGE.md mentions.
 //
 // ⛔ GAP: `n:96000` sizes the delay line and has to be a compile-time
-//    constant. Nothing lets one say that a declared parameter is not a port.
+//    constant. Nothing in docs/LANGUAGE.md keeps a port with known bounds
+//    from becoming a control.
 
 let dly1 fdelay(n:96000, d:13000)
 let fb1  *(retour:0.55)
@@ -162,8 +162,8 @@ _ lpf1
 
 // --- 10:15  put it back into the flow ---------------------------------------
 //
-// ⛔ GAP: it does not exist. `_` and `!` have no inverse. `!_ lpf1` is not in
-//    the specification -- the `!` cancels the sign it precedes, and `_` is
+// ⛔ GAP: it did not exist. `_` and `!` had no inverse. `!_ lpf1` was not in
+//    the language -- the `!` cancels the sign it precedes, and `_` is
 //    already the sign of the neutralisation. Replacing the body puts nothing
 //    back into the flow, since `_ lpf1` "does not touch the body". The line
 //    we wanted to write has no form:
@@ -171,7 +171,7 @@ _ lpf1
 //
 //    SETTLED SINCE: `!_ lpf1` is exactly the line, and it follows from the
 //    `!` rule with nothing added. The line below is therefore no longer the
-//    way to do it. (LANGUAGE.md, "The gestures".)
+//    way to do it. (LANGUAGE.md §5.)
 
 lpf1 resonlp(fc:420, Q:16, gain:0.9)
 
@@ -192,7 +192,7 @@ lpf1 resonlp(fc:420, Q:16, gain:0.9)
 //    SETTLED SINCE: spacing is significant, and it is a rule of the whole
 //    language -- tight, a sign qualifies; spaced, it connects. Both readings
 //    stand, and which one applies is decided by the space.
-//    (LANGUAGE.md, "Spacing is significant".)
+//    (LANGUAGE.md §1.3.)
 //
 // ⛔ GAP: the first of the two would not be enough anyway. `! clic` took the
 //    instance out of the flow, and replacing its body "does not touch the
@@ -220,11 +220,11 @@ clic.7.fc:2489
 // ⛔ AMBIGUOUS: does `voix.3` designate the third voice, or the instance's
 //    third channel? Here the two coincide because every voice is mono. With a
 //    two-output body -- a stereo reverb, say -- the two readings diverge and
-//    the specification does not settle it.
+//    the language did not settle it.
 //
 //    SETTLED SINCE: the dot followed by a number designates a channel, and
 //    for a bank of one-channel modules the channel IS the module. One rule,
-//    one reading. (LANGUAGE.md, "The channels".)
+//    one reading. (LANGUAGE.md §7.)
 //
 // ⛔ GAP: `lowpass(N:2, …)` -- the filter order, again.
 //
@@ -233,7 +233,7 @@ clic.7.fc:2489
 //
 //    SETTLED SINCE: `i` is the rank of the copy, so the eight pitches fit on
 //    the one `let` -- `let voix:8 sawtooth(freq:110 * (i+1))`.
-//    (LANGUAGE.md, "Placing a module".)
+//    (LANGUAGE.md §2.3.)
 
 let voix:8 sawtooth : lowpass(N:2, fc:1200)
 voix : sortie
@@ -260,18 +260,18 @@ voix.5 : dly1
 // --- 15:00  lay the reverb down as a send -----------------------------------
 //
 // ⛔ GAP, the gravest one: `rev1` has two outputs. Two cables arriving at
-//    `process` sum there -- the specification says so without reservation. So
+//    `process` sum there -- the language said so without reservation. So
 //    the piece is MONO, and nothing lets one write otherwise. What we wanted
 //    to write does not exist:
 //        rev1.1 : process.1
 //        rev1.2 : process.2
-//    `process` has no channels in the specification, and element 7 names the
-//    inputs without ever naming the outputs.
+//    `process` had no channels in the language, which named the inputs
+//    without ever naming the outputs.
 //
 //    SETTLED SINCE: it was a writing oversight, not a decision. `process` is
 //    an instance, so the dot rule applies to it, and those two lines are
 //    exactly how a stereo piece is written.
-//    (LANGUAGE.md, "What sounds".)
+//    (LANGUAGE.md §8.)
 
 let rev1  stereo_freeverb(fb1:0.88, fb2:0.7, damp:0.4, spread:23)
 let envoi *(niveau:0.25)
@@ -285,7 +285,11 @@ rev1 : process
 // ⛔ AMBIGUOUS: `!let rev1` gives the name back and the tail drains. But the
 //    two cables `sortie : envoi : rev1` and `rev1 : process` aimed at that
 //    name. Are they destroyed with it? Repatched onto the new `rev1`? The
-//    specification does not say. We rewire by hand, for want of knowing.
+//    language did not say. We rewire by hand, for want of knowing.
+//
+//    SETTLED SINCE: `!let` deletes the instance and its wires, so the two
+//    lines that rewire the new `rev1` are what one writes.
+//    (LANGUAGE.md §5.)
 
 !let rev1
  let rev1 mono_freeverb(fb1:0.94, fb2:0.75, damp:0.3, spread:19)
@@ -313,7 +317,7 @@ dly1 !~ fb1
 //
 //    SETTLED SINCE, on this very line: a cut wire does not remove the input,
 //    it puts zero into it. The width does not change and the expected silence
-//    happens. (LANGUAGE.md, "Connecting".)
+//    happens. (LANGUAGE.md §4.3.)
 
 basse !: vcab
 

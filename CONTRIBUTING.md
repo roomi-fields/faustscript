@@ -22,6 +22,7 @@ npm test
 |---------|-------------|
 | `npm test` | Run the test suite (Vitest) |
 | `npm run test:coverage` | Tests with coverage |
+| `npm run references` / `-- --update` | Compare / engrave the reference outputs under `tests/references/`; `--update` goes in a commit that names the gap |
 | `npm run lint` / `lint:fix` | Check / fix code style |
 | `npm run format` / `format:check` | Format with Prettier |
 | `npm run typecheck` | TypeScript check |

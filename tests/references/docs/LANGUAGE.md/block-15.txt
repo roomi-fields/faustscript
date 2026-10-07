@@ -1,0 +1,30 @@
+FaustX reference output of the faustx block 15 of docs/LANGUAGE.md, which opens with let lfo1 osc(freq:0.2).
+Engraved by `npm run references -- --update`, in a commit that names the gap.
+
+--- apply
+
+1  let lfo1 osc(freq:0.2)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: lfo1
+    faust: lfo1 = vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.2, 0.1, 8000, 0.001)));
+    needs: []
+
+2  let lpf1 lowpass(fc:800)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: lpf1
+    faust: lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 800, 2, 8000, 0.001)));
+    needs: []
+
+3  lfo1 : it.remap(-1, 1, 140, 900) : lpf1.fc
+    outcome: {"done":false,"reason":"it does not exist"}
+    gesture: wire
+    name: null
+
+--- write
+
+import("stdfaust.lib");
+lfo1 = vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.2, 0.1, 8000, 0.001)));
+lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 800, 2, 8000, 0.001)));
+process = 0;

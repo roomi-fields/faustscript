@@ -1,0 +1,19 @@
+FaustX reference output of the faustx block 7 of docs/LANGUAGE.md, which opens with voix(freq:110, fc:800)  sawtooth(freq:freq) : lowpass(fc:fc).
+Engraved by `npm run references -- --update`, in a commit that names the gap.
+
+--- apply
+
+1  voix(freq:110, fc:800)  sawtooth(freq:freq)
+    outcome: {"done":false,"reason":"voix is not a placed instance"}
+    gesture: replace
+    name: voix
+
+1  lowpass(fc:fc)
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+--- write
+
+import("stdfaust.lib");
+process = 0;

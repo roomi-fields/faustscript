@@ -1,0 +1,407 @@
+FaustX reference output of examples/3-twenty-minute-session.fx.
+Engraved by `npm run references -- --update`, in a commit that names the gap.
+
+--- apply
+
+30  let bat1   beat(t:112)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: bat1
+    faust: bat1 = ba.beat(112);
+    needs: []
+
+31  let envb   ar(at:0.004, rt:0.16)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: envb
+    faust: envb = vgroup("envb", en.ar(hslider("at[unit:s][scale:log]", 0.004, 0.001, 0.1, 0.001), hslider("rt[unit:s][scale:log]", 0.16, 0.001, 0.8, 0.001), 0));
+    needs: []
+
+32  let basse  sawtooth(freq:55)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: basse
+    faust: basse = vgroup("basse", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 55, 0.08, 220, 0.001)));
+    needs: []
+
+33  let vcab   *
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: vcab
+    faust: vcab = *;
+    needs: []
+
+34  let sortie *(gain:0.5)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: sortie
+    faust: sortie = vgroup("sortie", *(nentry("gain", 0.5, 0, 1e6, 0.001)));
+    needs: []
+
+36  bat1 : envb.gate
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+37  (basse, envb) : vcab : sortie : process
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+52  let lpf1 resonlp(fc:420, Q:6, gain:0.9)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: lpf1
+    faust: lpf1 = vgroup("lpf1", fi.resonlp(hslider("fc[unit:Hz][scale:log]", 420, 20, 20000, 0.001), hslider("Q[scale:log]", 6, 0.5, 50, 0.001), hslider("gain", 0.9, 0, 1, 0.001)));
+    needs: []
+
+54  vcab : lpf1
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+55  lpf1 : sortie
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+56  vcab !: sortie
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+73  let lfo1 osc(freq:0.13) * 380 + 520
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: lfo1
+    faust: lfo1 = vgroup("lfo1", vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.13, 0.1, 8000, 0.001))) * 380 + 520);
+    needs: []
+
+74  lfo1 : lpf1.fc
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+79  lpf1.Q:16
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: lpf1
+
+103  let bruit noise
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: bruit
+    faust: bruit = no.noise;
+    needs: []
+
+104  let envc  ar(at:0.001, rt:0.09)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: envc
+    faust: envc = vgroup("envc", en.ar(hslider("at[unit:s][scale:log]", 0.001, 0.001, 0.1, 0.001), hslider("rt[unit:s][scale:log]", 0.09, 0.001, 0.8, 0.001), 0));
+    needs: []
+
+105  let vcac  *
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: vcac
+    faust: vcac = *;
+    needs: []
+
+106  let clic:6 resonbp(fc:900, Q:60, gain:1)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: clic
+    faust: clic = vgroup("clic", par(i,6,fi.resonbp(hslider("fc[unit:Hz][scale:log]", 900, 20, 20000, 0.001), hslider("Q[scale:log]", 60, 0.5, 50, 0.001), hslider("gain", 1, 0, 1, 0.001))));
+    needs: []
+
+108  bat1 : envc.gate
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+109  (bruit, envc) : vcac : clic
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+110  clic : sortie
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+112  clic.1.fc:311
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: clic
+
+113  clic.2.fc:466
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: clic
+
+114  clic.3.fc:622
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: clic
+
+115  clic.4.fc:933
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: clic
+
+116  clic.5.fc:1244
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: clic
+
+117  clic.6.fc:1866
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: clic
+
+130  basse square(freq:55)
+    outcome: {"done":true,"reason":null}
+    gesture: replace
+    name: basse
+    faust: basse = vgroup("basse", os.square(hslider("freq[unit:Hz][scale:log]", 55, 20, 20000, 0.001)));
+    needs: []
+
+144  let dly1 fdelay(n:96000, d:13000)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: dly1
+    faust: dly1 = vgroup("dly1", de.fdelay(hslider("n[unit:samples]", 96000, 44100, 2.09715e+06, 0.001), 13000));
+    needs: []
+
+145  let fb1  *(retour:0.55)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: fb1
+    faust: fb1 = vgroup("fb1", *(nentry("retour", 0.55, 0, 1e6, 0.001)));
+    needs: []
+
+147  lpf1 : dly1
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+148  dly1 ~ fb1
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+149  dly1 : sortie
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+154  let lfo2 osc(freq:0.07) * 4000 + 9000
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: lfo2
+    faust: lfo2 = vgroup("lfo2", vgroup("lfo2", os.osc(hslider("freq[unit:Hz][scale:log]", 0.07, 0.1, 8000, 0.001))) * 4000 + 9000);
+    needs: []
+
+155  lfo2 : dly1.d
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+160  _ lpf1
+    outcome: {"done":true,"reason":null}
+    gesture: bypass
+    name: lpf1
+    faust: lpf1 = vgroup("lpf1", fi.resonlp(lfo1, hslider("Q[scale:log]", 16, 0.5, 50, 0.001), hslider("gain", 0.9, 0, 1, 0.001)));
+    needs: ["lfo1"]
+
+176  lpf1 resonlp(fc:420, Q:16, gain:0.9)
+    outcome: {"done":true,"reason":null}
+    gesture: replace
+    name: lpf1
+    faust: lpf1 = vgroup("lpf1", fi.resonlp(lfo1, hslider("Q[scale:log]", 16, 0.5, 50, 0.001), hslider("gain", 0.9, 0, 1, 0.001)));
+    needs: ["lfo1"]
+
+181  ! clic
+    outcome: {"done":true,"reason":null}
+    gesture: remove
+    name: clic
+    faust: clic = vgroup("clic", par(i,6,fi.resonbp(hslider("fc[unit:Hz][scale:log]", 900, 20, 20000, 0.001), hslider("Q[scale:log]", 60, 0.5, 50, 0.001), hslider("gain", 1, 0, 1, 0.001))));
+    needs: []
+
+208  !let clic
+    outcome: {"done":true,"reason":null}
+    gesture: release
+    name: clic
+
+209  let clic:12 resonbp(fc:900, Q:60, gain:1)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: clic
+    faust: clic = vgroup("clic", par(i,12,fi.resonbp(hslider("fc[unit:Hz][scale:log]", 900, 20, 20000, 0.001), hslider("Q[scale:log]", 60, 0.5, 50, 0.001), hslider("gain", 1, 0, 1, 0.001))));
+    needs: []
+
+211  vcac : clic
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+212  clic : sortie
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+214  clic.1.fc:311
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: clic
+
+215  clic.7.fc:2489
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: clic
+
+238  let voix:8 sawtooth : lowpass(N:2, fc:1200)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: voix
+    faust: voix = vgroup("voix", par(i,8,os.sawtooth(220) : vgroup("voix", fi.lowpass(2, hslider("fc[unit:Hz][scale:log]", 1200, 2, 8000, 0.001)))));
+    needs: []
+
+239  voix : sortie
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+241  voix.1.freq:110
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: voix
+
+242  voix.2.freq:165
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: voix
+
+243  voix.3.freq:220
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: voix
+
+244  voix.4.freq:277
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: voix
+
+245  voix.5.freq:330
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: voix
+
+246  voix.6.freq:440
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: voix
+
+247  voix.7.freq:554
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: voix
+
+248  voix.8.freq:660
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: voix
+
+257  voix.5 : dly1
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+276  let rev1  stereo_freeverb(fb1:0.88, fb2:0.7, damp:0.4, spread:23)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: rev1
+    faust: rev1 = vgroup("rev1", re.stereo_freeverb(hslider("fb1", 0.88, 0, 1, 0.001), hslider("fb2", 0.7, 0, 1, 0.001), hslider("damp", 0.4, 0, 1, 0.001), 23));
+    needs: ["fb1"]
+
+277  let envoi *(niveau:0.25)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: envoi
+    faust: envoi = vgroup("envoi", *(nentry("niveau", 0.25, 0, 1e6, 0.001)));
+    needs: []
+
+279  sortie : envoi : rev1
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+280  rev1 : process
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+294  !let rev1
+    outcome: {"done":true,"reason":null}
+    gesture: release
+    name: rev1
+
+295  let rev1 mono_freeverb(fb1:0.94, fb2:0.75, damp:0.3, spread:19)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: rev1
+    faust: rev1 = vgroup("rev1", re.mono_freeverb(hslider("fb1", 0.94, 0, 1, 0.001), hslider("fb2", 0.75, 0, 1, 0.001), hslider("damp", 0.3, 0, 1, 0.001), 19));
+    needs: ["fb1"]
+
+297  sortie : envoi : rev1
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+298  rev1 : process
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+307  dly1 !~ fb1
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+322  basse !: vcab
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+327  sortie.gain:0.2
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: sortie
+
+328  sortie.gain:0
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: sortie
+
+--- write
+
+import("stdfaust.lib");
+bat1 = ba.beat(112);
+envb = vgroup("envb", en.ar(hslider("at[unit:s][scale:log]", 0.004, 0.001, 0.1, 0.001), hslider("rt[unit:s][scale:log]", 0.16, 0.001, 0.8, 0.001), bat1));
+basse = vgroup("basse", os.square(hslider("freq[unit:Hz][scale:log]", 55, 20, 20000, 0.001)));
+vcab = *;
+sortie = vgroup("sortie", *(nentry("gain", 0.5, 0, 1e6, 0.001)));
+lpf1 = vgroup("lpf1", fi.resonlp(lfo1, hslider("Q[scale:log]", 16, 0.5, 50, 0.001), hslider("gain", 0.9, 0, 1, 0.001)));
+lfo1 = vgroup("lfo1", vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.13, 0.1, 8000, 0.001))) * 380 + 520);
+bruit = no.noise;
+envc = vgroup("envc", en.ar(hslider("at[unit:s][scale:log]", 0.001, 0.001, 0.1, 0.001), hslider("rt[unit:s][scale:log]", 0.09, 0.001, 0.8, 0.001), bat1));
+vcac = *;
+dly1 = vgroup("dly1", de.fdelay(hslider("n[unit:samples]", 96000, 44100, 2.09715e+06, 0.001), lfo2));
+fb1 = vgroup("fb1", *(nentry("retour", 0.55, 0, 1e6, 0.001)));
+lfo2 = vgroup("lfo2", vgroup("lfo2", os.osc(hslider("freq[unit:Hz][scale:log]", 0.07, 0.1, 8000, 0.001))) * 4000 + 9000);
+clic = vgroup("clic", par(i,12,fi.resonbp(hslider("fc[unit:Hz][scale:log]", 900, 20, 20000, 0.001), hslider("Q[scale:log]", 60, 0.5, 50, 0.001), hslider("gain", 1, 0, 1, 0.001))));
+voix = vgroup("voix", par(i,8,os.sawtooth(220) : vgroup("voix", fi.lowpass(2, hslider("fc[unit:Hz][scale:log]", 1200, 2, 8000, 0.001)))));
+envoi = vgroup("envoi", *(nentry("niveau", 0.25, 0, 1e6, 0.001)));
+rev1 = vgroup("rev1", re.mono_freeverb(hslider("fb1", 0.94, 0, 1, 0.001), hslider("fb2", 0.75, 0, 1, 0.001), hslider("damp", 0.3, 0, 1, 0.001), 19));
+process = (envb, basse, bruit, envc, fb1, voix) : route(13, 12, 1,1, 1,2, 3,3, 4,4, 6,5, 7,6, 8,7, 9,8, 10,9, 11,10, 12,11, 13,12) : (vcab, vcac, si.bus(8)) : route(10, 21, 1,1, 2,2, 2,3, 2,4, 2,5, 2,6, 2,7, 2,8, 2,9, 2,10, 2,11, 2,12, 2,13, 3,14, 4,15, 5,16, 6,17, 7,18, 8,19, 9,20, 10,21) : ((_ <: ((0 : lpf1), _) :> _), clic, si.bus(8)) : route(21, 22, 1,1, 1,2, 2,3, 3,4, 4,5, 5,6, 6,7, 7,8, 8,9, 9,10, 10,11, 11,12, 12,13, 13,14, 14,15, 15,16, 16,17, 17,18, 18,19, 19,20, 20,21, 21,22) : (dly1, si.bus(21)) : route(22, 1, 2,1) : sortie : route(1, 2, 1,1, 1,2) : (envoi, si.bus(1)) : route(2, 2, 1,1, 2,2) : (rev1, si.bus(1));

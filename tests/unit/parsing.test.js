@@ -1,6 +1,5 @@
 // The examples are the grammar's test bench: if they do not parse, it is
-// wrong. They existed before the transpiler, with their Faust translations
-// already verified.
+// wrong.
 import { test } from 'vitest'
 import assert from 'node:assert'
 import { readFileSync, readdirSync } from 'node:fs'

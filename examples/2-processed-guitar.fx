@@ -1,29 +1,23 @@
 // ============================================================================
 // 2. A GUITAR THAT COMES IN AND GOES OUT
 //
-// Two real inputs: the guitar and an expression pedal. The guitar goes
+// One audio input, the guitar, and an expression pedal. The guitar goes
 // through a noise gate, a compressor, a saturation, a notch in the low end
 // and a lowpass whose frequency the pedal opens; then a dotted-eighth delay,
 // whose output goes both to the master volume and to a reverb send.
 //
-// What it exercises in the specification:
-//   - the named input, `let guitare _` (element 7) and the declaration order
-//     that decides which one is input0;
-//   - the series chain between instances, just as it is (element 2);
-//   - one instance broadcast to two destinations, `dly1` going to `sortie`
-//     and to `envoi1` (element 1, "let shares");
-//   - two cables arriving at `process` and summing there (element 7);
-//   - an input signal patched into a named port (element 3).
+// What it exercises in docs/LANGUAGE.md:
+//   - the named input, `let guitare _` (§8);
+//   - the series chain between instances, just as it is (§4.1);
+//   - one instance sent to two destinations, `dly1` going to `sortie` and to
+//     `envoi1` (§2.2);
+//   - two wires arriving at `process` and summing there (§8);
+//   - a signal patched into a named port, `pedale * 3800 + 400 : corps1.fc`
+//     (§6).
 //
-// GAPS MET WHILE WRITING IT — see the report:
-//   - `N:3`: the same gap as in program 1, a filter order cannot be a port
-//     and nothing lets one say so.
-//   - the pedal puts out 0 to 1, the `fc` port expects hertz: there is no
-//     notation at all for scaling a signal to a port. The line
-//     `pedale * 3800 + 400 : corps1.fc` is raw Faust written by hand, and it
-//     ignores the `fc.min` / `fc.max` bounds declared two lines above, which
-//     are therefore of no use.
-//   - the output is necessarily mono: two cables on `process` sum.
+// `N:3` is the filter order, a constant (§3.4).
+// The Faust that FaustX writes for this piece is engraved in
+// tests/references/examples/2-processed-guitar.fx.txt.
 //
 // The instance names are the musician's own, and French; they are left
 // untouched. guitare = guitar, pedale = pedal, porte1 = gate, creux1 = notch,
