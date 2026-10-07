@@ -1,78 +1,38 @@
 # FaustX — principles
 
-## Moved from the design journal, to be rewritten
+This document states the directives that apply to the whole project: every reference document, every rule of the repository and every ticket conforms to them.
 
-<!-- moved from faustx-specification.md, "What FaustX adds" -->
+## 1. The language
 
-**FaustX is a superset of Faust.** Every Faust program is a FaustX program. This document says **what
-FaustX adds**, and nothing else.
+- FaustX is Faust for live coding. It adds what playing live requires and Faust lacks: placing a named instance, acting on it while the sound plays, and giving its name back. It adds no function that computes a signal.
+- Every Faust program is a FaustX program, with its Faust meaning. A FaustX writing occupies a writing that Faust refuses.
+- FaustX decorates Faust's signs and invents none. The `:` stays the connection, and what surrounds it qualifies it: `:8` over eight copies, `!:` cuts. A sign that decorates nothing in Faust is not part of the language.
+- `let` is the one exception: Faust already carries `letrec`, and `let` is the most common word for a single binding.
+- A decoration has one meaning in every position: a `!` in front cancels the sign it precedes, a number after says how many, a dot reaches into an instance. One rule that applies everywhere outweighs several separate signs.
+- A decoration serves a gesture made while the sound plays. Faust's constructions that are written once — `seq`, `sum`, `prod`, substitution — stay as Faust writes them.
+- One act has one writing. The call to a Faust function that the catalogue does not declare is the one exception, so that every Faust function stays reachable.
+- Where Faust has a convention, FaustX takes it: channels count from 1, the sink is `process`, an input is `_`.
+- FaustX guesses nothing: a value it cannot derive passes as written.
+- A writing never stops the sound: widths adapt instead of being refused, and a refused line changes nothing while the rest applies. FaustX checks the writing, not the music.
 
-<!-- moved from faustx-specification.md, "What Faust does" -->
+## 2. The transpiler
 
-**FaustX adds no computing function.** What Faust lacks in order to patch live is not a function, it
-is two manipulations.
+- The transpiler writes Faust, and Faust compiles it; all signal computation is Faust's. Its role and its boundary are in `CADRE.md`.
+- The signs of the language live in the grammar and in the files under `lib/`, read by the code; renaming a sign changes those files only.
+- The catalogue is generated from Faust's libraries by `tools/`; it is corrected in its generator, then generated again.
 
-<!-- moved from faustx-specification.md, "1. The definition" -->
+## 3. The documents
 
-**`let` is the only exception to the principle of notation**, and it is justified: Faust already
-carries `letrec`, and it is the most classical word there is for single binding.
+- `LANGUAGE.md` is the specification: what it describes exists, and a gap between it and the transpiler is a defect of the transpiler. Its examples are executed by a test.
+- A rule is affirmative, in the present, without date or author; it says what the thing is, with its reason.
+- One subject, one address.
 
-<!-- moved from faustx-specification.md, "1. The definition" -->
+## 4. Arbitration
 
-**The `!` cancels the sign it precedes.** One rule, two uses: `saw1 !: lpf1` cancels the connection,
-`!let lpf1` cancels the binding.
+When two written rules contradict each other, the first force of this list that applies wins, and the choice names it. Two rules of the same force require a decision of Romain.
 
-<!-- moved from faustx-specification.md, "2. The five combinators" -->
-
-**Patching without counting.** A musician patching while it plays does not work out multiples; a
-width that does not come out even must not stop the music.
-
-<!-- moved from faustx-specification.md, "2. The five combinators" -->
-
-**No valid Faust program changes meaning** — FaustX only accepts what Faust used to reject.
-
-<!-- moved from faustx-specification.md, "2. The five combinators" -->
-
-**Two decorations, learned once, valid everywhere: a `!` in front cancels, a digit after gives the
-width.** That is what separates a rule from three lucky finds — the `!` already serves on binding,
-`!let`.
-
-<!-- moved from faustx-specification.md, "3. The routing primitives" -->
-
-**This is what replaces the `on` and `off` keywords of the first draft.** A keyword decorates
-nothing; `_` and `!` are primitives Faust already carries. **The gesture costs no new sign.**
-
-<!-- moved from faustx-specification.md, "5. The iterators" -->
-
-**`seq`, `sum` and `prod` get no decoration.** Putting eight copies in series, adding them or
-multiplying them are writing constructions, not gestures: they are laid down once and do not change
-while you play. They stay available exactly as they are.
-
-<!-- moved from faustx-specification.md, "6. The interface parameters" -->
-
-This is the only place in the language where two notations do the same thing, and it is owned:
-without it, Faust's 1,002 public functions would be out of reach until a declaration covers them.
-
-<!-- moved from faustx-specification.md, "7. The entry point" -->
-
-**The `out` of our first drafts does not belong to FaustX.** It comes from the host stage — *"the
-sink of a chain designates the actor's output, whose channel is declared elsewhere"* — and FaustX
-knows neither actor nor channel. Writing it here would mean inventing a sign Faust does not have,
-which the principle of notation forbids.
-
-**A host stays free to define `out`** as another name for `process`; that is no business of the
-language.
-
-<!-- moved from faustx-specification.md, "What happens when the code is wrong" -->
-
-**An error is reported, and the sound does not stop.** This is an absolute rule, and it is the one
-that separates a live language from a studio language.
-
-**Faust does the opposite, and it is right to**: an arity mismatch, an unknown name, a non-constant
-parameter stop the compilation and produce no program at all. In the studio, that is what you want.
-In concert, a compiler that refuses to return a program would leave the room in silence.
-
-<!-- moved from faustx-specification.md, "What happens when the code is wrong" -->
-
-**What this does not cover**: a correct line that produces a wrong sound. Feedback written without a
-mistake is still feedback — FaustX checks that the code is valid, not that the music is good.
+1. **Faust is the reference.** A writing that Faust reads keeps Faust's meaning. A statement about what Faust does cites its level: the compiler's execution, then its source, then its documentation.
+2. **The sound does not stop.** Between refusing a writing and giving it the meaning that keeps the sound going, the second wins when that meaning is unique.
+3. **The signs are fixed.** The signs of the language are those of `LANGUAGE.md`; a new expressiveness composes existing decorations, and adding a sign is a decision of Romain.
+4. **FaustX knows no host.** What concerns the output devices, musical time, scenes or the substitution of a running module belongs to the host, which knows FaustX.
+5. **One person maintains the project**, assisted by agents. At equal merit on everything else, the solution one person can maintain wins.
