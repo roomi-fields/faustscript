@@ -96,8 +96,8 @@ lpf1.Q:16
 // ⛔ GAP: `let bruit noise` and a second `let bruit2 noise` are, in the Faust
 //    emitted, THE SAME circuit -- measured, the two outputs are the same
 //    `fTemp0`. A module with no port has nothing to tell it apart from its
-//    twin and the compiler merges them; there are 240 such out of the
-//    catalogue's 998. The rule "= duplicates" only holds for what has at
+//    twin and the compiler merges them; the catalogue holds hundreds of
+//    such modules. The rule "= duplicates" only holds for what has at
 //    least one port.
 
 let bruit noise

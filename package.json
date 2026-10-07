@@ -47,6 +47,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "references": "node tools/references.mjs",
+    "catalogue": "python3 -B tools/generate-declarations.py > lib/faust.fx",
     "lint": "eslint src tests bin tools --ext .ts,.js,.mjs",
     "lint:fix": "eslint src tests bin tools --ext .ts,.js,.mjs --fix",
     "format": "prettier --write \"{src,tests,bin,tools}/**/*.{ts,js,mjs}\"",

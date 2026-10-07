@@ -11,7 +11,7 @@ does not have: **naming one instance**, and **acting on that instance while it
 runs**.
 
 It computes nothing. A FaustX program is **translated into Faust**, and Faust
-compiles it — with its 998 public library functions, untouched.
+compiles it — with the functions its libraries declare, untouched.
 
 ```faustx
 let saw1 sawtooth(freq:110)
@@ -136,10 +136,11 @@ specification was checked by compiling.
 single rejected gesture, and the Faust they produce compiles. 34 tests, a dozen
 of which invoke the real compiler.
 
-**The catalogue declares all 998 public Faust functions** — parameters, starting
-values, bounds, measured input and output counts, and measured output ranges for
-738 of them. It is generated from Faust's own documentation by
-`tools/generate-declarations.py`.
+**The catalogue declares the modules Faust's libraries declare** — parameters,
+starting values, bounds, measured input and output counts, and measured output
+ranges. It is generated from the documentation of the libraries that the pinned
+`@grame/faustwasm` carries, by `tools/generate-declarations.py`
+(`npm run catalogue`); its header records the versions and the count.
 
 **What is not true yet:** *every Faust program is a FaustX program* is the
 stated goal, not the current state. The grammar reads FaustX, plus Faust's
@@ -192,7 +193,7 @@ fails if any of it leaks into the engine.
 | | |
 |---|---|
 | `src/faustx.grammar` | the grammar; it **generates** `src/parser.js` (Lezer) |
-| `lib/faust.fx` | the catalogue — 998 modules, itself written in FaustX |
+| `lib/faust.fx` | the catalogue — the modules Faust's libraries declare, itself written in FaustX |
 | `lib/translation.fx` | templates, reserved words, decision rules |
 | `src/` | graph, reading, staging, emission — none of it knows the language |
 

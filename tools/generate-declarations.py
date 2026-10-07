@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
-"""Generates FaustX module declarations from the faustlibraries documentation.
+"""Generates FaustX module declarations from the documentation of Faust's libraries.
 
 The Faust libraries document every public function in a standard block: a usage
 section, the description of each parameter, and a worked example. This script
 extracts from it what a FaustX declaration needs — the names, the starting
 values, the bounds, the units — and leaves as a comment what it could not read.
 
-    python3 tools/generate-declarations.py <path/to/faustlibraries> > lib/faust.fx
+    npm run catalogue
+
+The libraries are those the pinned @grame/faustwasm carries, and every
+compilation and measurement goes through that same Faust (`tools/faustwasm.py`):
+the catalogue describes exactly what the host compiles, and its header records
+the versions of faustwasm, libfaust and the libraries.
 
 The starting values come, in decreasing order of reliability, from:
 
@@ -71,7 +76,7 @@ port. It is not read but MEASURED, by `tools/measure-ranges.py`.
 What comes out is a STARTING POINT: the names are still Faust's own, often
 terse. Do not edit by hand — correct this file and run it again.
 """
-import re, sys, os, json, pathlib, shutil, tempfile, subprocess, collections
+import re, sys, os, pathlib, shutil, tempfile, collections
 import concurrent.futures, importlib.util
 
 # The bench that measures the output range of each module, in the same folder.
@@ -79,6 +84,12 @@ _spec = importlib.util.spec_from_file_location(
     'measures', pathlib.Path(__file__).resolve().with_name('measure-ranges.py'))
 measures = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(measures)
+
+# The Faust of the pinned faustwasm, in the same folder.
+_spec = importlib.util.spec_from_file_location(
+    'faustwasm', pathlib.Path(__file__).resolve().with_name('faustwasm.py'))
+faustwasm = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(faustwasm)
 
 # The names Faust uses by convention for a signal passing through.
 # `s` alone is excluded from it: it is just as much a selector
@@ -1083,6 +1094,12 @@ def quote(value):
     return value
 
 
+# The refusal of a module that calls a function of the C library the WebAssembly
+# backend does not link: the module is unavailable in faustwasm, whatever its
+# values.
+FOREIGN = re.compile(r"calling foreign function '(\w+)' is not allowed")
+
+
 def render(d):
     """The text of a declaration, once the compiler has gone over it."""
     head = [f"{p}:{quote(d['values'][p])}" if p in d['values'] else p
@@ -1108,6 +1125,9 @@ def render(d):
             lines.append(f"  {p}.nature:{d['natures'][p]}")
             if p in d['examples']:
                 lines.append(f"  {p}.example:{quote(d['examples'][p])}")
+    foreign = re.search(FOREIGN, d['error'] or '')
+    if foreign:
+        lines.append(f'  faustwasm.unavailable:{foreign.group(1)}')
     lines += rendered_range(d)
     for p in d['params']:
         if p in d['guessed'] and p in d['values']:
@@ -1163,68 +1183,38 @@ def expression(d, tweak=None):
     return f"\\({', '.join(free)}).({call})" if free else call
 
 
-def preamble(root):
-    """The prefix bindings of `stdfaust.lib`, pointed at this very clone.
-
-    Without this the compiler takes the `stdfaust.lib` of its own installation,
-    which is older and where whole prefixes are missing — `db`, `mo`, `la`, `hy`.
-    """
-    abs_root = os.path.abspath(root)
-    txt = (pathlib.Path(root) / 'stdfaust.lib').read_text(errors='replace')
-    return re.sub(r'library\("([^"]+)"\)',
-                  lambda m: 'library("%s/%s")' % (abs_root, m.group(1)), txt)
-
-
-def first_error(text, path):
+def first_error(text):
+    """The compiler's first error, from `ERROR` on: its place is in the bench's
+    own program, which says nothing of the module."""
     for line in (text or '').splitlines():
-        if 'ERROR' in line or 'error' in line:
-            line = line.replace(path, '').strip(' :')
-            return line[:110]
+        at = line.find('ERROR')
+        if at >= 0:
+            return line[at:].strip()[:110]
     return (text or 'failure without a message').strip().splitlines()[0][:110]
 
 
-def compile_faust(expr, head, root, delay=300):
+def compile_faust(expr, delay=300):
     """Returns (inputs, outputs) or (None, error message).
 
     We compile `(expression), 1`: the added constant changes nothing to the
     inputs, adds an output we subtract again, and lets a module without an
     output — a signal blocker, an environment — go through all the same.
     """
-    work = tempfile.mkdtemp(prefix='faustx-')
-    dsp = os.path.join(work, 'm.dsp')
-    try:
-        with open(dsp, 'w') as f:
-            f.write('%s\nprocess = (%s), 1;\n' % (head, expr))
-        # absolute path: the compilation runs in a temporary directory, and that
-        # is how the libraries import one another
-        r = subprocess.run(['faust', '-I', os.path.abspath(root), '-json',
-                            '-o', os.devnull, dsp],
-                           capture_output=True, text=True, timeout=delay, cwd=work)
-        if r.returncode == 0 and os.path.exists(dsp + '.json'):
-            with open(dsp + '.json') as f:
-                j = json.load(f)
-            return (int(j['inputs']), int(j['outputs']) - 1), None
-        if not (r.stderr or '').strip():
-            # killed by a signal, for lack of time or memory: the declaration is
-            # not at fault, it asks for more than this bench can give
-            return None, ('the compiler was interrupted (signal %d): the '
-                          'compilation exceeds what this bench allocates'
-                          % -r.returncode) if r.returncode < 0 else \
-                         ('the compiler stops without a message (code %d)'
-                          % r.returncode)
-        return None, first_error(r.stderr, dsp)
-    except subprocess.TimeoutExpired:
+    r = faustwasm.ask({'op': 'compile', 'code': '%s\nprocess = (%s), 1;\n'
+                       % (faustwasm.HEAD, expr)}, delay)
+    if 'timeout' in r:
         return None, 'compilation too long'
-    except (ValueError, KeyError, OSError) as e:
-        return None, f'cannot read the compiler: {e}'
-    finally:
-        shutil.rmtree(work, ignore_errors=True)
+    if 'broken' in r:
+        return None, 'the compiler fails: %s' % r['broken']
+    if 'error' in r:
+        return None, first_error(r['error'])
+    return (r['inputs'], r['outputs'] - 1), None
 
 
-def in_parallel(tasks, head, root):
+def in_parallel(tasks):
     """Compiles a batch of expressions, keeping every available unit busy."""
     with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count() or 4) as ex:
-        return list(ex.map(lambda e: compile_faust(e, head, root), tasks))
+        return list(ex.map(compile_faust, tasks))
 
 
 def tweaks(d):
@@ -1243,9 +1233,8 @@ def tweaks(d):
             yield (p, '_')
 
 
-def verify(decls, root, stats):
+def verify(decls, stats):
     """Makes the compiler the source of truth on each declaration."""
-    head = preamble(root)
     testable = [d for d in decls if d['environment'] is None]
     exprs = [expression(d) for d in testable]
     for d, e in zip(testable, exprs):
@@ -1253,7 +1242,7 @@ def verify(decls, root, stats):
             d['unverifiable'] = ('no example to put in place of a '
                                  'non-adjustable parameter')
     todo = [(d, e) for d, e in zip(testable, exprs) if e is not None]
-    for (d, _), res in zip(todo, in_parallel([e for _, e in todo], head, root)):
+    for (d, _), res in zip(todo, in_parallel([e for _, e in todo])):
         (arity, err) = res
         if arity:
             d['inputs'], d['outputs'] = arity
@@ -1266,7 +1255,7 @@ def verify(decls, root, stats):
     for _ in range(4):
         broken = [d for d in testable
                   if d['error'] and d['error'].startswith(('ERROR', 'error'))]
-        if not broken or not repair(broken, head, root, stats):
+        if not broken or not repair(broken, stats):
             break
 
     # what fails on a name borrowed from a documentation example is not a broken
@@ -1283,13 +1272,12 @@ def verify(decls, root, stats):
     doubles = [(d, p, expression(d, (p, '1'))) for d in testable if not d['error']
                for p in d['params'] if d['natures'].get(p) in ('function', 'table')]
     doubles = [(d, p, e) for d, p, e in doubles if e is not None]
-    for (d, p, _), (arity, _) in zip(doubles, in_parallel([e for _, _, e in doubles],
-                                                          head, root)):
+    for (d, p, _), (arity, _) in zip(doubles, in_parallel([e for _, _, e in doubles])):
         stats['nature refusing a number' if not arity
               else 'nature accepting a number too'] += 1
 
 
-def verify_sliders(decls, root, stats):
+def verify_sliders(decls, stats):
     """A bounded port must be adjustable while playing.
 
     Faust demands a constant in certain places — the size of a table, a filter
@@ -1297,7 +1285,6 @@ def verify_sliders(decls, root, stats):
     what will never be one: we put an `hslider` in place of the value, and what
     the compiler refuses loses its bounds.
     """
-    head = preamble(root)
     trials = []
     for d in decls:
         if d['error'] or d['unverifiable'] or d['environment'] is not None:
@@ -1315,8 +1302,7 @@ def verify_sliders(decls, root, stats):
                                % (p, start, low, high, (high - low) / 1000.0)))
             if e is not None:
                 trials.append((d, p, e))
-    for (d, p, _), (arity, _) in zip(trials, in_parallel([e for _, _, e in trials],
-                                                         head, root)):
+    for (d, p, _), (arity, _) in zip(trials, in_parallel([e for _, _, e in trials])):
         if arity:
             stats['bounds that hold as a slider'] += 1
             continue
@@ -1327,26 +1313,25 @@ def verify_sliders(decls, root, stats):
         stats['bounds removed, the setting stays frozen'] += 1
 
 
-def measure_ranges(decls, root, stats, journal):
+def measure_ranges(decls, libfaust, stats, journal):
     """Makes each module sound and attaches the range recorded to it."""
     measurable = [d for d in decls if not d['error'] and not d['unverifiable']
                   and d['environment'] is None and d['outputs']]
     exprs = [expression(d) for d in measurable]
-    ranges = measures.measure([e for e in exprs if e], preamble(root), root,
-                              journal=journal)
+    ranges = measures.measure([e for e in exprs if e], libfaust, journal=journal)
     for d, e in zip(measurable, exprs):
         d['range'] = ranges.get(e)
         if d['range']:
             stats['range ' + d['range']['state']] += 1
-    measures.write_cache(ranges)
+    measures.write_cache(ranges, libfaust)
 
 
-def repair(broken, head, root, stats):
+def repair(broken, stats):
     """Tries one tweak per parameter; returns the number of repairs."""
     repaired = 0
     trials = [(d, t, expression(d, t)) for d in broken for t in tweaks(d)]
     trials = [(d, t, e) for d, t, e in trials if e is not None]
-    for (d, t, _), (arity, _) in zip(trials, in_parallel([e for _, _, e in trials], head, root)):
+    for (d, t, _), (arity, _) in zip(trials, in_parallel([e for _, _, e in trials])):
         if not arity or not d['error']:
             continue
         p, what = t
@@ -1378,9 +1363,17 @@ def repair(broken, head, root, stats):
 
 
 def main():
-    root = sys.argv[1] if len(sys.argv) > 1 else '../faust-upstream/faustlibraries'
-    if not shutil.which('faust'):
-        sys.exit('faust cannot be found: the catalogue cannot be verified.')
+    versions = faustwasm.ask({'op': 'versions'})
+    root = tempfile.mkdtemp(prefix='faustx-libraries-')
+    try:
+        faustwasm.ask({'op': 'libraries', 'to': root})
+        generate(root, versions)
+    finally:
+        shutil.rmtree(root)
+
+
+def generate(root, versions):
+    """Writes the catalogue of the libraries copied into `root` on stdout."""
     blocks = documented_blocks(root)
     sigs, bodies = signatures(root)
     ui, uib = ui_settings_index(root)
@@ -1396,9 +1389,9 @@ def main():
             continue
         decls.append(d)
 
-    verify(decls, root, stats)
-    verify_sliders(decls, root, stats)
-    measure_ranges(decls, root, stats, sys.stderr)
+    verify(decls, stats)
+    verify_sliders(decls, stats)
+    measure_ranges(decls, versions['libfaust'], stats, sys.stderr)
 
     done = []
     for d in decls:
@@ -1426,7 +1419,10 @@ def main():
         if 'output.min:' in text: stats['with an output range'] += 1
         if 'TO COMPLETE' not in text: stats['complete'] += 1
 
-    print('// FaustX module declarations, generated from faustlibraries.')
+    print('// FaustX module declarations, generated from the Faust libraries of')
+    print('// @grame/faustwasm %s: libfaust %s, libraries %s (version.lib).'
+          % (versions['faustwasm'], versions['libfaust'], versions['libraries']))
+    print('// %d modules.' % len(done))
     print('// A starting point to be corrected: the names are still Faust\'s own.')
     print('// Every declaration has been compiled with its starting values: the')
     print('// "N inputs, M outputs" line comes from the compiler, not from the text.')
@@ -1446,6 +1442,10 @@ def main():
     print('// first second discarded, on silence then on full-scale noise.')
     print('// `output.measure` says under which excitation. These are observed')
     print('// values, never theoretical bounds.')
+    print('//')
+    print('// `faustwasm.unavailable:f` marks a module that faustwasm refuses to')
+    print('// compile: it calls the foreign function f, which the WebAssembly')
+    print('// backend does not allow.')
     print('// Do not edit by hand: correct tools/generate-declarations.py.')
     print()
     print('\n\n'.join(done))

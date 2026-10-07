@@ -186,9 +186,9 @@ export interface Port {
 }
 ```
 
-`catalogue` returns the 998 modules the catalogue declares, as one value frozen in depth, the same at each call. A `Port` is a parameter of the module that carries no nature (a function, a signal): its name, its starting value as written, and its bounds. Each one is a port of the instances whose body calls the module.
+`catalogue` returns the modules the catalogue declares, as one value frozen in depth, the same at each call. A `Port` is a parameter of the module that carries no nature (a function, a signal): its name, its starting value as written, and its bounds. Each one is a port of the instances whose body calls the module.
 
-**Guard** — `tests/unit/graph.test.js` (the catalogue carries the 998 Faust modules); target, faustx-zj5.10: the interface test checks that the value is frozen in depth and that a write into it throws.
+**Guard** — `tests/unit/graph.test.js` (the catalogue carries every module its header counts); target, faustx-zj5.10: the interface test checks that the value is frozen in depth and that a write into it throws.
 
 ## 9. The command line
 

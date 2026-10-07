@@ -19,7 +19,7 @@ FaustX is a superset of Faust for live coding, and its transpiler: it reads a Fa
 
 ## 4. Knows
 
-- **R7.** Faust's syntax and the 998 modules its libraries declare, with their parameters, starting values and bounds, through the catalogue.
+- **R7.** Faust's syntax and the modules its libraries declare, with their parameters, starting values and bounds, through the catalogue.
 - **R8.** The signs of FaustX, through the grammar that generates its parser and through the templates.
 
 ## 5. Does not know

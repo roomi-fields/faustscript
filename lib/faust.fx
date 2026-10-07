@@ -1,4 +1,6 @@
-// FaustX module declarations, generated from faustlibraries.
+// FaustX module declarations, generated from the Faust libraries of
+// @grame/faustwasm 0.16.6: libfaust 2.86.2, libraries 2.71.0 (version.lib).
+// 1006 modules.
 // A starting point to be corrected: the names are still Faust's own.
 // Every declaration has been compiled with its starting values: the
 // "N inputs, M outputs" line comes from the compiler, not from the text.
@@ -17,6 +19,10 @@
 // first second discarded, on silence then on full-scale noise.
 // `output.measure` says under which excitation. These are observed
 // values, never theoretical bounds.
+//
+// `faustwasm.unavailable:f` marks a module that faustwasm refuses to
+// compile: it calls the foreign function f, which the WebAssembly
+// backend does not allow.
 // Do not edit by hand: correct tools/generate-declarations.py.
 
 ADAA1(EPS:0.001, f, F1)  aa.ADAA1(EPS, f, F1, x)
@@ -35,9 +41,7 @@ ADAA2(EPS:0.001, f, F1, F2)  aa.ADAA2(EPS, f, F1, F2, x)
   // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
 
 BS  pl.BS
-  output.min:384
-  output.max:512
-  output.measure:no-input
+  // CONSTANT OUTPUT: the output does not move from 512
   // 0 input, 1 output
 
 CZhalfSine(index:0.5)  os.CZhalfSine(fund, index)
@@ -244,24 +248,16 @@ FTZ  ma.FTZ(x)
   // 1 input, 1 output
 
 J0  ma.J0
-  output.min:0.765201
-  output.max:1
-  output.measure:silence-and-noise
-  // at rest: 1 to 1; under noise: 0.765201 to 1
-  // 1 input, 1 output
+  faustwasm.unavailable:j0
+  // DOES NOT COMPILE: ERROR : calling foreign function 'j0' is not allowed in this compilation mode
 
 J1  ma.J1
-  output.min:-0.440048
-  output.max:0.440033
-  output.measure:silence-and-noise
-  // 1 input, 1 output
+  faustwasm.unavailable:j1
+  // DOES NOT COMPILE: ERROR : calling foreign function 'j1' is not allowed in this compilation mode
 
 Jn  ma.Jn
-  output.min:0.765198
-  output.max:1
-  output.measure:silence-and-noise
-  // at rest: 1 to 1; under noise: 0.765198 to 1
-  // 2 inputs, 1 output
+  faustwasm.unavailable:jn
+  // DOES NOT COMPILE: ERROR : calling foreign function 'jn' is not allowed in this compilation mode
 
 MAX  ma.MAX
   // CONSTANT OUTPUT: the output does not move from 3.40282e+38
@@ -358,7 +354,7 @@ RMS_compression_gain_N_chan_db(strength:0.5, thresh:-18, att:0.02, rel:0.12, kne
   rel.max:10
   rel.scale:log
   output.min:-6.66782
-  output.max:-0
+  output.max:0
   output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: strength from 0 to 2
   // BOUNDS GUESSED, from the parameter name: thresh from -80 to 0
@@ -403,7 +399,7 @@ RMS_compression_gain_mono_db(strength:0.5, thresh:-18, att:0.02, rel:0.12, knee:
   rel.max:10
   rel.scale:log
   output.min:-6.6704
-  output.max:-0
+  output.max:0
   output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: strength from 0 to 2
   // BOUNDS GUESSED, from the parameter name: thresh from -80 to 0
@@ -562,7 +558,7 @@ SFFormantModelFofSmooth(voiceType:0, vowel:0, freq:220, gain:0.7)  pm.SFFormantM
   gain.min:0
   gain.max:2
   output.min:-0.00680057
-  output.max:0.00761311
+  output.max:0.00761312
   output.measure:no-input
   // BOUNDS FROM INTERFACE, from the slider the libraries put on it: voiceType from 0 to 4
   // BOUNDS FROM INTERFACE, from the slider the libraries put on it: vowel from 0 to 4
@@ -571,8 +567,8 @@ SFFormantModelFofSmooth(voiceType:0, vowel:0, freq:220, gain:0.7)  pm.SFFormantM
   // 0 input, 1 output
 
 SFFormantModelFofSmooth_ui  pm.SFFormantModelFofSmooth_ui
-  output.min:-0.299216
-  output.max:0.398478
+  output.min:-0.299215
+  output.max:0.398477
   output.measure:no-input
   // 0 input, 1 output
 
@@ -592,16 +588,16 @@ T  ma.T
   // 0 input, 1 output
 
 Y0  ma.Y0
-  // OUTPUT NOT FINITE: NaN or infinity on silence (191872 samples out of 191872)
-  // 1 input, 1 output
+  faustwasm.unavailable:y0
+  // DOES NOT COMPILE: ERROR : calling foreign function 'y0' is not allowed in this compilation mode
 
 Y1  ma.Y1
-  // OUTPUT NOT FINITE: NaN or infinity on silence (191872 samples out of 191872)
-  // 1 input, 1 output
+  faustwasm.unavailable:y1
+  // DOES NOT COMPILE: ERROR : calling foreign function 'y1' is not allowed in this compilation mode
 
 Yn  ma.Yn
-  // OUTPUT NOT FINITE: NaN or infinity on silence (191872 samples out of 191872)
-  // 2 inputs, 1 output
+  faustwasm.unavailable:yn
+  // DOES NOT COMPILE: ERROR : calling foreign function 'yn' is not allowed in this compilation mode
 
 abs_envelope_rect(period:0.05)  an.abs_envelope_rect(period, x)
   period.unit:s
@@ -771,7 +767,7 @@ adsr_bias(att:0.05, dec:0.1, sus:0.6, rel:0.4, bias_att:0.4, bias_dec:0.6, bias_
   bias_dec.max:1
   bias_rel.min:0
   bias_rel.max:1
-  // OUTPUT NOT MEASURED: the generated C does not compile
+  // CONSTANT OUTPUT: nothing comes out with the starting values
   // BOUNDS GUESSED, from the parameter name: att from 0.001 to 10
   // BOUNDS GUESSED, from the parameter name: dec from 0.001 to 10
   // BOUNDS GUESSED, from the parameter name: rel from 0.001 to 10
@@ -809,7 +805,7 @@ adsrf_bias(att:0.05, dec:0.1, sus:0.6, rel:0.4, final:0.2, bias_att:0.4, bias_de
   bias_dec.max:1
   bias_rel.min:0
   bias_rel.max:1
-  // OUTPUT NOT MEASURED: the generated C does not compile
+  // CONSTANT OUTPUT: the output does not move from 0.2
   // BOUNDS GUESSED, from the parameter name: att from 0.001 to 10
   // BOUNDS GUESSED, from the parameter name: dec from 0.001 to 10
   // BOUNDS GUESSED, from the parameter name: rel from 0.001 to 10
@@ -837,7 +833,7 @@ ahdsr_bias(att:0.05, hol:0.05, dec:0.1, sus:0.6, rel:0.4, bias_att:0.4, bias_dec
   bias_dec.max:1
   bias_rel.min:0
   bias_rel.max:1
-  // OUTPUT NOT MEASURED: the generated C does not compile
+  // CONSTANT OUTPUT: nothing comes out with the starting values
   // BOUNDS GUESSED, from the parameter name: att from 0.001 to 10
   // BOUNDS GUESSED, from the parameter name: dec from 0.001 to 10
   // BOUNDS GUESSED, from the parameter name: rel from 0.001 to 10
@@ -877,11 +873,21 @@ ahdsrf_bias(att:0.05, hol:0.05, dec:0.1, sus:0.6, rel:0.4, final:0.2, bias_att:0
   bias_dec.max:1
   bias_rel.min:0
   bias_rel.max:1
-  // OUTPUT NOT MEASURED: the generated C does not compile
+  // CONSTANT OUTPUT: the output does not move from 0.2
   // BOUNDS GUESSED, from the parameter name: att from 0.001 to 10
   // BOUNDS GUESSED, from the parameter name: dec from 0.001 to 10
   // BOUNDS GUESSED, from the parameter name: rel from 0.001 to 10
   // 0 input, 1 output
+
+algorithm(algo:1)  dx.algorithm(algo)
+  output.min:-6.37372e-05
+  output.max:6.37373e-05
+  output.measure:no-input
+  // 0 input, 1 output
+  // algo cannot be adjusted live: the compiler demands a constant in this place
+
+algorithms  dx.algorithms
+  // DOES NOT COMPILE: ERROR : stack overflow
 
 allpass2(f0:1000, Q:1, dtune:0)  wa.allpass2(f0, Q, dtune, x)
   f0.unit:Hz
@@ -1134,7 +1140,7 @@ asinh2  aa.asinh2(x)
   x.nature:signal
   x.example:os.osc(110)
   output.min:-0.874896
-  output.max:0.865245
+  output.max:0.865247
   output.measure:silence-and-noise
   // 1 input, 1 output
 
@@ -1279,8 +1285,8 @@ bandpass12e(fl:500, fu:2000)  fi.bandpass12e(fl, fu)
   fu.min:20
   fu.max:20000
   fu.scale:log
-  output.min:-0.557898
-  output.max:0.635833
+  output.min:-0.557909
+  output.max:0.635851
   output.measure:silence-and-noise
   // GUESSED: fl:500, from the parameter name
   // GUESSED: fu:2000, from the parameter name
@@ -1344,7 +1350,7 @@ bandstop(Nh:2, fl:500, fu:1500)  fi.bandstop(Nh, fl, fu)
   fu.max:20000
   fu.scale:log
   output.min:-1.66199
-  output.max:1.52401
+  output.max:1.52456
   output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: fl from 20 to 20000
   // BOUNDS GUESSED, from the parameter name: fu from 20 to 20000
@@ -1376,9 +1382,9 @@ bitcrusher(nbits:8)  ba.bitcrusher(nbits, x)
   output.measure:silence-and-noise
   // 1 input, 1 output
 
-block(N:1)  si.block(N)
+block(n:1)  si.block(n)
   // 1 input, 0 output
-  // N cannot be adjusted live: the compiler demands a constant in this place
+  // n cannot be adjusted live: the compiler demands a constant in this place
 
 blower(pressure:0.5, breathGain:0.05, breathCutoff:2000, vibratoFreq:5, vibratoGain:0.2)  pm.blower(pressure, breathGain, breathCutoff, vibratoFreq, vibratoGain)
   pressure.min:0
@@ -1493,14 +1499,14 @@ brassModel(tubeLength:0.9, lipsTension:0.4, mute:0.2, pressure:0.6)  pm.brassMod
 brassModel_ui(pressure:0.4)  pm.brassModel_ui(pressure)
   pressure.min:0
   pressure.max:1
-  output.min:-0.102822
-  output.max:0.0527091
+  output.min:-0.102823
+  output.max:0.052709
   output.measure:no-input
   // 0 input, 1 output
 
 brass_ui  pm.brass_ui
-  output.min:-2.56957e-08
-  output.max:2.57096e-08
+  output.min:-2.57018e-08
+  output.max:2.57057e-08
   output.measure:no-input
   // 0 input, 1 output
 
@@ -1572,14 +1578,14 @@ buildup(A)  wd.buildup(A)
   A.example:vsrc : (branch : (res_leaf, probe))
   // NOT VERIFIABLE: the parameter's example relies on `vsrc`, defined nowhere else
 
-bus(N:3)  si.bus(N)
+bus(n:3)  si.bus(n)
   output.min:-0.999999
   output.max:0.999997
   output.measure:silence-and-noise
   // 3 inputs, 3 outputs
-  // N cannot be adjusted live: the compiler demands a constant in this place
+  // n cannot be adjusted live: the compiler demands a constant in this place
 
-butterfly(N:4)  ro.butterfly(N)
+butterfly(n:4)  ro.butterfly(n)
   output.min:-1.99642
   output.max:1.99885
   output.measure:silence-and-noise
@@ -1641,10 +1647,8 @@ capacitor_Vout(i, R:2e-7)  wd.capacitor_Vout(i, R)
   // NOT VERIFIABLE: no example to put in place of a non-adjustable parameter
 
 cbrt  ma.cbrt
-  output.min:-0.999997
-  output.max:0.999981
-  output.measure:silence-and-noise
-  // 1 input, 1 output
+  faustwasm.unavailable:cbrtf
+  // DOES NOT COMPILE: ERROR : calling foreign function 'cbrtf' is not allowed in this compilation mode
 
 cbus(N:2)  si.cbus(N)
   output.min:-0.999999
@@ -2011,12 +2015,12 @@ countup(n:8)  ba.countup(n, trig)
   // at rest: 8 to 8; under noise: 0 to 8
   // 1 input, 1 output
 
-cross(N:3)  ro.cross(N)
+cross(n:3)  ro.cross(n)
   output.min:-0.999999
   output.max:0.999997
   output.measure:silence-and-noise
   // 3 inputs, 3 outputs
-  // N cannot be adjusted live: the compiler demands a constant in this place
+  // n cannot be adjusted live: the compiler demands a constant in this place
 
 cross1n(N:3)  ro.cross1n(N)
   output.min:-0.999999
@@ -2030,13 +2034,13 @@ crossNM(N:2, M:3)  ro.crossNM(N, M)
   output.measure:silence-and-noise
   // 5 inputs, 5 outputs
 
-crossn1(N:3)  ro.crossn1(N)
+crossn1(n:3)  ro.crossn1(n)
   output.min:-0.999999
   output.max:0.999997
   output.measure:silence-and-noise
   // 4 inputs, 4 outputs
 
-crossnn(N:2)  ro.crossnn(N)
+crossnn(n:2)  ro.crossnn(n)
   output.min:-0.999999
   output.max:0.999997
   output.measure:silence-and-noise
@@ -2162,7 +2166,7 @@ dattorro_rev_default  re.dattorro_rev_default
 
 dattorro_rev_demo  dm.dattorro_rev_demo
   output.min:-0.562392
-  output.max:0.557099
+  output.max:0.557098
   output.measure:silence-and-noise
   // 2 inputs, 2 outputs
 
@@ -2321,7 +2325,7 @@ dorian  qu.dorian
   output.measure:no-input
   // 0 input, 7 outputs
 
-dot(N:3)  si.dot(N)
+dot(n:3)  si.dot(n)
   output.min:-2.53632
   output.max:2.71655
   output.measure:silence-and-noise
@@ -2495,6 +2499,14 @@ englishBell_ui  pm.englishBell_ui
   // CONSTANT OUTPUT: nothing comes out with the starting values
   // 0 input, 1 output
 
+env(rates, levels, outlevel:80, rate_scaling:90, gate:0)  dx.env(rates, levels, outlevel, rate_scaling, gate)
+  rates.nature:table
+  rates.example:(60,61,62,63)
+  levels.nature:table
+  levels.example:(60,61,62,63)
+  // CONSTANT OUTPUT: the output does not move from 1.04858e+06
+  // 0 input, 1 output
+
 envelopeAbs(thr:0.05, gain:1.25, envUpMs:15, envDownMs:25)  mo.envelopeAbs(thr, gain, envUpMs, envDownMs, sig)
   gain.min:0
   gain.max:2
@@ -2538,17 +2550,12 @@ eolian  qu.eolian
   // 0 input, 7 outputs
 
 erf  ma.erf
-  output.min:-0.842697
-  output.max:0.842678
-  output.measure:silence-and-noise
-  // 1 input, 1 output
+  faustwasm.unavailable:erff
+  // DOES NOT COMPILE: ERROR : calling foreign function 'erff' is not allowed in this compilation mode
 
 erfc  ma.erfc
-  output.min:0.157322
-  output.max:1.8427
-  output.measure:silence-and-noise
-  // at rest: 1 to 1; under noise: 0.157322 to 1.8427
-  // 1 input, 1 output
+  faustwasm.unavailable:erfcf
+  // DOES NOT COMPILE: ERROR : calling foreign function 'erfcf' is not allowed in this compilation mode
 
 exciter  dm.exciter
   output.min:-0.556077
@@ -2617,10 +2624,8 @@ expander_N_chan(strength:0.5, thresh:-40, range:20, att:0.05, hold:0.02, rel:0.2
   // meter is a treatment one patches in: the compiler accepts here neither value nor input
 
 expm1  ma.expm1
-  output.min:-0.632118
-  output.max:1.71813
-  output.measure:silence-and-noise
-  // 1 input, 1 output
+  faustwasm.unavailable:expm1f
+  // DOES NOT COMPILE: ERROR : calling foreign function 'expm1f' is not allowed in this compilation mode
 
 f2l(freq:440)  pm.f2l(freq)
   freq.min:20
@@ -2630,7 +2635,7 @@ f2l(freq:440)  pm.f2l(freq)
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
   // 0 input, 1 output
 
-fb_comb(maxdel:2048, del:64, b0:0.7, aN:0.6)  fi.fb_comb(maxdel, del, b0, aN)
+fb_comb(maxdel:2048, N:64, b0:0.7, aN:0.6)  fi.fb_comb(maxdel, N, b0, aN)
   b0.min:0.7
   b0.max:1
   output.min:-1.55855
@@ -2647,11 +2652,25 @@ fb_comb_common(dop, N:64, b0:0.8, aN:0.6)  fi.fb_comb_common(dop, N, b0, aN)
   output.measure:silence-and-noise
   // 1 input, 1 output
 
-fb_fcomb(maxdel:2048, del:64.5, b0:0.7, aN:0.6)  fi.fb_fcomb(maxdel, del, b0, aN)
+fb_fcomb(maxdel:2048, N:64.5, b0:0.7, aN:0.6)  fi.fb_fcomb(maxdel, N, b0, aN)
   output.min:-1.25668
   output.max:1.33761
   output.measure:silence-and-noise
   // 1 input, 1 output
+
+fdbkscalef(feedback:0.5)  dx.fdbkscalef(feedback)
+  feedback.min:0
+  feedback.max:1
+  // CONSTANT OUTPUT: the output does not move from 0.0110485
+  // BOUNDS GUESSED, from the parameter name: feedback from 0 to 1
+  // 0 input, 1 output
+
+fdbkscalef2(feedback:0.5)  dx.fdbkscalef2(feedback)
+  feedback.min:0
+  feedback.max:1
+  // CONSTANT OUTPUT: the output does not move from 0.00276214
+  // BOUNDS GUESSED, from the parameter name: feedback from 0 to 1
+  // 0 input, 1 output
 
 fdelay(n:44100, d:22050.5)  de.fdelay(n, d, x)
   n.unit:samples
@@ -2679,7 +2698,9 @@ fdnrev0(MAXDELAY:4096, delays, BBSO:1, freqs, durs, loopgainmax:0.8, nonl:0.0)  
   output.measure:silence-and-noise
   // 4 inputs, 4 outputs
 
-fdnrev0_demo(N:16, NB:5, BBSO:3)  dm.fdnrev0_demo(N, NB, BBSO)
+fdnrev0_demo(N:16, NB:5, BBSO:3)  dm.fdnrev0_demo(N, NB, BBSO, x, y)
+  x.nature:signal
+  y.nature:signal
   output.min:-0.141418
   output.max:0.124513
   output.measure:silence-and-noise
@@ -2691,7 +2712,7 @@ ff_comb(maxdel:2048, M:64, b0:1, bM:0.7)  fi.ff_comb(maxdel, M, b0, bM)
   output.measure:silence-and-noise
   // 1 input, 1 output
 
-ff_fcomb(maxdel:2048, del:64.5, b0:1, bM:0.7)  fi.ff_fcomb(maxdel, del, b0, bM)
+ff_fcomb(maxdel:2048, M:64.5, b0:1, bM:0.7)  fi.ff_fcomb(maxdel, M, b0, bM)
   output.min:-1.67762
   output.max:1.67282
   output.measure:silence-and-noise
@@ -2704,7 +2725,10 @@ ffcombfilter(maxdel:2048, del:64, g:0.7)  fi.ffcombfilter(maxdel, del, g)
   // 1 input, 1 output
 
 fft_spectral_level_demo(N:256)  dm.fft_spectral_level_demo(N)
-  // DOES NOT COMPILE: the compiler was interrupted (signal 14): the compilation exceeds what this bench allocates
+  output.min:-0.999992
+  output.max:0.999944
+  output.measure:silence-and-noise
+  // 1 input, 1 output
 
 fibonacci(order:2)  ef.fibonacci(order)
   // OUTPUT NOT FINITE: NaN or infinity on noise (191872 samples out of 191872)
@@ -3035,8 +3059,8 @@ fxRingMod(N:1, f0:200, fa:0.5, tf:0)  ho.fxRingMod(N, f0, fa, tf)
   // 3 inputs, 3 outputs
 
 gamma  ma.gamma
-  // OUTPUT NOT FINITE: NaN or infinity on silence (191872 samples out of 191872)
-  // 1 input, 1 output
+  faustwasm.unavailable:tgammaf
+  // DOES NOT COMPILE: ERROR : calling foreign function 'tgammaf' is not allowed in this compilation mode
 
 gate_demo  dm.gate_demo
   output.min:-0.999999
@@ -3165,7 +3189,7 @@ greyhole(dt:2.0, damp:0.3, size:1.0, early_diff:0.6, feedback:0.5, mod_depth:0.4
   // 2 inputs, 2 outputs
 
 greyhole_demo  dm.greyhole_demo
-  // OUTPUT WITHOUT RANGE: still rising after 5 s on noise (peak 6.012)
+  // OUTPUT WITHOUT RANGE: still rising after 5 s on noise (peak 6.011)
   // 2 inputs, 2 outputs
 
 ground  mi.ground(x0)
@@ -3282,7 +3306,7 @@ gyroEnvelopePos(thr:0.02, gain:0.9, envUpMs:25, envDownMs:30)  mo.gyroEnvelopePo
   // BOUNDS FROM INTERFACE, from the slider the libraries put on it: envDownMs from 0 to 5000
   // 1 input, 1 output
 
-hadamard(N:4)  ro.hadamard(N)
+hadamard(n:4)  ro.hadamard(n)
   output.min:-3.89329
   output.max:3.88647
   output.measure:silence-and-noise
@@ -3461,7 +3485,7 @@ highpass_minus_lowpass_even(N:4, fc:1000)  fi.highpass_minus_lowpass_even(N, fc)
   fc.max:20000
   fc.scale:log
   output.min:-1.94936
-  output.max:1.85374
+  output.max:1.85373
   output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: fc from 20 to 20000
   // 2 inputs, 1 output
@@ -3628,10 +3652,8 @@ hyperbolic2  aa.hyperbolic2(x)
   // 1 input, 1 output
 
 hypot  ma.hypot
-  output.min:0
-  output.max:1.41296
-  output.measure:silence-and-noise
-  // 2 inputs, 1 output
+  faustwasm.unavailable:hypotf
+  // DOES NOT COMPILE: ERROR : calling foreign function 'hypotf' is not allowed in this compilation mode
 
 hz2mel(freq:440.0)  ba.hz2mel(freq)
   freq.unit:Hz
@@ -3699,10 +3721,10 @@ if(cond:1, then:0.5, else:-0.5)  ba.if(cond, then, else)
   then.min:-4.28
   then.max:1
   else.min:-2.633
-  else.max:1
+  else.max:1e+10
   // CONSTANT OUTPUT: the output does not move from 0.5
   // BOUNDS FROM USAGE, the values the libraries pass to it: then from -4.28 to 1
-  // BOUNDS FROM USAGE, the values the libraries pass to it: else from -2.633 to 1
+  // BOUNDS FROM USAGE, the values the libraries pass to it: else from -2.633 to 1e+10
   // 0 input, 1 output
 
 ifNc(n)  ba.ifNc(n)
@@ -3772,11 +3794,8 @@ iir_nl(bv, av)  fi.iir_nl(bv, av)
   // 1 input, 1 output
 
 ilogb  ma.ilogb
-  output.min:-2.14748e+09
-  output.max:-1
-  output.measure:silence-and-noise
-  // at rest: -2.14748e+09 to -2.14748e+09; under noise: -22 to -1
-  // 1 input, 1 output
+  faustwasm.unavailable:ilogbf
+  // DOES NOT COMPILE: ERROR : calling foreign function 'ilogbf' is not allowed in this compilation mode
 
 imlsDecoder(N:1, la, direct:1, shift:0)  ho.imlsDecoder(N, la, direct, shift)
   la.nature:table
@@ -3802,7 +3821,7 @@ imptrainN(N:3, freq:220)  os.imptrainN(N, freq)
   freq.min:20
   freq.max:20000
   freq.scale:log
-  output.min:-0.00520186
+  output.min:-0.00502452
   output.max:0.745698
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
@@ -3913,12 +3932,13 @@ integrator  fi.integrator
   output.measure:silence-and-noise
   // 1 input, 1 output
 
-interleave(R:2, C:2)  ro.interleave(R, C)
+interleave(row:2, col:2)  ro.interleave(row, col)
   output.min:-0.999999
   output.max:0.999997
   output.measure:silence-and-noise
   // 4 inputs, 4 outputs
-  // C cannot be adjusted live: the compiler demands a constant in this place
+  // row cannot be adjusted live: the compiler demands a constant in this place
+  // col cannot be adjusted live: the compiler demands a constant in this place
 
 interpolate(i:0.5)  si.interpolate(i, x, y)
   i.min:0
@@ -4120,13 +4140,13 @@ ja_processor_stereo(Ms:380, a:720, alpha:0.015, k:380, c:0.25, drive:ba.db2linea
   // 2 inputs, 2 outputs
 
 ja_processor_stereo_ui  hy.ja_processor_stereo_ui
-  output.min:-1.158
+  output.min:-1.15801
   output.max:1.14465
   output.measure:silence-and-noise
   // 2 inputs, 2 outputs
 
 ja_processor_ui  hy.ja_processor_ui
-  output.min:-1.13241
+  output.min:-1.13242
   output.max:1.15239
   output.measure:silence-and-noise
   // 1 input, 1 output
@@ -4237,7 +4257,11 @@ klonCentaur(gain:0.5, treble:0.5, level:0.5)  ve.klonCentaur(gain, treble, level
   treble.max:1
   level.min:0
   level.max:1
-  // DOES NOT COMPILE: the compiler was interrupted (signal 14): the compilation exceeds what this bench allocates
+  output.min:-0.364313
+  output.max:0.377383
+  output.measure:silence-and-noise
+  // at rest: -0.00177327 to 0.000889623; under noise: -0.364313 to 0.377383
+  // 1 input, 1 output
 
 korg35HPF(normFreq:0.4, Q:3.5)  ve.korg35HPF(normFreq, Q)
   normFreq.min:0
@@ -4359,10 +4383,8 @@ latch_demo  dm.latch_demo
   // 0 input, 3 outputs
 
 ldexp  ma.ldexp
-  output.min:-0.999991
-  output.max:0.999953
-  output.measure:silence-and-noise
-  // 2 inputs, 1 output
+  faustwasm.unavailable:ldexpf
+  // DOES NOT COMPILE: ERROR : calling foreign function 'ldexpf' is not allowed in this compilation mode
 
 lerp  it.lerp(x0, x1, y0, y1, x)
   x0.nature:signal
@@ -4450,14 +4472,13 @@ lf_sawpos(freq:3)  os.lf_sawpos(freq)
   // BOUNDS FROM USAGE, the values the libraries pass to it: freq from 3 to 220
   // 0 input, 1 output
 
-lf_sawpos_phase(freq:3, phase:0.25)  os.lf_sawpos_phase(freq, phase)
+lf_sawpos_phase(phase:3, freq:0.25)  os.lf_sawpos_phase(phase, freq)
   freq.unit:Hz
-  phase.min:0
-  phase.max:1
   output.min:7.7486e-06
   output.max:0.999998
   output.measure:no-input
   // 0 input, 1 output
+  // the bounds stated for phase (0 to 1) are not kept: phase:3 falls outside
 
 lf_sawpos_phase_reset(freq:3, phase:0.75, reset:0)  os.lf_sawpos_phase_reset(freq, phase, reset)
   freq.unit:Hz
@@ -4506,9 +4527,23 @@ lf_trianglepos(freq:3)  os.lf_trianglepos(freq)
   output.measure:no-input
   // 0 input, 1 output
 
+lfo(lfoWave:1, lfoDelay:50, lfoSync:0, lfoSpeed:35, gate:0)  dx.lfo(lfoWave, lfoDelay, lfoSync, lfoSpeed, gate)
+  lfoWave.min:0
+  lfoWave.max:5
+  lfoDelay.min:0
+  lfoDelay.max:99
+  lfoSync.min:0
+  lfoSync.max:1
+  lfoSpeed.min:0
+  lfoSpeed.max:99
+  output.min:7.24813e-06
+  output.max:1
+  output.measure:no-input
+  // 0 input, 2 outputs
+
 lgamma  ma.lgamma
-  // OUTPUT NOT FINITE: NaN or infinity on silence (191872 samples out of 191872)
-  // 1 input, 1 output
+  faustwasm.unavailable:lgammaf
+  // DOES NOT COMPILE: ERROR : calling foreign function 'lgammaf' is not allowed in this compilation mode
 
 limiter_1176_R4_mono  co.limiter_1176_R4_mono(x)
   x.nature:signal
@@ -4621,8 +4656,8 @@ linsweep(fs:20, fe:2000, dur:5)  an.linsweep(fs, fe, dur)
   fs.unit:Hz
   fe.unit:Hz
   dur.unit:s
-  output.min:-1.00003
-  output.max:1.00003
+  output.min:-1.00001
+  output.max:1
   output.measure:no-input
   // 0 input, 1 output
 
@@ -4642,10 +4677,8 @@ locrian  qu.locrian
   // 0 input, 7 outputs
 
 log1p  ma.log1p
-  output.min:-11.7229
-  output.max:0.693119
-  output.measure:silence-and-noise
-  // 1 input, 1 output
+  faustwasm.unavailable:log1pf
+  // DOES NOT COMPILE: ERROR : calling foreign function 'log1pf' is not allowed in this compilation mode
 
 log2  ma.log2(x)
   x.nature:signal
@@ -4657,8 +4690,8 @@ log2LinGain(n:0.25)  ba.log2LinGain(n)
   // 0 input, 1 output
 
 logb  ma.logb
-  // OUTPUT NOT FINITE: NaN or infinity on silence (191872 samples out of 191872)
-  // 1 input, 1 output
+  faustwasm.unavailable:logbf
+  // DOES NOT COMPILE: ERROR : calling foreign function 'logbf' is not allowed in this compilation mode
 
 logsweep(fs:20, fe:2000, dur:5)  an.logsweep(fs, fe, dur)
   fs.unit:Hz
@@ -4672,7 +4705,7 @@ logsweep(fs:20, fe:2000, dur:5)  an.logsweep(fs, fe, dur)
 loop(sf, part:0)  so.loop(sf, part)
   sf.nature:expression
   sf.example:"soundfile('sound[url:{'tests/assets/silence.wav'}]', 1)"
-  // OUTPUT NOT MEASURED: the generated C does not compile
+  // CONSTANT OUTPUT: nothing comes out with the starting values
   // 0 input, 1 output
   // sf is not an input: the compiler accepts it only in the form of its example
 
@@ -4682,7 +4715,7 @@ loop_speed(sf, part:0, speed:1)  so.loop_speed(sf, part, speed)
   speed.scale:log
   sf.nature:expression
   sf.example:"soundfile('sound[url:{'tests/assets/silence.wav'}]', 1)"
-  // OUTPUT NOT MEASURED: the generated C does not compile
+  // CONSTANT OUTPUT: nothing comes out with the starting values
   // BOUNDS GUESSED, from the parameter name: speed from 0.01 to 20
   // 0 input, 1 output
   // sf is not an input: the compiler accepts it only in the form of its example
@@ -4695,7 +4728,7 @@ loop_speed_level(sf, part:0, speed:1, level:0.5)  so.loop_speed_level(sf, part, 
   level.max:2
   sf.nature:expression
   sf.example:"soundfile('sound[url:{'tests/assets/silence.wav'}]', 1)"
-  // OUTPUT NOT MEASURED: the generated C does not compile
+  // CONSTANT OUTPUT: nothing comes out with the starting values
   // BOUNDS GUESSED, from the parameter name: speed from 0.01 to 20
   // BOUNDS GUESSED, from the parameter name: level from 0 to 2
   // 0 input, 1 output
@@ -4865,8 +4898,8 @@ lowshelf2(f0:500, gain:6, dtune:0)  wa.lowshelf2(f0, gain, dtune, x)
   f0.scale:log
   gain.unit:dB
   x.nature:signal
-  output.min:-1.27735
-  output.max:1.37902
+  output.min:-1.27734
+  output.max:1.37903
   output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: f0 from 20 to 20000
   // 1 input, 1 output
@@ -5158,8 +5191,8 @@ modularInterpStringModel(stringLength:0.9, pluckPosition:0.3, shape:1.0, scale:1
   bodyExcitation.example:pm.impulseExcitation(button("pm.modularInterpStringModel/body"))
   stringExcitation.nature:signal
   stringExcitation.example:pm.impulseExcitation(button("pm.modularInterpStringModel/string"))
-  output.min:-8.2154
-  output.max:8.11821
+  output.min:-8.21526
+  output.max:8.11817
   output.measure:silence-and-noise
   // 2 inputs, 1 output
 
@@ -5351,13 +5384,13 @@ multiTapSincDelay(K:2, MaxDelay:4096, tau1:1024.0, tau2:1536.0, alpha:0.5)  de.m
   output.measure:silence-and-noise
   // 1 input, 1 output
 
-multinoise(N:3)  no.multinoise(N)
+multinoise(n:3)  no.multinoise(n)
   output.min:-0.999991
   output.max:0.999996
   output.measure:no-input
   // 0 input, 3 outputs
 
-multirandom(N:3)  no.multirandom(N)
+multirandom(n:3)  no.multirandom(n)
   output.min:-2.14747e+09
   output.max:2.14747e+09
   output.measure:no-input
@@ -5688,6 +5721,93 @@ openTube(maxLength, length:0.9)  pm.openTube(maxLength, length)
   // 3 inputs, 3 outputs
   // maxLength is not an input: the compiler accepts it only in the form of its example
 
+operator(mode:0, freqCoarse:1, freqFine:0, detune:0, outLev:99, R1:99, R2:99, R3:99, R4:99, L1:0, L2:0, L3:0, L4:0, keyVelSens:0, ampModSens:0, rateScale:0, breakpoint:4, breakpointLDepth:35, breakpointRDepth:0, breakpointLCurve:0, breakpointRCurve:0, lfoWave:1, lfoSpeed:3, lfoDelay:99, lfoPMD:99, lfoAMD:99, lfoSync:99, lfoPitchModSens:0, oscKeySync:0, pitch_egR1:0, pitch_egR2:0, pitch_egR3:50, pitch_egR4:0, pitch_egL1:0, pitch_egL2:0, pitch_egL3:0, pitch_egL4:0, transpose:-12, phaseMod:0, base_freq_:440.0, gain:1.0, gate:0)  dx.operator(mode, freqCoarse, freqFine, detune, outLev, R1, R2, R3, R4, L1, L2, L3, L4, keyVelSens, ampModSens, rateScale, breakpoint, breakpointLDepth, breakpointRDepth, breakpointLCurve, breakpointRCurve, lfoWave, lfoSpeed, lfoDelay, lfoPMD, lfoAMD, lfoSync, lfoPitchModSens, oscKeySync, pitch_egR1, pitch_egR2, pitch_egR3, pitch_egR4, pitch_egL1, pitch_egL2, pitch_egL3, pitch_egL4, transpose, phaseMod, base_freq_, gain, gate)
+  freqCoarse.min:0
+  freqCoarse.max:31
+  freqFine.min:0
+  freqFine.max:99
+  detune.min:-7
+  detune.max:7
+  outLev.min:0
+  outLev.max:99
+  R1.min:0
+  R1.max:99
+  R2.min:0
+  R2.max:99
+  R3.min:0
+  R3.max:99
+  R4.min:0
+  R4.max:99
+  L1.min:0
+  L1.max:99
+  L2.min:0
+  L2.max:99
+  L3.min:0
+  L3.max:99
+  L4.min:0
+  L4.max:99
+  keyVelSens.min:0
+  keyVelSens.max:7
+  ampModSens.min:0
+  ampModSens.max:3
+  rateScale.min:0
+  rateScale.max:7
+  breakpoint.min:0
+  breakpoint.max:99
+  breakpointLDepth.min:0
+  breakpointLDepth.max:99
+  breakpointRDepth.min:0
+  breakpointRDepth.max:99
+  breakpointLCurve.min:0
+  breakpointLCurve.max:3
+  breakpointRCurve.min:0
+  breakpointRCurve.max:3
+  lfoWave.min:0
+  lfoWave.max:5
+  lfoSpeed.min:0
+  lfoSpeed.max:99
+  lfoDelay.min:0
+  lfoDelay.max:99
+  lfoPMD.min:0
+  lfoPMD.max:99
+  lfoAMD.min:0
+  lfoAMD.max:99
+  lfoPitchModSens.min:0
+  lfoPitchModSens.max:7
+  oscKeySync.min:0
+  oscKeySync.max:1
+  pitch_egR1.min:0
+  pitch_egR1.max:99
+  pitch_egR2.min:0
+  pitch_egR2.max:99
+  pitch_egR3.min:0
+  pitch_egR3.max:99
+  pitch_egR4.min:0
+  pitch_egR4.max:99
+  pitch_egL1.min:0
+  pitch_egL1.max:99
+  pitch_egL2.min:0
+  pitch_egL2.max:99
+  pitch_egL3.min:0
+  pitch_egL3.max:99
+  pitch_egL4.min:0
+  pitch_egL4.max:99
+  transpose.min:-24
+  transpose.max:24
+  phaseMod.min:-1
+  phaseMod.max:1
+  base_freq_.min:50
+  base_freq_.max:1000
+  gain.min:0
+  gain.max:1
+  output.min:-3.18687e-05
+  output.max:3.18687e-05
+  output.measure:no-input
+  // BOUNDS FROM INTERFACE, from the slider the libraries put on it: base_freq_ from 50 to 1000
+  // BOUNDS FROM INTERFACE, from the slider the libraries put on it: gain from 0 to 1
+  // 0 input, 1 output
+  // the bounds stated for lfoSync (0 to 1) are not kept: lfoSync:99 falls outside
+
 optim(N:1, ot:1)  ho.optim(N, ot)
   output.min:-0.999959
   output.max:0.999935
@@ -5833,18 +5953,15 @@ oscil(m:1.0, k:0.5, grav:0.0)  mi.oscil(m, k, z, grav, x0, x1)
   // OUTPUT WITHOUT RANGE: still rising after 5 s on noise (peak 9.516e+06)
   // 4 inputs, 1 output
 
-oscp(freq:440, phase:ma.PI/3)  os.oscp(freq, phase)
+oscp(freq:440, p:ma.PI/3)  os.oscp(freq, p)
   freq.unit:Hz
   freq.min:20
   freq.max:20000
   freq.scale:log
-  phase.min:0
-  phase.max:1
   output.min:-1
   output.max:1
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
-  // BOUNDS GUESSED, from the parameter name: phase from 0 to 1
   // 0 input, 1 output
 
 oscq(fr:440)  os.oscq(fr)
@@ -5852,8 +5969,8 @@ oscq(fr:440)  os.oscq(fr)
   fr.min:20
   fr.max:20000
   fr.scale:log
-  output.min:-0.999706
-  output.max:0.999706
+  output.min:-0.999785
+  output.max:0.999791
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: fr from 20 to 20000
   // 0 input, 2 outputs
@@ -5905,8 +6022,8 @@ oscw(fr:440)  os.oscw(fr)
   fr.min:20
   fr.max:20000
   fr.scale:log
-  output.min:-0.999692
-  output.max:0.999706
+  output.min:-0.999776
+  output.max:0.999791
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: fr from 20 to 20000
   // 0 input, 1 output
@@ -5916,8 +6033,8 @@ oscwc(fr:440)  os.oscwc(fr)
   fr.min:20
   fr.max:20000
   fr.scale:log
-  output.min:-0.999692
-  output.max:0.999706
+  output.min:-0.999776
+  output.max:0.999791
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: fr from 20 to 20000
   // 0 input, 1 output
@@ -5927,8 +6044,8 @@ oscws(fr:440)  os.oscws(fr)
   fr.min:20
   fr.max:20000
   fr.scale:log
-  output.min:-0.999706
-  output.max:0.999696
+  output.min:-0.999785
+  output.max:0.999778
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: fr from 20 to 20000
   // 0 input, 1 output
@@ -5960,9 +6077,9 @@ outRightWave(s:0.3)  pm.outRightWave(x, y, s)
   // at rest: 0 to 0.3; under noise: -0.999999 to 1.29998
   // 2 inputs, 3 outputs
 
-panner(g:0.3)  sp.panner(g)
-  g.min:0
-  g.max:1
+panner(c:0.3)  sp.panner(c)
+  c.min:0
+  c.max:1
   output.min:-0.699994
   output.max:0.699961
   output.measure:silence-and-noise
@@ -6038,14 +6155,14 @@ parallelRMS(n:3)  ba.parallelRMS(n)
 
 parametric_eq_demo  dm.parametric_eq_demo
   output.min:-2.18179
-  output.max:2.16933
+  output.max:2.16934
   output.measure:silence-and-noise
   // 1 input, 1 output
 
 parres(Ap)  wd.parres(Ap)
   Ap.nature:table
   Ap.example:(subtree_left, subtree_right)
-  // NOT VERIFIABLE: the parameter's example relies on `subtree_right`, defined nowhere else
+  // NOT VERIFIABLE: the parameter's example relies on `subtree_left`, defined nowhere else
 
 peak_compression_gain_N_chan(strength:0.5, thresh:-12, att:0.01, rel:0.1, knee:6, prePost:0, link:0.5, N:2)  co.peak_compression_gain_N_chan(strength, thresh, att, rel, knee, prePost, link, N)
   strength.min:0
@@ -6084,7 +6201,7 @@ peak_compression_gain_N_chan_db(strength:0.5, thresh:-12, att:0.01, rel:0.1, kne
   rel.max:10
   rel.scale:log
   output.min:-4.88463
-  output.max:-0
+  output.max:0
   output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: strength from 0 to 2
   // BOUNDS GUESSED, from the parameter name: thresh from -80 to 0
@@ -6129,7 +6246,7 @@ peak_compression_gain_mono_db(strength:0.5, thresh:-12, att:0.01, rel:0.1, knee:
   rel.max:10
   rel.scale:log
   output.min:-4.88409
-  output.max:-0
+  output.max:0
   output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: strength from 0 to 2
   // BOUNDS GUESSED, from the parameter name: thresh from -80 to 0
@@ -6243,7 +6360,7 @@ peaking2(f0:1000, gain:3, Q:1, dtune:0)  wa.peaking2(f0, gain, Q, dtune, x)
   Q.max:50
   Q.scale:log
   x.nature:signal
-  output.min:-1.1915
+  output.min:-1.19149
   output.max:1.18599
   output.measure:silence-and-noise
   // BOUNDS GUESSED, from the parameter name: f0 from 20 to 20000
@@ -6294,12 +6411,19 @@ phaser2_mono(Notches:4, phase01:0.0, width:50, frqmin:200, fratio:1.5, frqmax:40
   phase01.min:0
   phase01.max:1
   width.unit:Hz
+  width.min:10
+  width.max:5000
+  width.scale:log
   frqmin.unit:Hz
+  frqmin.min:20
+  frqmin.max:5000
+  frqmin.scale:log
+  fratio.min:1.1
+  fratio.max:4
   frqmax.unit:Hz
   speed.unit:Hz
-  speed.min:0.01
-  speed.max:20
-  speed.scale:log
+  speed.min:0
+  speed.max:10
   depth.min:0
   depth.max:1
   fb.min:-1
@@ -6307,12 +6431,23 @@ phaser2_mono(Notches:4, phase01:0.0, width:50, frqmin:200, fratio:1.5, frqmax:40
   output.min:-1.1927
   output.max:1.26327
   output.measure:silence-and-noise
-  // BOUNDS GUESSED, from the parameter name: speed from 0.01 to 20
+  // BOUNDS FROM INTERFACE, from the slider the libraries put on it: width from 10 to 5000
+  // BOUNDS FROM INTERFACE, from the slider the libraries put on it: frqmin from 20 to 5000
+  // BOUNDS FROM INTERFACE, from the slider the libraries put on it: fratio from 1.1 to 4
+  // BOUNDS FROM INTERFACE, from the slider the libraries put on it: speed from 0 to 10
   // 1 input, 1 output
 
 phaser2_stereo(Notches:4, width:50, frqmin:200, fratio:1.5, frqmax:4000, speed:0.5, depth:0.8, fb:0.2, invert:0)  pf.phaser2_stereo(Notches, width, frqmin, fratio, frqmax, speed, depth, fb, invert)
   width.unit:Hz
+  width.min:10
+  width.max:5000
+  width.scale:log
   frqmin.unit:Hz
+  frqmin.min:20
+  frqmin.max:5000
+  frqmin.scale:log
+  fratio.min:1.1
+  fratio.max:4
   frqmax.unit:Hz
   speed.unit:Hz
   speed.min:0
@@ -6324,6 +6459,9 @@ phaser2_stereo(Notches:4, width:50, frqmin:200, fratio:1.5, frqmax:4000, speed:0
   output.min:-1.22339
   output.max:1.25419
   output.measure:silence-and-noise
+  // BOUNDS FROM INTERFACE, from the slider the libraries put on it: width from 10 to 5000
+  // BOUNDS FROM INTERFACE, from the slider the libraries put on it: frqmin from 20 to 5000
+  // BOUNDS FROM INTERFACE, from the slider the libraries put on it: fratio from 1.1 to 4
   // BOUNDS FROM INTERFACE, from the slider the libraries put on it: speed from 0 to 10
   // 2 inputs, 2 outputs
 
@@ -6391,8 +6529,8 @@ piecewise(xList, yList)  it.piecewise(xList, yList, x)
   // 1 input, 1 output
 
 pink_noise  no.pink_noise
-  output.min:-0.206322
-  output.max:0.207947
+  output.min:-0.206333
+  output.max:0.207954
   output.measure:no-input
   // 0 input, 1 output
 
@@ -6416,9 +6554,17 @@ pitchTracker(N:4, t:0.02)  an.pitchTracker(N, t, x)
   x.nature:signal
   x.example:os.osc(220)
   output.min:0
-  output.max:80.4899
+  output.max:80.4252
   output.measure:silence-and-noise
   // 1 input, 1 output
+
+pitchenv(rates, levels, gate:0)  dx.pitchenv(rates, levels, gate)
+  rates.nature:table
+  rates.example:(60,61,62,63)
+  levels.nature:table
+  levels.example:(60,61,62,63)
+  // CONSTANT OUTPUT: the output does not move from 6.81574e+06
+  // 0 input, 1 output
 
 pluckString(stringLength:0.9, cutoff:1, maxFreq:1, sharpness:1, gain:0.6, trigger:0)  pm.pluckString(stringLength, cutoff, maxFreq, sharpness, gain, trigger)
   sharpness.min:0
@@ -6909,8 +7055,8 @@ pulsetrainN(N:3, freq:220, duty:0.25)  os.pulsetrainN(N, freq, duty)
   freq.scale:log
   duty.min:0
   duty.max:1
-  output.min:-1.5007
-  output.max:0.500735
+  output.min:-1.5006
+  output.max:0.500503
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
   // 0 input, 1 output
@@ -6933,7 +7079,7 @@ quantizeSmoothed(rf:440, nl)  qu.quantizeSmoothed(rf, nl, x)
   nl.nature:table
   nl.example:qu.ionian
   x.nature:signal
-  // OUTPUT NOT FINITE: NaN or infinity on silence (191872 samples out of 191872)
+  // OUTPUT NOT MEASURED: the module stops dead: float unrepresentable in integer range
   // 1 input, 1 output
 
 rEncoder(N:1, sp:0.5, a:0.0, it:0.05)  ho.rEncoder(N, sp, a, it)
@@ -6980,8 +7126,8 @@ ramp(n:256)  ba.ramp(n)
   // 1 input, 1 output
 
 randomseed  no.randomseed
-  // CONSTANT OUTPUT: the output does not move from 12345
-  // 0 input, 1 output
+  faustwasm.unavailable:arc4random
+  // DOES NOT COMPILE: ERROR : calling foreign function 'arc4random' is not allowed in this compilation mode
 
 ratio2cent(ratio:1.5)  ba.ratio2cent(ratio)
   ratio.min:1
@@ -7246,28 +7392,21 @@ rms_envelope_tau(period:0.05)  an.rms_envelope_tau(period, x)
   // 1 input, 1 output
 
 rmultinoise(N:3)  no.rmultinoise(N)
-  output.min:-0.999994
-  output.max:0.999995
-  output.measure:no-input
-  // 0 input, 3 outputs
+  faustwasm.unavailable:arc4random
+  // DOES NOT COMPILE: ERROR : calling foreign function 'arc4random' is not allowed in this compilation mode
 
 rmultirandom(N:3)  no.rmultirandom(N)
-  output.min:-2.14748e+09
-  output.max:2.14746e+09
-  output.measure:no-input
-  // 0 input, 3 outputs
+  faustwasm.unavailable:arc4random
+  // DOES NOT COMPILE: ERROR : calling foreign function 'arc4random' is not allowed in this compilation mode
 
 rnoise  no.rnoise
-  output.min:-0.999991
-  output.max:1
-  output.measure:no-input
-  // 0 input, 1 output
+  faustwasm.unavailable:arc4random
+  // DOES NOT COMPILE: ERROR : calling foreign function 'arc4random' is not allowed in this compilation mode
 
-rnoises(N:4, i:1)  no.rnoises(N, i)
-  output.min:-0.999996
-  output.max:0.999972
-  output.measure:no-input
-  // 0 input, 1 output
+rnoises(N:4)  no.rnoises(N, i)
+  i.nature:signal
+  // 1 input, 0 output
+  // i becomes a signal: the compiler refuses a value in this place
 
 rotate(N:1, a:0.78)  ho.rotate(N, a)
   output.min:-1.41341
@@ -7465,7 +7604,7 @@ saw3(freq:220)  os.saw3(freq)
   freq.min:20
   freq.max:20000
   freq.scale:log
-  output.min:-0.990954
+  output.min:-0.990836
   output.max:0.990954
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
@@ -7477,7 +7616,7 @@ saw4(freq:220)  os.saw4(freq)
   freq.max:20000
   freq.scale:log
   output.min:-1.01565
-  output.max:1.0221
+  output.max:1.01565
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
   // 0 input, 1 output
@@ -7501,8 +7640,8 @@ sawNp(N:3, freq:330, phase:0.5)  os.sawNp(N, freq, phase)
   freq.scale:log
   phase.min:0
   phase.max:1
-  output.min:-0.986514
-  output.max:0.986462
+  output.min:-0.986462
+  output.max:0.986409
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
   // BOUNDS GUESSED, from the parameter name: phase from 0 to 1
@@ -7538,10 +7677,8 @@ sawtooth_demo  dm.sawtooth_demo
   // 1 input, 1 output
 
 scalb  ma.scalb
-  output.min:-0.999991
-  output.max:0.999953
-  output.measure:silence-and-noise
-  // 2 inputs, 1 output
+  faustwasm.unavailable:scalbnf
+  // DOES NOT COMPILE: ERROR : calling foreign function 'scalbnf' is not allowed in this compilation mode
 
 scale(ilow:0.2, ihigh:0.8, olow:0, ohigh:1)  mo.scale(ilow, ihigh, olow, ohigh)
   ilow.min:0
@@ -7582,7 +7719,7 @@ scope(N:1, rt:0.1)  ho.scope(N, rt)
   output.min:-0.999594
   output.max:1
   output.measure:silence-and-noise
-  // at rest: -0 to 1; under noise: -0.999594 to 1
+  // at rest: 0 to 1; under noise: -0.999594 to 1
   // 3 inputs, 3 outputs
 
 sdelay(n:44100, it:1024, d:22050.5)  de.sdelay(n, it, d)
@@ -7610,6 +7747,8 @@ selectbus(BUS_SIZE:2, NUM_BUSES:2, id:1)  ba.selectbus(BUS_SIZE, NUM_BUSES, id)
   output.max:0.999993
   output.measure:silence-and-noise
   // 4 inputs, 2 outputs
+  // BUS_SIZE cannot be adjusted live: the compiler demands a constant in this place
+  // NUM_BUSES cannot be adjusted live: the compiler demands a constant in this place
 
 selectmulti(n:ma.SR/100, lgen)  ba.selectmulti(n, lgen, id)
   n.unit:samples
@@ -7634,11 +7773,11 @@ selectn(N:4, i:2)  ba.selectn(N, i)
 
 selector(i:2, n:4)  ba.selector(i, n)
   i.min:0
-  i.max:2
+  i.max:3
   output.min:-0.999987
   output.max:0.999993
   output.measure:silence-and-noise
-  // BOUNDS FROM USAGE, the values the libraries pass to it: i from 0 to 2
+  // BOUNDS FROM USAGE, the values the libraries pass to it: i from 0 to 3
   // 4 inputs, 1 output
 
 selectoutn(N:3, s:1)  ba.selectoutn(N, s)
@@ -7885,7 +8024,7 @@ sparse_noise(f0:5.0)  no.sparse_noise(f0)
   output.measure:no-input
   // 0 input, 1 output
 
-spat(N:4, a:0.25, d:0.5)  sp.spat(N, a, d)
+spat(n:4, a:0.25, d:0.5)  sp.spat(n, a, d)
   output.min:-0.749398
   output.max:0.749362
   output.measure:silence-and-noise
@@ -8008,8 +8147,8 @@ squareN(N:3, freq:220)  os.squareN(N, freq)
   freq.min:20
   freq.max:20000
   freq.scale:log
-  output.min:-1.00079
-  output.max:1.00082
+  output.min:-1.00067
+  output.max:1.00063
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
   // 0 input, 1 output
@@ -8266,7 +8405,7 @@ tanh  ma.tanh
 tanh1  aa.tanh1(x)
   x.nature:signal
   x.example:os.osc(110)
-  output.min:-0.759759
+  output.min:-0.759772
   output.max:0.760768
   output.measure:silence-and-noise
   // 1 input, 1 output
@@ -8346,7 +8485,7 @@ tf2np(b0:0.6, b1:0.3, b2:0.2, a1:-0.5, a2:0.2)  fi.tf2np(b0, b1, b2, a1, a2)
 
 tf2sb(b2:0, b1:0, b0:1, a1:sqrt(2), a0:1, w1:2*ma.PI*200, wc:2*ma.PI*1000)  fi.tf2sb(b2, b1, b0, a1, a0, w1, wc)
   output.min:-0.21573
-  output.max:0.220561
+  output.max:0.22056
   output.measure:silence-and-noise
   // 1 input, 1 output
 
@@ -8487,8 +8626,8 @@ triangleN(N:3, freq:220)  os.triangleN(N, freq)
   freq.min:20
   freq.max:20000
   freq.scale:log
-  output.min:-0.993781
-  output.max:0.994936
+  output.min:-0.993779
+  output.max:0.994935
   output.measure:no-input
   // BOUNDS GUESSED, from the parameter name: freq from 20 to 20000
   // 0 input, 1 output
@@ -8499,7 +8638,7 @@ twin_osc(f:220, amt:0.5, detune:0, m:0)  os.twin_osc(f, amt, detune, m)
   amt.max:1
   detune.unit:samples
   output.min:-1.5732
-  output.max:0.766766
+  output.max:0.766768
   output.measure:no-input
   // 0 input, 1 output
 
@@ -8590,7 +8729,7 @@ vecOp(vectorsList, op)  si.vecOp(vectorsList, op)
   vectorsList.example:(v0, v1)
   op.nature:function
   op.example:+
-  // NOT VERIFIABLE: the parameter's example relies on `v1`, defined nowhere else
+  // NOT VERIFIABLE: the parameter's example relies on `v0`, defined nowhere else
 
 velvet_noise(amp:0.5, f0:5.0)  no.velvet_noise(amp, f0)
   amp.min:0
@@ -8667,8 +8806,8 @@ violinModel(stringLength:0.82, bowPressure:0.4, bowVelocity:0.05, bowPosition:0.
   bowVelocity.max:1
   bowPosition.min:0
   bowPosition.max:1
-  output.min:-0.16465
-  output.max:0.190947
+  output.min:-0.164713
+  output.max:0.191226
   output.measure:no-input
   // BOUNDS FROM INTERFACE, from the slider the libraries put on it: stringLength from 0 to 2
   // 0 input, 1 output
@@ -8701,8 +8840,8 @@ vital_rev(_prelow:0.2, _prehigh:0.8, _lowcutoff:0.5, _highcutoff:0.7, _lowgain:0
   // 2 inputs, 2 outputs
 
 vital_rev_demo  dm.vital_rev_demo
-  output.min:-0.813251
-  output.max:0.76793
+  output.min:-0.813256
+  output.max:0.767928
   output.measure:silence-and-noise
   // 2 inputs, 2 outputs
 
@@ -8810,8 +8949,8 @@ wgr(f:440, r:0.995)  fi.wgr(f, r, x)
   f.unit:Hz
   x.nature:signal
   x.example:os.osc(440)
-  output.min:-23.2549
-  output.max:22.694
+  output.min:-23.255
+  output.max:22.6939
   output.measure:silence-and-noise
   // 1 input, 2 outputs
 
@@ -8844,12 +8983,15 @@ zero  fi.zero(z)
   // 2 inputs, 1 output
 
 zita_light  dm.zita_light
-  output.min:-0.530035
+  output.min:-0.530036
   output.max:0.500878
   output.measure:silence-and-noise
   // 2 inputs, 2 outputs
 
-zita_rev1  dm.zita_rev1
+zita_rev1  dm.zita_rev1(x, y)
+  x.nature:signal
+  x.example:stereoOsc(440, 442)
+  y.nature:signal
   output.min:-0.105761
   output.max:0.099943
   output.measure:silence-and-noise

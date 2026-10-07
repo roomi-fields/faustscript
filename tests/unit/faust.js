@@ -16,11 +16,11 @@ const libfaust = join(pkg, 'libfaust-wasm/libfaust-wasm')
 let compiler = null
 
 /**
- * A new compiler. faustwasm loads libfaust by writing a module next to the script it is given and
+ * A new compiler of the pinned faustwasm. faustwasm loads libfaust by writing a module next to the script it is given and
  * deleting it after: the script is copied into a folder of this call's own, so that test files
  * instantiating at the same time never delete each other's module.
  */
-async function instantiate() {
+export async function instantiate() {
   const FaustWasm = await import(join(pkg, 'dist/esm/index.js'))
   const folder = mkdtempSync(join(tmpdir(), 'faustx-libfaust-'))
   try {

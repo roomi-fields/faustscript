@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The catalogue is generated from the libraries of the pinned `@grame/faustwasm` (0.16.6:
+  libfaust 2.86.2, libraries 2.71.0), every module compiled and measured by that same Faust
+  (`npm run catalogue`); its header records the versions and the module count, and
+  `faustwasm.unavailable` marks a module faustwasm refuses to compile.
+
 - Project tooling: Vitest replaces `node --test` (tests move to `tests/unit/`), ESLint,
   Prettier, EditorConfig, a TypeScript configuration ready for the migration, GitHub CI
   and release workflows.

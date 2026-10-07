@@ -93,7 +93,7 @@ lpfs:16 lowpass                      // the bank becomes sixteen filters
 
 ### 3.1 The catalogue
 
-A module is a Faust function that the catalogue declares with the names of its parameters and their starting values. The catalogue, `lib/faust.fx`, declares the 998 public functions of Faust's libraries under Faust's own names, each name once, with bodies that call them by their usual prefixes (`fi.`, `os.`, `re.`…). A module is written by its name alone: `lowpass` is `fi.lowpass`, with its parameters in any order and by name.
+A module is a Faust function that the catalogue declares with the names of its parameters and their starting values. The catalogue, `lib/faust.fx`, declares the public functions of Faust's libraries under Faust's own names, each name once, with bodies that call them by their usual prefixes (`fi.`, `os.`, `re.`…). A module is written by its name alone: `lowpass` is `fi.lowpass`, with its parameters in any order and by name.
 
 ### 3.2 Declaring a module
 

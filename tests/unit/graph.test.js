@@ -6,9 +6,8 @@ import { readFileSync } from 'node:fs'
 import { readCatalogue } from '../../src/catalogue.js'
 import { Graph } from '../../src/graph.js'
 
-const catalogue = readCatalogue(
-  readFileSync(new URL('../../lib/faust.fx', import.meta.url), 'utf8')
-)
+const text = readFileSync(new URL('../../lib/faust.fx', import.meta.url), 'utf8')
+const catalogue = readCatalogue(text)
 
 const neuf = () => {
   const g = new Graph(catalogue)
@@ -16,8 +15,8 @@ const neuf = () => {
   return g
 }
 
-test('the catalogue carries the 998 Faust modules', () => {
-  assert.equal(catalogue.size, 998)
+test('the catalogue carries every module its header counts', () => {
+  assert.equal(catalogue.size, Number(text.match(/^\/\/ (\d+) modules\.$/m)[1]))
   assert.equal(catalogue.get('lowpass').parameters.length, 2)
   assert.equal(catalogue.get('resonlp').attribute('fc', 'unit'), 'Hz')
 })
