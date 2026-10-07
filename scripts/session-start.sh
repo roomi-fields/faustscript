@@ -5,7 +5,7 @@ set -uo pipefail
 
 root="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
 if [ -f "$root/.claude/template" ]; then
-  echo "## Gabarit _project-structure"
+  echo "## Gabarit Roomi's Grillhouse"
   echo "Ce dossier est le gabarit du framework, pas un projet : il ne s'initialise pas. Un projet neuf se crée par \`npm run new -- <chemin> [préfixe]\` ; sa première séance propose le grill d'initialisation."
   exit 0
 fi
@@ -26,7 +26,7 @@ done
 
 [ ${#missing[@]} -eq 0 ] && [ ${#pending[@]} -eq 0 ] && exit 0
 
-echo "## Projet à initialiser (framework _project-structure)"
+echo "## Projet à initialiser (Roomi's Grillhouse)"
 if [ ${#missing[@]} -gt 0 ]; then
   echo "Manque : $(IFS=';'; echo "${missing[*]}" | sed "s/;/, /g"). Lance \`bash scripts/setup.sh\` toi-même avant tout autre geste : il est sans invite et idempotent."
 fi

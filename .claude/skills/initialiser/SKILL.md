@@ -1,6 +1,6 @@
 ---
 name: initialiser
-description: Initialiser un projet bâti sur le framework _project-structure — préparer le dépôt, mener le grill d'initialisation, puis écrire la charte, l'architecture, le cadre, les interfaces et le lexique, et ouvrir les premiers tickets. À charger au premier lancement d'un projet neuf ou d'un projet existant qui adopte le framework, quand l'ouverture de séance signale « Projet à initialiser », ou quand le responsable demande d'initialiser ou de redéfinir ces éléments.
+description: Initialiser un projet bâti sur le framework Roomi's Grillhouse — préparer le dépôt, mener le grill d'initialisation, puis écrire la charte, l'architecture, le cadre, les interfaces et le lexique, et ouvrir les premiers tickets. À charger au premier lancement d'un projet neuf ou d'un projet existant qui adopte le framework, quand l'ouverture de séance signale « Projet à initialiser », ou quand le responsable demande d'initialiser ou de redéfinir ces éléments.
 ---
 
 # Initialiser un projet
