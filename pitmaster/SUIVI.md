@@ -1,25 +1,30 @@
 # Suivi de la supervision
 
-Tenu par la compétence `superviseur`. Une question s'écrit ici dès qu'elle naît ; tranchée, elle en
+Tenu par la compétence `pitmaster`. Une question s'écrit ici dès qu'elle naît ; tranchée, elle en
 sort et sa réponse va dans son ticket.
 
 ## Dernier tour
 
-- Date : 2026-10-07, après-midi.
+- Date : 2026-10-07, fin d'après-midi.
 - Chantier courant : faustx-zj5 (FaustX au niveau de BPScript).
-- Agents lancés : zj5-7-exemples (faustx-zj5.7, `tests/unit/language-examples*`) ; zj5-27-releve
-  (lecture seule : box API de faustwasm, conventions de paquets de bp-mono, imports de `src/`).
-- Tickets de code suspendus derrière faustx-zj5.27 (paquets séparés) : rien ne bouge dans `src/`
+- La séance a redémarré : l'agent de faustx-zj5.7 est perdu ; ses deux fichiers
+  `tests/unit/language-examples*.js` restent non suivis, ticket en cours. Un agent neuf le reprend.
+- Tickets de code suspendus derrière faustx-zj5.27 (six paquets) : rien ne bouge dans `src/`
   avant la structure.
-- À vérifier au prochain tour : la fermeture de faustx-zj5.7 ; le relevé de zj5-27-releve.
+- À vérifier au prochain tour : la fermeture de faustx-zj5.7.
 
 ## R — à confirmer par le responsable
 
-- **Architecture en paquets (faustx-zj5.27)** — contexte : Romain a tranché « des paquets séparés
-  c'est la convention » ; le découpage, la publication et la forme du composant Faust restent à
-  griller. Recommandation : syntaxe, graphe, Faust (AST + imprimeur), catalogue, transpileur.
-- **`docs/ARCHITECTURE.md` (faustx-zj5.3)** — écrit au dépôt, en attente de relecture ; remplacé
-  en partie par la nouvelle architecture.
+- **Le morceau joué (faustx-zj5.27, Q26)** — contexte : `createTranspiler()` crée en réalité un
+  graphe vivant ; Romain : « FaustX est le transpileur FaustX il n'y e a qu'un ». Exemple : les
+  tests créent un graphe neuf par test ; BPScript n'a pas tranché un graphe par scène, par acteur
+  ou par séance. Référence mature : SuperCollider, un serveur et des espaces de proxys séparés ;
+  TypeScript, un compilateur et un « programme » par projet. Existant : aucun. Exigence :
+  déterminisme (deux graphes ne partagent rien). Recommandation : le transpileur est la
+  bibliothèque et possède le catalogue lu une fois ; `createSession()` crée un morceau qui possède
+  son graphe et son compteur. Question : le nom (`Session` ou autre).
+- **`docs/ARCHITECTURE.md` (faustx-zj5.3)** — écrit au dépôt, en attente de relecture ; il sera
+  remplacé par l'architecture en six paquets.
 
 ## S — à surveiller
 
@@ -29,4 +34,9 @@ sort et sa réponse va dans son ticket.
 ## F — fermés
 
 - Interface (faustx-zj5.2), spécification et principes (faustx-zj5.4), lexique (faustx-zj5.5),
-  charte (faustx-zj5.6), alignement sur le lexique (faustx-zj5.23).
+  charte (faustx-zj5.6), alignement sur le lexique (faustx-zj5.23), « Comment on arbitre »
+  (faustx-zj5.27, Q18–Q20).
+- Grill faustx-zj5.27 : six paquets (Q15), un seul paquet public `040-faustx` (Q16), dossiers
+  numérotés comme BPScript (Q17), faute propre aux champs de BPScript (Q21), corps typé lu une fois
+  (Q22), citations tenues par le graphe (Q23), largeurs déclarées (Q24), fichier des modèles
+  dissous (Q25).
