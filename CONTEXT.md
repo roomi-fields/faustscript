@@ -5,7 +5,7 @@ This file defines the words of FaustX: the language, and the transpiler that rea
 ## 1. The language
 
 - **FaustX** — a superset of Faust for live coding: Faust plus named instances that a text places, connects, sets and changes while the sound plays. Every Faust program is a FaustX program, with its Faust meaning.
-- **Line** — the unit of a FaustX text: one statement, ended by a newline. The transpiler applies each line on its own, in order.
+- **Line** — the unit of a FaustX text: one statement, ended by a newline. A session applies each line on its own, in order; a blank line or a comment returns no result.
 - **Decoration** — one of the three marks FaustX adds to a Faust sign: a `!` in front cancels it (`!:`, `!let`, `!_`), a number after says how many (`:8`, `~4`), a dot reaches into an instance (`lpf1.fc`, `saw1.3`). A decoration has one meaning in every position.
 - **Module** — a Faust function that the catalogue declares, or that a declaration in the text declares (`lowpass(N:4, fc:2000) fi.lowpass(N, fc)`), with the names of its parameters and their starting values. A module is written by its name alone: `lowpass` is `fi.lowpass`.
 - **Parameter** — a named argument of a module, with its starting value and, through its attributes, its bounds. A parameter that carries a nature (a function, a signal) is part of the module's structure and never a port.
@@ -20,17 +20,22 @@ This file defines the words of FaustX: the language, and the transpiler that rea
 - **Channel** — one signal of an instance's outputs or inputs, reached by a dot and a number counted from 1, as Faust's `route` counts them: `src1.3 : dst1.5`.
 - **Sink** — `process`, the reserved name where the program's output arrives; wires into it are summed, and it has channels like any instance.
 - **Input** — one of the program's inputs, Faust's wire `_`, written in a chain or placed under a name (`let micro _`). The order in which inputs are placed is their order on the program. An input never drives a port.
-- **Computed signal** — an instance the transpiler places under a name of its own for an expression in a chain that is neither a name nor a module, such as `lfo1 * 3800 + 400`.
+- **Computed signal** — an instance the session places under a name of its own for an expression in a chain that is neither a name nor a module, such as `lfo1 * 3800 + 400`.
 
 ## 2. The transpiler
 
-- **Transpiler** — the object `createTranspiler` returns: it holds one graph, applies FaustX text to it, and writes the Faust program it describes. Two transpilers share no state.
-- **Graph** — the state of a piece: the instances in the order they were placed, with their bodies, settings and marks, and the wires in the order they were laid. A line is the only way to change it; the host reads it as a frozen view.
+- **Transpiler** — the library that reads FaustX text and writes Faust: the package `faustx` and the five packages it assembles. It reads the catalogue once and serves every session.
+- **Session** — the piece being played, the object `createSession` returns: it holds one graph and the counter of its computed signals, applies FaustX text to the graph, and writes the Faust program it describes. Two sessions share no state; they read the same catalogue.
+- **Graph** — the state of a session's piece: the instances in the order they were placed, with their bodies, settings and marks, and the wires in the order they were laid. A line is the only way to change it; the host reads it as a frozen view.
 - **Gesture** — what a line does to the graph, one of seven: `place` (`let`), `replace` (a placed name followed by a body), `release` (`!let`: the instance goes, its name becomes free), `remove` (`! lpf1`: the instance leaves the flow with its wires, its name stays taken), `bypass`, `set` (a setting), `wire` (lays or cuts wires). The gesture tells the host what it has to compile.
 - **Bypass** — the gesture `_ lpf1`, and the mark it leaves on the instance: the instance receives silence, the signal passes around it, and its output stays summed in, so what rings inside it runs out. `!_ lpf1` puts the instance back in the flow.
-- **Refusal** — the outcome of a line the transpiler does not apply: a stable code from a closed list, and a sentence that names the cause and the name involved. A refused line leaves the graph as it was, and the lines after it apply. An error the Faust compiler raises stays the compiler's message.
+- **Refusal** — the outcome of a line a session does not apply: a stable code from a closed list, and a sentence that names the cause and the name involved. A refused line leaves the graph as it was, and the lines after it apply. An error the Faust compiler raises stays the compiler's message.
 - **Control path** — the address of a control in the compiled program, from the program root: an instance is written as a Faust group named after it, so `lpf1.fc:400` returns `/lpf1/fc`. The host writes a setting's value at that path without compiling.
 - **Stages** — the form of the program once an instance feeds more than one destination: each shared signal is written once and its destinations read it.
-- **Catalogue** — `lib/faust.fx`, the declaration of the public functions of Faust's libraries as modules, under Faust's own names, with their parameters, starting values and bounds. `tools/` generates it from the libraries of the pinned faustwasm; the transpiler exposes it as a frozen value.
-- **Template** — an entry of `lib/translation.fx` that gives the Faust text a form of the language becomes, with its places between braces (`template.Series {a} : {b}`). The same file declares the words the language reserves: the sink, the rank `i`, the input `_`. The code reads these files and writes no sign of the language.
-- **Host** — the program that creates a transpiler, sends it text, compiles the Faust it returns and plays it. The output, musical time, scenes and what becomes of a running circuit's state belong to the host.
+- **Catalogue** — `lib/faust.fx`, the declaration of the public functions of Faust's libraries as modules, under Faust's own names, with their parameters, starting values and bounds. `tools/` generates it from the libraries of the pinned faustwasm, and marks a module that faustwasm does not provide with the foreign function it calls; a session exposes it as a frozen value.
+- **Template** — an entry of `lib/translation.fx` that gives the Faust text a form of the language becomes, with its places between braces (`template.Series {a} : {b}`). The same file declares the words the language reserves: the sink, the rank `i`, the input `_`. The code reads these files and writes no sign of the language. The word leaves with 030-lowering (faustx-zj5.35), which builds a Faust AST in place of the templates and moves the reserved words into the grammar.
+- **AST** — the typed tree of a text, one per language. The FaustX AST is a FaustX text read once by the parser, each node with its position in the text; a body is a typed node, a catalogue call with its ordered arguments or a Faust expression as a tree. The Faust AST is the Faust that lowering builds and the printer writes.
+- **Lowering** — the translation of the graph into a Faust AST: one definition per instance, and the program written directly or in stages.
+- **Printer** — the function that writes a Faust AST as Faust text, with the parentheses its precedence requires.
+- **Diagnostic** — a refusal in the form of the Language Server Protocol, at the position of its line, for an editor.
+- **Host** — the program that creates a session, sends it text, compiles the Faust it returns and plays it. The output, musical time, scenes and what becomes of a running circuit's state belong to the host.
