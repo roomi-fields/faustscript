@@ -26,6 +26,9 @@ other path is this repository's.
 (`bp-mono/packages/000-forms/docs/INTERFACE.md` §8.3). The rule that gives every guest language its own
 package is `bp-mono/packages/800-evaluator/docs/CADRE.md` R2.
 
+**BPScript receives FaustX by its published package**, under the package name `faustx`, never from
+this repository's working tree; a module that needs a fresher state asks FaustX to publish.
+
 **The dependency goes one way.** The module imports FaustX; nothing in FaustX imports, names or
 tests for BPScript. A need of the module that FaustX cannot meet with a host-free function goes back
 to the BPScript side, or becomes a question for Romain (§6).
@@ -162,10 +165,6 @@ None of these is settled. Each goes to Romain; an agent that meets one stops and
    shared by actors, tracks and sends?
 2. **How a scene writes FaustX.** The tag (`fx:` in an earlier note, `faustx:`), and its places: a
    head code that places the modules, a code in a sequence that acts on them. No writing is decided.
-3. **How FaustX reaches BPScript.** FaustX's charter says a linked repository is consumed live; the
-   hub decision `2026-08-24-un-depot-ne-consomme-que-le-paquet-publie-d-un-voisin` replaces that
-   rule with "a neighbour loads only the published package"; BPScript reaches a dependency by its
-   package name or under `vendor/`.
 4. **The package's number and name** in series 800.
 5. **What one graph covers.** One transpiler per scene, per actor, or per session; and what happens
    to the graph when the author edits the scene while it plays.
