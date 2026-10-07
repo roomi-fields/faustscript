@@ -1,6 +1,6 @@
-# FaustX
+# FaustScript
 
-FaustX is a superset of Faust for live coding, and its transpiler: a line of FaustX places a named instance or acts on it while the sound plays, and the transpiler writes the Faust that the host compiles and plays. This repository carries the language and its transpiler, as one TypeScript library with its command line.
+FaustScript is a superset of Faust for live coding, and its transpiler: a line of FaustScript places a named instance or acts on it while the sound plays, and the transpiler writes the Faust that the host compiles and plays. This repository carries the language and its transpiler, as one TypeScript library with its command line.
 
 **Owner**: Romain. He validates `docs/LANGUAGE.md`, `docs/PRINCIPES.md`, `docs/ARCHITECTURE.md`, and each package's `CADRE.md`, `INTERFACE.md` and `ARCHITECTURE.md` under `packages/<x>/docs/`; the supervisor validates the other documents.
 
@@ -8,8 +8,8 @@ FaustX is a superset of Faust for live coding, and its transpiler: a line of Fau
 
 `docs/PRINCIPES.md`, then the specification (`docs/LANGUAGE.md`), then the architecture (`docs/ARCHITECTURE.md`) and each package's frame (`packages/<x>/docs/`), then the code. A gap between the specification and the transpiler is a defect of the transpiler. A decision lives in the document it settles; a rule is affirmative, in the present, without date or author. `CONTEXT.md` gives each word of the domain its one sense.
 
-- `docs/LANGUAGE.md` — how FaustX is written: read it before touching the grammar, a gesture or a translation.
-- `packages/040-faustx/docs/INTERFACE.md` — what crosses FaustX's public boundary: read it before changing an export, a line's result or a refusal.
+- `docs/LANGUAGE.md` — how FaustScript is written: read it before touching the grammar, a gesture or a translation.
+- `packages/040-faustscript/docs/INTERFACE.md` — what crosses FaustScript's public boundary: read it before changing an export, a line's result or a refusal.
 - `packages/<x>/docs/CADRE.md` — a package's role and boundary (R1…): cite its rules in a ticket.
 
 ## How we arbitrate
@@ -34,9 +34,9 @@ A supervision session loads the supervisor (`pitmaster`); a development agent lo
 
 ## What keeps the repository straight
 
-- **Faust stays as GRAME ships it.** The licence exception on Faust's architecture files holds on the condition that they are unmodified; FaustX writes Faust and calls the compiler as published.
+- **Faust stays as GRAME ships it.** The licence exception on Faust's architecture files holds on the condition that they are unmodified; FaustScript writes Faust and calls the compiler as published.
 - **Signs live in the grammar and in `lib/`**, never in the code; a guard checks it.
-- **A neighbour reads only FaustX's published package**, and FaustX reads only its neighbours' published packages. A consumer that needs a fresher state asks for a publication.
+- **A neighbour reads only FaustScript's published package**, and FaustScript reads only its neighbours' published packages. A consumer that needs a fresher state asks for a publication.
 - **One subject, one address.** What a document already describes is poured into it.
 - **A replacement deletes what it replaces** in the same commit, with its consumers and its guards.
 - **A comment says what the thing is**, in the present.
@@ -52,5 +52,5 @@ A supervision session loads the supervisor (`pitmaster`); a development agent lo
 
 ## Commands
 
-- `npm test` · `npm run typecheck` · `npm run lint` · `npm run format:check` · `npm run grammaire` (regenerates the parser from `src/faustx.grammar`).
+- `npm test` · `npm run typecheck` · `npm run lint` · `npm run format:check` · `npm run grammaire` (regenerates the parser from `src/faustscript.grammar`).
 - Conventional commits, message by file (`git commit -F`), trailer `Co-Authored-By: Claude`. Every commit is pushed.
