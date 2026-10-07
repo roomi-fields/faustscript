@@ -1,214 +1,168 @@
-# The architecture of the transpiler
+# FaustX — architecture
 
-**FaustX is a transpiler: it translates FaustX into Faust, and nothing else.** It does not compile, it
-computes no sample, it plays nothing. What it returns, a Faust compiler takes as it is.
+The FaustX transpiler is a JavaScript library that holds the graph of a piece and writes Faust from it. It parses FaustX text with a parser generated from the grammar, applies each line as a gesture on the graph, and fills the templates of `lib/translation.fx` to write the Faust of one instance or of the whole program. Its role and its boundary are in `CADRE.md`; the forms that cross that boundary are in `INTERFACE.md`.
 
-This document says how it is built. What it translates is in `LANGUAGE.md`; why the signs are the ones
-they are, in `PRINCIPES.md`.
+## 1. Context
 
----
+The host creates a transpiler with the texts of the two files under `lib/`, sends it FaustX text, and gives the Faust it returns to a Faust compiler. Two tools prepare the transpiler's inputs before any run: `tools/` generates the catalogue from Faust's libraries, and `lezer-generator` (`npm run grammaire`) generates the parser from the grammar.
 
-## ⛔ The rule that commands everything
-
-**No sign of FaustX is written hard into the transpiler's code.**
-
-The code is an engine that does not know the language: it applies a grammar, consults a catalogue, and
-fills in templates. The signs — `let`, `:8`, `!:`, `!let`, the dot, the colon — exist only in
-declarative files.
-
-**This rule is checked by a guard, not by discipline.** See *The guard*.
-
----
-
-## The chain, from a typed line to the sound
-
-```
-     a line of FaustX
-            │
-            ▼
-    ┌───────────────┐
-    │    parser     │  generated from faustx.grammar (Lezer)
-    └───────────────┘
-            │  tree
-            ▼
-    ┌───────────────┐
-    │     graph     │  name → instance table, and the wires
-    └───────────────┘
-            │  gesture
-            ▼
-    ┌───────────────┐
-    │    emitter    │  fills in the templates of translation.fx
-    └───────────────┘
-            │  some Faust
-            ▼
-      a Faust compiler      ← outside this repository
-            │
-            ▼
-         the sound
+```mermaid
+flowchart LR
+  libs[Faust libraries] -->|tools/generate-declarations.py| cat[lib/faust.fx<br>catalogue]
+  gram[src/faustx.grammar] -->|lezer-generator| parser[src/parser.js]
+  tpl[lib/translation.fx<br>templates]
+  host[Host]
+  fx[FaustX transpiler]
+  faust[Faust compiler]
+  cat -->|text| host
+  tpl -->|text| host
+  host -->|createTranspiler · apply text| fx
+  parser --- fx
+  fx -->|one result per line · Faust text| host
+  host -->|Faust text| faust
+  faust -->|compiled module| host
 ```
 
-**The transpiler stops at the Faust text.** What compiles it and substitutes it into a living graph
-belongs to the host.
+The command `faustx` (`bin/faustx.js`) is a host of its own: it reads the two files under `lib/` and a `.fx` file, applies the file to an empty graph, and writes the whole program.
 
----
+## 2. Strategy
 
-## What the transpiler returns
+1. **The grammar generates the parser, and the signs of the language live in the files under `lib/`.** The code reads the names of the tree's nodes, the catalogue and the templates; the text of a sign appears only in `src/faustx.grammar` and `lib/translation.fx`. Reason: renaming a sign or changing what a form becomes in Faust changes a file the code reads, and the published grammar is the parser that runs.
+2. **A living graph is the state, and each line is a gesture on it.** The transpiler keeps the instances and the wires between calls; a line changes the graph and returns what it changed. Reason: a line typed while the sound plays describes a change, not a program, and only the graph knows what a name designates (`lpf1(fc:400)` is a call or a setting depending on what is placed).
+3. **Each instance is written alone, as one Faust definition.** A gesture that changes an instance's circuit returns that definition and the instances it cites. Reason: the host compiles one module instead of the program, which costs about nineteen times less for fifty modules (§8).
+4. **The program is written in stages as soon as a signal is shared.** When one instance feeds more than one destination, the program places the instances in stages and routes the channels between them, so each instance is written once. Reason: Faust builds one circuit for each occurrence of a name, so a name written twice would make two circuits with two memories.
 
-**A gesture, not a file.** A line sent back while it plays does not describe the whole program: it
-says that a module appears, that a wire is cut, that a control changes. The transpiler therefore
-returns **what has changed**, with the Faust needed for it. The result of each gesture is listed in
-`docs/INTERFACE.md` §4.
+## 3. Components
 
-**That is what makes it possible to recompile only one module** — some 32 ms instead of 620 for a
-fifty-module program — and it is measured by `tools/measure-compilation.mjs`.
-
-**In file mode, a complete program is the sequence of its gestures** applied to an empty graph, then
-serialised into a `.dsp`. FaustX therefore stays usable on its own, without a host: that is the
-condition for standalone.
-
----
-
-## The declarative files
-
-### `src/faustx.grammar` — the grammar
-
-**The parser is generated from it**, it is not written by hand. That is what makes drift impossible
-between the published grammar and the executed code: there is only one object.
-
-Lezer brings two properties that live performance requires:
-
-**Parsing is incremental** — retyping a line does not reparse the whole piece.
-
-**It tolerates errors** — a tree is returned even on incomplete code, with the faults marked as such.
-That is what allows a faulty line to be refused without anything stopping.
-
-**The names of the grammar's rules are the names of the tree's nodes.** There is no second file to
-keep in step: the AST is the structure the grammar describes, and the templates refer to it by those
-very names.
-
-### `lib/faust.fx` — the catalogue
-
-Faust's 998 public functions, with their parameters, their starting values, their bounds and their
-number of inputs and outputs. Generated by `tools/generate-declarations.py`, never edited by hand.
-
-**It is the only source of what the transpiler knows about modules.** A function absent from the
-catalogue stays usable through the fallback, with Faust's own argument order.
-
-### `lib/translation.fx` — the templates
-
-Every form of the tree finds its Faust model there:
-
-```
-Series(a, b)                   →  "{a} : {b}"
-WideSeries(a, b, n)            →  "par(i,{n},{a}) : par(i,{n},{b})"
-Multiple(name, n, body)        →  "{name} = par(i,{n}, {body});"
-Feedback(a, b)                 →  "{a} ~ {b}"
+```mermaid
+flowchart TD
+  transpiler[transpiler.js] --> catalogue[catalogue.js]
+  transpiler --> templates[templates.js]
+  transpiler --> graph[graph.js]
+  transpiler --> reading[reading.js]
+  transpiler --> emitter[emitter.js]
+  transpiler --> stages[stages.js]
+  reading --> parser[parser.js<br>generated]
+  reading --> graph
+  catalogue --> parser
+  emitter --> parser
+  bin[bin/faustx.js] --> transpiler
 ```
 
-**The behaviour rules are there too, in tables** — the adaptation of widths, the summing on a port,
-the scaling of a signal connected to a control. These are decisions of the language, so they are read,
-they are not compiled.
+- **parser** (`src/parser.js`, generated from `src/faustx.grammar` by Lezer) turns a text into a tree whose node names are the grammar's rule names. It owns no state. Lezer is CodeMirror's parser, so an editor built on CodeMirror highlights FaustX with the same grammar.
+- **catalogue** (`src/catalogue.js`) reads the text of `lib/faust.fx` with the parser and returns a table from module name to module. It owns the module records; it calls the parser.
+- **templates** (`src/templates.js`) reads the text of `lib/translation.fx` into a table from key to value and fills a value's places between braces. It owns that table; it calls nothing.
+- **graph** (`src/graph.js`) holds the instances and the wires and carries one method per gesture (`place`, `replace`, `release`, `remove`, `bypass`, `set`, `connect`, `cut`), each returning an outcome. It owns the state of the piece; it calls nothing, and carries the catalogue that reading and the emitter read through it.
+- **reading** (`src/reading.js`) applies a parsed text to the graph: for each line, it maps the form's node name to a gesture, reads the names, bodies and settings out of the tree, and calls the graph's method. It owns no state beyond the counter that names computed signals; it calls the parser and the graph.
+- **emitter** (`src/emitter.js`) writes the Faust definition of one instance and, by walking the wires back from the sink, the expression of a program where no signal is shared. It owns no state; it reads the catalogue, the templates and the graph, and parses the body of an instance written as a Faust expression to translate the modules it calls.
+- **stages** (`src/stages.js`) writes the expression of a program where a signal is shared: it places the instances in stages, counts each instance's inputs and outputs, and writes the routing between two stages. It owns no state; it reads the catalogue, the templates and the graph.
+- **transpiler** (`src/transpiler.js`) creates the other components and exposes `createTranspiler`, `apply` and `write`. It owns one catalogue, one templates table and one graph; it calls reading, emitter and stages.
+- **command line** (`bin/faustx.js`) reads the files, calls the transpiler, and writes the program and the refused lines.
 
----
+## 4. Data
 
-## What is left as code, and why
+| structure | form | created by | read by | lifetime |
+| --- | --- | --- | --- | --- |
+| tree | Lezer tree of the text passed to `apply`, or of the catalogue, or of one body | parser | reading, catalogue, emitter | one call |
+| module | name; parameters (name, starting value); body as written; attributes keyed `parameter.attribute`; number of inputs and outputs | catalogue | graph, emitter, stages | the transpiler |
+| templates table | key → value, as written in `lib/translation.fx` | templates | emitter, stages, transpiler | the transpiler |
+| instance | name; body (a module name, or a Faust expression as written); number of copies; settings (port → value as written); `bypassed`; `removed` | graph, on `place` | reading, emitter, stages | until `release` |
+| wire | from and to (each a name and an optional port or channel); width; `loop` | graph, on `connect` | emitter, stages | until `cut`, or until an end is released or removed |
+| outcome | `done`, and the sentence of a refusal | graph, reading | transpiler, host | one line result |
+| stages | the instance names stage by stage, and each loop's return and source | stages | stages | one `write` |
 
-Three things cannot be declarative. **None of them knows the language.**
+The graph keeps instances in a `Map` in the order they were placed and wires in an array in the order they were laid; the emitter and the stages iterate in that order. The number of a module's inputs and outputs comes from a comment line that the generator writes under each module, and, when that line is missing, from the module's measured output range.
 
-**The engine.** It applies the templates, fills in the holes, assembles the text. Generic.
+## 5. Flow
 
-**The computation of widths.** Knowing how many channels a module produces requires reading the
-catalogue, and sometimes compiling in order to decide. That is a computation, not a table.
+`apply` parses the whole text once, then handles its lines in order. Each line is applied to the graph, and its result is completed right after it, so that it describes the line at the moment it was applied.
 
-**The graph.** The name → instance table and the list of wires are the living state of the piece;
-state has no declarative form. It carries the names **written by the musician**, never signs of the
-language.
+```mermaid
+sequenceDiagram
+  participant H as Host
+  participant T as transpiler
+  participant R as reading
+  participant P as parser
+  participant G as graph
+  participant E as emitter
+  H->>T: apply(text)
+  T->>R: apply(text, graph, complete)
+  R->>P: parse(text)
+  P-->>R: tree
+  loop each Line node
+    R->>G: gesture method (place, set, connect…)
+    G-->>R: outcome
+    R->>T: complete(result)
+    alt place, replace, bypass or remove applied
+      T->>E: writeInstance(instance)
+      E-->>T: Faust definition
+      T->>T: names of other instances in it (needs)
+    end
+  end
+  R-->>T: results
+  T-->>H: one result per line
+```
 
----
+`write` writes the header, one definition per instance in the flow, then `process`. Its expression comes from the emitter when every instance is the source of at most one wire, and from the stages otherwise; an empty graph gives the silence template.
 
-## The guard
+```mermaid
+sequenceDiagram
+  participant H as Host
+  participant T as transpiler
+  participant E as emitter
+  participant S as stages
+  H->>T: write()
+  T->>E: writeInstance, for each instance not removed
+  alt a wire source feeds several destinations
+    T->>S: writeInStages(graph)
+    S-->>T: stages joined by routing
+  else
+    T->>E: writeExpression(graph)
+    E-->>T: wires walked back from the sink
+  end
+  T-->>H: header, definitions, process
+```
 
-**A test fails if a sign of FaustX appears hard-coded in the transpiler's code.**
+## 6. Run time
 
-It looks, in every string literal of the source code, for: the keywords (`let`), the compound signs
-(`!:`, `!~`, `:8`), and the module names from the catalogue. An occurrence is an architectural defect,
-not a detail of style — it means that a decision of the language has leaked into the engine.
+The transpiler is an ES module for Node 22 or later, and runs in the host's process and thread. Every call is synchronous and performs no input or output; the command line alone reads and writes files. Each transpiler parses its own copy of the catalogue at creation and keeps it with its graph for its whole life. The parser imports `@lezer/lr` at run time. The Faust compiler runs in the host; the tests call it through `@grame/faustwasm` to check that the Faust written compiles.
 
-**The only exceptions allowed** are the error messages meant for humans, marked as such, and the file
-that loads the declarative files — it does have to know their names.
+## 7. Cross-cutting concepts
 
----
+- **Identity.** An instance is identified by the name the author wrote; a computed signal by a name reading gives it, `computation` followed by a counter. In the Faust written, an instance whose body carries a control is wrapped in a group named after it, so its control path starts with the instance's name.
+- **Errors.** A gesture the graph cannot apply returns an outcome that carries a sentence naming the cause; the line's result carries that outcome. A key missing from the templates throws `template missing: <key>`.
+- **Determinism.** The graph, the catalogue and the templates iterate in insertion order, and nothing reads the clock or a random source, so the same text in the same order of gestures writes the same Faust.
+- **Signs out of the code.** Reading recognises a form by its node name, and the emitter and the stages take the text of each Faust form from a template key. A test reads the string literals of every hand-written file under `src/` and fails on the declaration word, the sink's name, a cut, a width written in place, or the input sign.
 
-## When the code is wrong
+## 8. Quality
 
-**An error is raised, and the sound does not stop.** The graph is never touched before the compilation
-has succeeded.
+The cost that counts is the compilation the host performs after a gesture; the transpiler's own work per line is small beside it, and not measured. `tools/measure-compilation.mjs` measures what a gesture saves by recompiling one module: the median of twelve compilations after three warm-up rounds, with the compiler's cache defeated at each round. The figures move by about a tenth from one run to the next.
 
-| where the error arises | who detects it |
-| --- | --- |
-| the line does not parse | the parser, which marks the faulty node |
-| an unknown name, a port that does not exist | the graph, by refusing the gesture |
-| Faust refuses the program produced | the host, before substituting |
+| what is recompiled | browser (libfaust-wasm 0.16.6, Faust 2.86.2) | native (Faust 2.70.3, same WebAssembly backend, 34 ms start-up removed) |
+| --- | --- | --- |
+| one module | ~32 ms | ~30 ms |
+| 5 modules | ~64 ms | ~60 ms |
+| 20 modules | ~200 ms | ~185 ms |
+| 50 modules | ~620 ms | ~520 ms |
 
-**In all three cases the gesture is refused, the graph stays intact, and the error goes back to
-whoever wrote it.** What was playing keeps playing, without a missing sample.
+A fifty-module program costs about 19 times one module (17 to 21 depending on the run): this ratio is why an instance is the unit of compilation (`CADRE.md` R16).
 
----
+The separation costs computation in the compiled program, measured with Faust 2.70.3:
 
-## The tests
+- compiling per module instead of as one block: +12.9 % operations, since Faust no longer optimises across modules;
+- a controlled port instead of a constant: +17 % operations on a third-order filter;
+- the instance's name: no operation, since a Faust group is a label.
 
-**The programs in `examples/` are the test bench, from the very first day.** They exist before the
-transpiler, with their Faust translations verified: if one of them does not parse, the grammar is
-wrong; if its translation differs, the emitter is.
+Together, a program written by FaustX computes about 30 % more than the same Faust written as one block with every value constant. A width is fixed at compilation: changing it while the sound plays recompiles the instance, about 32 ms. An external measurement of on-the-fly recompilation finds 6 to 52 ms depending on the module (arXiv:2606.13193v1).
 
-Three levels:
+## 9. Risks
 
-**Parsing** — every example produces a tree with no error node.
-
-**Translation** — the Faust produced is the one already in `examples/*.dsp`, and it compiles.
-
-**The guard** — no sign of the language in the engine.
-
----
-
-## The tooling
-
-**TypeScript and Lezer**, as in an earlier language of ours, which already uses `@lezer/generator`,
-`@lezer/lr` and `@lezer/highlight`. This choice is not one of convenience: Lezer is CodeMirror's
-parser, so the day a live coding editor opens, syntax highlighting and incremental parsing come from
-the same grammar, without rewriting it.
-
----
-
-## What exists
-
-| | |
-| --- | --- |
-| `src/faustx.grammar` | the grammar, which generates `src/parser.js` |
-| `src/catalogue.js` | reads `lib/faust.fx` — 998 modules, in 176 ms |
-| `src/graph.js` | the state: instances, controls, wires |
-| `src/reading.js` | applies a parsed line to the graph |
-| `src/stages.js` | writes a graph where the signals are shared |
-| `src/emitter.js` | fills in the templates |
-| `src/transpiler.js` | chains the five |
-| `lib/translation.fx` | the templates, the reserved words, the decision rules |
-
-**The three pieces in `examples/` translate without a single rejection, and the Faust
-produced compiles.** Thirty-four tests, a dozen of which really invoke the
-compiler — it is the only judge.
-
-## What is left
-
-**The catalogue parses in full.** All 8,892 lines of it, and a test asserts it:
-the catalogue is written in FaustX, so our own parser must read it entirely.
-
-**The fade of a gesture belongs to the host, not here.** A bypassed module
-receives silence and its output stays summed, so its tail runs out; but the
-switch from one circuit to the other is instantaneous, and it is whoever
-substitutes the living module that has to fade it. Faust already carries what is
-needed for that in its runtime combiners — a crossfade,
-`architecture/faust/dsp/dsp-combiner.h`.
-
-**The sound.** Nothing here makes any: the transpiler returns Faust text. What
-compiles it while it plays, and substitutes the module without a missing sample,
-belongs to the host.
+- **Atomicity and shared state** (faustx-zj5.12): a refused line can leave part of its wires or a computed signal in the graph, the counter of computed signals is shared by every transpiler of the process, and a line the grammar does not read can be applied as a wire.
+- **Refusal codes and the result of a setting** (faustx-zj5.9): an outcome carries a sentence and no code, and a `set` result carries neither the port, the value nor the path.
+- **The surface** (faustx-zj5.10): the package exports the graph and the catalogue modules, and the transpiler exposes its internal graph and catalogue as fields; the target is the one function and the frozen views of `INTERFACE.md`, in TypeScript.
+- **Gaps with the language reference** (faustx-zj5.13 to faustx-zj5.22): the number after a connection sign, channels, silence on a cut wire, width adaptation, chain terms that are not instances, settings on an instance, calls outside the catalogue, Faust's own forms, declarations and imports in a text, resizing a bank. Each ticket names the rule of `LANGUAGE.md` and the line that shows the gap.
+- **Counts inferred by the code.** The number of inputs of a body written as a Faust expression is read from the shape of its text, and a module's numbers of inputs and outputs travel in a comment of the catalogue; the Faust compiler is the source that gives them exactly.
+- **What the guard sees** (faustx-zj5.11, its bite proof): it looks for five forms in string literals; the Faust forms that the stages and the emitter write directly (`route`, `si.bus`, the parentheses of a call) and the names of the catalogue's modules are outside its patterns.
+- **The run-time dependency** (faustx-zj5.26): `package.json` declares `@lezer/lr`, which the parser imports, among the development dependencies only.
+- **An instance cited by a body** (faustx-zj5.24): the program is written in stages only when an instance is the source of several wires, so an instance in the flow that a computed signal also cites (`lpf1 * 3 : process`) is written twice and becomes two circuits.
+- **The cost of a line** (faustx-zj5.25): no instrument measures what one applied line costs, nor what creating a transpiler costs, so `CADRE.md` R16 has no ceiling yet.
