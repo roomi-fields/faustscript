@@ -1,17 +1,24 @@
-FaustScript reference output of the faustscript block 10 of docs/LANGUAGE.md, which opens with let lpf1 fi.lowpass(3, cutoff=800).
+FaustScript reference output of the faustscript block 10 of docs/LANGUAGE.md, which opens with voix(freq=110, fc=800)  os.sawtooth(freq=freq) : fi.lowpass(fc=fc).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let lpf1 fi.lowpass(3, cutoff=800)
+1  voix(freq=110, fc=
+    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
+    gesture: null
+    name: null
+
+1  800
     outcome: {"done":true,"reason":null}
-    gesture: place
-    name: lpf1
-    faust: lpf1 = fi.lowpass(3, cutoff=800);
-    needs: []
+    gesture: wire
+    name: null
+
+1  os.sawtooth(freq=freq) : fi.lowpass(fc=fc)
+    outcome: {"done":false,"reason":"os does not exist"}
+    gesture: wire
+    name: null
 
 --- write
 
 import("stdfaust.lib");
-lpf1 = fi.lowpass(3, cutoff=800);
 process = 0;

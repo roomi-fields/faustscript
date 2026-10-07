@@ -1,48 +1,22 @@
-FaustScript reference output of the faustscript block 4 of docs/LANGUAGE.md, which opens with let voix1 os.sawtooth.
+FaustScript reference output of the faustscript block 4 of docs/LANGUAGE.md, which opens with let lpf1 fi.lowpass.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let voix1 os.sawtooth
+1  let lpf1 fi.lowpass
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: voix1
-    faust: voix1 = os.sawtooth(220);
+    name: lpf1
+    faust: lpf1 = fi.lowpass(4, 2000);
     needs: []
 
-2  let voix2 os.sawtooth(freq=165)
-    outcome: {"done":true,"reason":null}
+2  let lpf1 fi.lowpass
+    outcome: {"done":false,"reason":"lpf1 is already placed"}
     gesture: place
-    name: voix2
-    faust: voix2 = os.sawtooth(freq=165);
-    needs: []
-
-3  let rev1 re.mono_freeverb
-    outcome: {"done":true,"reason":null}
-    gesture: place
-    name: rev1
-    faust: rev1 = re.mono_freeverb(0.7, 0.5, 0.3, 30);
-    needs: []
-
-4  voix1 : rev1
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
-
-5  voix2 : rev1
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
-
-6  rev1 : process
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
+    name: lpf1
 
 --- write
 
 import("stdfaust.lib");
-voix1 = os.sawtooth(220);
-voix2 = os.sawtooth(freq=165);
-rev1 = re.mono_freeverb(0.7, 0.5, 0.3, 30);
-process = (voix1, voix2) :> rev1;
+lpf1 = fi.lowpass(4, 2000);
+process = 0;

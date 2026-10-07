@@ -1,13 +1,13 @@
-FaustScript reference output of the faustscript block 21 of docs/LANGUAGE.md, which opens with let micro _.
+FaustScript reference output of the faustscript block 21 of docs/LANGUAGE.md, which opens with let lfo1 os.osc(freq=0.2).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let micro _
+1  let lfo1 os.osc(freq=0.2)
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: micro
-    faust: micro = _;
+    name: lfo1
+    faust: lfo1 = os.osc(freq=0.2);
     needs: []
 
 2  let lpf1 fi.lowpass(fc=800)
@@ -17,14 +17,14 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     faust: lpf1 = fi.lowpass(fc=800);
     needs: []
 
-3  micro : lpf1.fc
-    outcome: {"done":false,"reason":"micro carries one of the program's inputs: a setting can only be driven by a signal"}
+3  lfo1 : it.remap(-1, 1, 140, 900) : lpf1.fc
+    outcome: {"done":false,"reason":"it does not exist"}
     gesture: wire
     name: null
 
 --- write
 
 import("stdfaust.lib");
-micro = _;
+lfo1 = os.osc(freq=0.2);
 lpf1 = fi.lowpass(fc=800);
 process = 0;

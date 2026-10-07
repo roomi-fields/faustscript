@@ -1,30 +1,50 @@
-FaustScript reference output of the faustscript block 20 of docs/LANGUAGE.md, which opens with let lfo1 os.osc(freq=0.2).
+FaustScript reference output of the faustscript block 20 of docs/LANGUAGE.md, which opens with let lpf1 fi.lowpass(fc=800).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let lfo1 os.osc(freq=0.2)
-    outcome: {"done":true,"reason":null}
-    gesture: place
-    name: lfo1
-    faust: lfo1 = os.osc(freq=0.2);
-    needs: []
-
-2  let lpf1 fi.lowpass(fc=800)
+1  let lpf1 fi.lowpass(fc=800)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lpf1
     faust: lpf1 = fi.lowpass(fc=800);
     needs: []
 
-3  lfo1 : it.remap(-1, 1, 140, 900) : lpf1.fc
-    outcome: {"done":false,"reason":"it does not exist"}
+2  let lfo1 os.osc(freq=0.2)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: lfo1
+    faust: lfo1 = os.osc(freq=0.2);
+    needs: []
+
+3  lpf1.fc = 400                        // one port
+    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
+    gesture: null
+    name: null
+
+4  lpf1(fc=400, N=
+    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
+    gesture: null
+    name: null
+
+4  5
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+5  lpf1.fc.min = 20                     // an attribute of the port
+    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
+    gesture: null
+    name: null
+
+6  lfo1 : lpf1.fc
+    outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
 
 --- write
 
 import("stdfaust.lib");
-lfo1 = os.osc(freq=0.2);
 lpf1 = fi.lowpass(fc=800);
+lfo1 = os.osc(freq=0.2);
 process = 0;

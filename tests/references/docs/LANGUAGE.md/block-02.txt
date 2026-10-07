@@ -1,49 +1,43 @@
-FaustScript reference output of the faustscript block 2 of docs/LANGUAGE.md, which opens with let lpf1 fi.lowpass.
+FaustScript reference output of the faustscript block 2 of docs/LANGUAGE.md, which opens with let saw1 os.sawtooth.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let lpf1 fi.lowpass
+1  let saw1 os.sawtooth
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: saw1
+    faust: saw1 = os.sawtooth(220);
+    needs: []
+
+2  let lpf1 fi.lowpass
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lpf1
     faust: lpf1 = fi.lowpass(4, 2000);
     needs: []
 
-2  let lpf2 fi.lowpass(fc=400)
-    outcome: {"done":true,"reason":null}
-    gesture: place
-    name: lpf2
-    faust: lpf2 = fi.lowpass(fc=400);
-    needs: []
+3  saw1 : 8
+    outcome: {"done":false,"reason":"8 does not exist"}
+    gesture: wire
+    name: null
 
-3  let lpfs:8 fi.lowpass
+3  lpf1
     outcome: {"done":true,"reason":null}
-    gesture: place
-    name: lpfs
-    faust: lpfs = par(i,8,fi.lowpass(4, 2000));
-    needs: []
+    gesture: wire
+    name: null
 
-4  let voix:8 os.sawtooth : fi.lowpass
+4  let gate1 ef.gate_mono(thresh=-40)
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: voix
-    faust: voix = par(i,8,os.sawtooth(220) : fi.lowpass(4, 2000));
-    needs: []
-
-5  let vca1 *
-    outcome: {"done":true,"reason":null}
-    gesture: place
-    name: vca1
-    faust: vca1 = *;
+    name: gate1
+    faust: gate1 = ef.gate_mono(thresh=-40);
     needs: []
 
 --- write
 
 import("stdfaust.lib");
+saw1 = os.sawtooth(220);
 lpf1 = fi.lowpass(4, 2000);
-lpf2 = fi.lowpass(fc=400);
-lpfs = par(i,8,fi.lowpass(4, 2000));
-voix = par(i,8,os.sawtooth(220) : fi.lowpass(4, 2000));
-vca1 = *;
+gate1 = ef.gate_mono(thresh=-40);
 process = 0;

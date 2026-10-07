@@ -1,33 +1,45 @@
-FaustScript reference output of the faustscript block 14 of docs/LANGUAGE.md, which opens with let dly1 de.delay(4096, 1000).
+FaustScript reference output of the faustscript block 14 of docs/LANGUAGE.md, which opens with let basse os.sawtooth(freq=55).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let dly1 de.delay(4096, 1000)
+1  let basse os.sawtooth(freq=55)
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: dly1
-    faust: dly1 = de.delay(4096, 1000);
+    name: basse
+    faust: basse = os.sawtooth(freq=55);
     needs: []
 
-2  let fb1 _ * 0.5
+2  let nappe os.sawtooth(freq=220)
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: fb1
-    faust: fb1 = _ * 0.5;
+    name: nappe
+    faust: nappe = os.sawtooth(freq=220);
     needs: []
 
-3  dly1 ~ fb1
+3  let vcab si.bus(2) :> _
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: vcab
+    faust: vcab = si.bus(2) :> _;
+    needs: []
+
+4  basse : vcab
     outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
 
-4  dly1 !~ fb1
+5  nappe : vcab
     outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
 
-5  dly1 ~4 fb1
+6  vcab : process
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+7  basse !: vcab
     outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
@@ -35,6 +47,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 --- write
 
 import("stdfaust.lib");
-dly1 = de.delay(4096, 1000);
-fb1 = _ * 0.5;
-process = 0;
+basse = os.sawtooth(freq=55);
+nappe = os.sawtooth(freq=220);
+vcab = si.bus(2) :> _;
+process = nappe : vcab;

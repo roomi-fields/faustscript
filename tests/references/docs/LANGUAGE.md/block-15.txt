@@ -1,40 +1,33 @@
-FaustScript reference output of the faustscript block 15 of docs/LANGUAGE.md, which opens with let src1 os.sawtooth.
+FaustScript reference output of the faustscript block 15 of docs/LANGUAGE.md, which opens with let dly1 de.delay(4096, 1000).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let src1 os.sawtooth
-    outcome: {"done":true,"reason":null}
-    gesture: place
-    name: src1
-    faust: src1 = os.sawtooth(220);
-    needs: []
-
-2  let dly1 de.delay(4096, 1000)
+1  let dly1 de.delay(4096, 1000)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: dly1
     faust: dly1 = de.delay(4096, 1000);
     needs: []
 
-3  let fb1 _ * 0.5
+2  let fb1 _ * 0.5
     outcome: {"done":true,"reason":null}
     gesture: place
     name: fb1
     faust: fb1 = _ * 0.5;
     needs: []
 
-4  src1 : dly1
+3  dly1 ~ fb1
     outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
 
-5  dly1 ~ fb1
+4  dly1 !~ fb1
     outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
 
-6  dly1 : process
+5  dly1 ~4 fb1
     outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
@@ -42,7 +35,6 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 --- write
 
 import("stdfaust.lib");
-src1 = os.sawtooth(220);
 dly1 = de.delay(4096, 1000);
 fb1 = _ * 0.5;
-process = src1 : route(1, 1, 1,1) : ((+ : dly1) ~ fb1);
+process = 0;

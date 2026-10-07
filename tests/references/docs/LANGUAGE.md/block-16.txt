@@ -1,49 +1,48 @@
-FaustScript reference output of the faustscript block 16 of docs/LANGUAGE.md, which opens with let lpf1 fi.lowpass.
+FaustScript reference output of the faustscript block 16 of docs/LANGUAGE.md, which opens with let src1 os.sawtooth.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let lpf1 fi.lowpass
+1  let src1 os.sawtooth
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: lpf1
-    faust: lpf1 = fi.lowpass(4, 2000);
+    name: src1
+    faust: src1 = os.sawtooth(220);
     needs: []
 
-2  lpf1 fi.lowpass(fc=400)
+2  let dly1 de.delay(4096, 1000)
     outcome: {"done":true,"reason":null}
-    gesture: replace
-    name: lpf1
-    faust: lpf1 = fi.lowpass(fc=400);
+    gesture: place
+    name: dly1
+    faust: dly1 = de.delay(4096, 1000);
     needs: []
 
-3  _ lpf1
+3  let fb1 _ * 0.5
     outcome: {"done":true,"reason":null}
-    gesture: bypass
-    name: lpf1
-    faust: lpf1 = fi.lowpass(fc=400);
+    gesture: place
+    name: fb1
+    faust: fb1 = _ * 0.5;
     needs: []
 
-4  !_ lpf1
+4  src1 : dly1
     outcome: {"done":true,"reason":null}
-    gesture: bypass
-    name: lpf1
-    faust: lpf1 = fi.lowpass(fc=400);
-    needs: []
+    gesture: wire
+    name: null
 
-5  ! lpf1
+5  dly1 ~ fb1
     outcome: {"done":true,"reason":null}
-    gesture: remove
-    name: lpf1
-    faust: lpf1 = fi.lowpass(fc=400);
-    needs: []
+    gesture: wire
+    name: null
 
-6  !let lpf1
+6  dly1 : process
     outcome: {"done":true,"reason":null}
-    gesture: release
-    name: lpf1
+    gesture: wire
+    name: null
 
 --- write
 
 import("stdfaust.lib");
-process = 0;
+src1 = os.sawtooth(220);
+dly1 = de.delay(4096, 1000);
+fb1 = _ * 0.5;
+process = src1 : route(1, 1, 1,1) : ((+ : dly1) ~ fb1);

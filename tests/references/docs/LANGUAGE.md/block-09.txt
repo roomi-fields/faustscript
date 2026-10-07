@@ -1,21 +1,41 @@
-FaustScript reference output of the faustscript block 9 of docs/LANGUAGE.md, which opens with voix(freq=110, fc=800)  os.sawtooth(freq=freq) : fi.lowpass(fc=fc).
+FaustScript reference output of the faustscript block 9 of docs/LANGUAGE.md, which opens with fi.lowpass(N=4, fc=2000)  fi.lowpass(N, fc).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  voix(freq=110, fc=
+1  fi.lowpass(N=4, fc=
     outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
     gesture: null
     name: null
 
-1  800
+1  2000
     outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
 
-1  os.sawtooth(freq=freq) : fi.lowpass(fc=fc)
-    outcome: {"done":false,"reason":"os does not exist"}
+1  fi.lowpass(N, fc)
+    outcome: {"done":true,"reason":null}
     gesture: wire
+    name: null
+
+2  fc.min = 2
+    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
+    gesture: null
+    name: null
+
+3  fc.max = 8000
+    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
+    gesture: null
+    name: null
+
+4  fc.scale = log
+    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
+    gesture: null
+    name: null
+
+5  fc.unit = Hz
+    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
+    gesture: null
     name: null
 
 --- write

@@ -1,50 +1,36 @@
-FaustScript reference output of the faustscript block 19 of docs/LANGUAGE.md, which opens with let lpf1 fi.lowpass(fc=800).
+FaustScript reference output of the faustscript block 19 of docs/LANGUAGE.md, which opens with let rev1 re.mono_freeverb.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let lpf1 fi.lowpass(fc=800)
+1  let rev1 re.mono_freeverb
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: lpf1
-    faust: lpf1 = fi.lowpass(fc=800);
+    name: rev1
+    faust: rev1 = re.mono_freeverb(0.7, 0.5, 0.3, 30);
     needs: []
 
-2  let lfo1 os.osc(freq=0.2)
+2  rev1 re.mono_freeverb(damp=0.9)
+    outcome: {"done":true,"reason":null}
+    gesture: replace
+    name: rev1
+    faust: rev1 = re.mono_freeverb(damp=0.9);
+    needs: []
+
+3  !let rev1
+    outcome: {"done":true,"reason":null}
+    gesture: release
+    name: rev1
+
+4  let rev1 re.mono_freeverb(damp=0.9)
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: lfo1
-    faust: lfo1 = os.osc(freq=0.2);
+    name: rev1
+    faust: rev1 = re.mono_freeverb(damp=0.9);
     needs: []
-
-3  lpf1.fc = 400                        // one port
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
-    gesture: null
-    name: null
-
-4  lpf1(fc=400, N=
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
-    gesture: null
-    name: null
-
-4  5
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
-
-5  lpf1.fc.min = 20                     // an attribute of the port
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
-    gesture: null
-    name: null
-
-6  lfo1 : lpf1.fc
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
 
 --- write
 
 import("stdfaust.lib");
-lpf1 = fi.lowpass(fc=800);
-lfo1 = os.osc(freq=0.2);
+rev1 = re.mono_freeverb(damp=0.9);
 process = 0;

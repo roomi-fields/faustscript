@@ -1,35 +1,22 @@
-FaustScript reference output of the faustscript block 26 of docs/LANGUAGE.md, which opens with let micro _.
+FaustScript reference output of the faustscript block 26 of docs/LANGUAGE.md, which opens with let lpf1 fi.lowpass.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let micro _
-    outcome: {"done":true,"reason":null}
-    gesture: place
-    name: micro
-    faust: micro = _;
-    needs: []
-
-2  let lpf1 fi.lowpass
+1  let lpf1 fi.lowpass
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lpf1
     faust: lpf1 = fi.lowpass(4, 2000);
     needs: []
 
-3  micro : lpf1 : process
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
-
-4  micro !: lpf1
-    outcome: {"done":true,"reason":null}
+2  _ : lpf1 : process
+    outcome: {"done":false,"reason":"_ does not exist"}
     gesture: wire
     name: null
 
 --- write
 
 import("stdfaust.lib");
-micro = _;
 lpf1 = fi.lowpass(4, 2000);
-process = lpf1;
+process = 0;
