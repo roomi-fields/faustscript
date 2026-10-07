@@ -7403,10 +7403,9 @@ rnoise  no.rnoise
   faustwasm.unavailable:arc4random
   // DOES NOT COMPILE: ERROR : calling foreign function 'arc4random' is not allowed in this compilation mode
 
-rnoises(N:4)  no.rnoises(N, i)
-  i.nature:signal
-  // 1 input, 0 output
-  // i becomes a signal: the compiler refuses a value in this place
+rnoises(N:4, i:1)  no.rnoises(N, i)
+  faustwasm.unavailable:arc4random
+  // DOES NOT COMPILE: ERROR : calling foreign function 'arc4random' is not allowed in this compilation mode
 
 rotate(N:1, a:0.78)  ho.rotate(N, a)
   output.min:-1.41341

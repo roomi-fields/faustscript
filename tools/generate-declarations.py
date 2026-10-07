@@ -1251,10 +1251,13 @@ def verify(decls, stats):
 
     # what failed: we look for the tweak that repairs it. A tweak changes only
     # one parameter: two faults in the same declaration take as many rounds, and
-    # we stop as soon as a round repairs nothing more.
+    # we stop as soon as a round repairs nothing more. The refusal of a foreign
+    # function holds whatever the values: a tweak that goes through only hides
+    # the call, and the widths it yields are not the module's.
     for _ in range(4):
         broken = [d for d in testable
-                  if d['error'] and d['error'].startswith(('ERROR', 'error'))]
+                  if d['error'] and d['error'].startswith(('ERROR', 'error'))
+                  and not re.search(FOREIGN, d['error'])]
         if not broken or not repair(broken, stats):
             break
 

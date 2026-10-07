@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Prettier, EditorConfig, a TypeScript configuration ready for the migration, GitHub CI
   and release workflows.
 
+### Fixed
+
+- A module without a width line in the catalogue has no width: reading no longer gives it the
+  next module's, and generation no longer gives a module faustwasm refuses (`rnoises`) the
+  widths of a form that only hides the refused call.
+
 ## [0.1.0] - 2026-08-07
 
 ### Added

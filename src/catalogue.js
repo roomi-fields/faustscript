@@ -35,7 +35,11 @@ export function readCatalogue(text) {
   const modules = new Map()
   let courant = null
 
-  for (const line of childrenOf(arbre.topNode, 'Line')) {
+  for (let line = arbre.topNode.firstChild; line; line = line.nextSibling) {
+    if (line.name === 'Comment' && courant) {
+      readWidths(contenu(text, line), courant)
+      continue
+    }
     const definition = line.getChild('Definition')
     if (definition) {
       courant = readDefinition(text, definition)
@@ -47,7 +51,6 @@ export function readCatalogue(text) {
       readAttribute(text, setting, courant)
     }
   }
-  readWidths(text, modules)
   inferMissingWidths(modules)
   return modules
 }
@@ -74,21 +77,18 @@ function inferMissingWidths(modules) {
   }
 }
 
-/** The input and output counts, which generation writes as a comment.
+/** The input and output counts, which generation writes as a comment of the
+ * module's entry, from its definition to the next one. An entry without that
+ * comment leaves the module without counts.
  *
  * ⚠️ A stopgap: this information is measured by the compiler, so it is sound,
- * but it travels in a comment rather than in an attribute. To be taken up on
- * the catalogue side — here we merely read it.
+ * but it travels in a comment rather than in an attribute.
  */
-function readWidths(text, modules) {
-  const form = /^(\w+)[^\n]*\n(?:[^\n]*\n)*?\s*\/\/ (\d+) inputs?, (\d+) outputs?/gm
-  for (const trouve of text.matchAll(form)) {
-    const module = modules.get(trouve[1])
-    if (!module) {
-      continue
-    }
-    module.inputs = Number(trouve[2])
-    module.outputs = Number(trouve[3])
+function readWidths(comment, module) {
+  const counts = comment.match(/^\/\/ (\d+) inputs?, (\d+) outputs?$/)
+  if (counts) {
+    module.inputs = Number(counts[1])
+    module.outputs = Number(counts[2])
   }
 }
 
