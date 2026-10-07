@@ -247,7 +247,7 @@ _ : (_,_)    <span class="cc">→ ERROR : sequential composition A:B</span></cod
 
   <div class="col">
     <h3>How it is decorated</h3>
-    <pre><code>saw1 <span class="cx">:8</span> lpf1     <span class="cc">// connect as eight instances</span>
+    <pre><code>saw1 <span class="cx">:8</span> lpf1     <span class="cc">// connect as eight copies</span>
 saw1 <span class="cx">!:</span> lpf1     <span class="cc">// cut the wire</span></code></pre>
     <p><strong>And the bare <code>:</code> stops refusing</strong> — it adapts, like a polyphonic
     cable in VCV Rack.</p>
@@ -255,14 +255,14 @@ saw1 <span class="cx">!:</span> lpf1     <span class="cc">// cut the wire</span>
       <thead><tr><th>what arrives</th><th>what FaustX does</th></tr></thead>
       <tbody>
         <tr><td>one channel into several</td><td>it spreads over all of them</td></tr>
-        <tr><td>several into a module's input</td><td>they sum — nothing goes silent</td></tr>
-        <tr><td>several into a named control</td><td>the first is taken</td></tr>
+        <tr><td>several into an instance's input</td><td>they sum — nothing goes silent</td></tr>
+        <tr><td>several into a named port</td><td>the first is taken</td></tr>
       </tbody>
     </table>
     <p style="margin-top:16px"><strong>That distinction is VCV Rack's, to the letter</strong> — its
     voltage standards prescribe summing on an audio input and taking the first channel on a
     modulation input. And our notation already carries it: <code>saw8 : lpf1</code> targets the
-    module's input, <code>lfo8 : lpf1.cutoff</code> targets a control.</p>
+    instance's input, <code>lfo8 : lpf1.cutoff</code> targets a port.</p>
     <p><strong>It costs Faust nothing</strong>: since we translate, FaustX emits the
     <code>&lt;:</code>, the <code>:&gt;</code> or the bus that fits the widths it sees. The compiler
     receives widths that add up and never knows an adaptation happened.</p>
@@ -527,8 +527,8 @@ dly1 <span class="cx">~8</span> fb1     <span class="cc">// feed back eight chan
     compiles. 35 tests, a dozen of which invoke the real compiler. The catalogue declares all
     <strong>998 public Faust functions</strong>, generated from Faust's own documentation.</p>
     <p><strong>There is no sound here.</strong> FaustX emits Faust source; compiling it while the
-    audio runs, and swapping a module without dropping a sample, belongs to the host — that is where
-    the measured <strong>32 ms</strong> per module matters, against 620 ms for a fifty-module
+    audio runs, and swapping an instance without dropping a sample, belongs to the host — that is where
+    the measured <strong>32 ms</strong> per instance matters, against 620 ms for a fifty-instance
     program — both taken through libfaust compiled to WebAssembly, which is what a browser host
     runs.</p>
   </div>

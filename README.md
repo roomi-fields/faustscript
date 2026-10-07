@@ -115,9 +115,9 @@ like three players around one microphone.
 **One wire into several inputs is copied.** One LFO drives two filters exactly
 in phase — one LFO, not two.
 
-**Nothing is cut off abruptly.** A bypassed or removed module keeps running on
+**Nothing is cut off abruptly.** A bypassed or removed instance keeps running on
 silence, so what was ringing inside finishes ringing. Faust's own `ba.bypass1`
-does the opposite — measured, a reverb's 97 memory fields drop to 0, the module
+does the opposite — measured, a reverb's 97 memory fields drop to 0, the instance
 is erased; ours keeps 81.
 
 **A wrong line raises an error and the sound does not stop.** The graph is never
@@ -148,9 +148,9 @@ definitions, imports, operators, iterators and feedback — but not yet `with{}`
 parse whole.
 
 **There is no sound here.** FaustX emits Faust source. Compiling it while the
-audio runs, and swapping a module without dropping a sample, belongs to the
-host — that is where the measured **~32 ms** per module recompilation matters,
-against ~620 ms for a fifty-module program. Both are taken through libfaust
+audio runs, and swapping an instance without dropping a sample, belongs to the
+host — that is where the measured **~32 ms** per instance recompilation matters,
+against ~620 ms for a fifty-instance program. Both are taken through libfaust
 compiled to WebAssembly, which is what a browser host runs; rerun them with
 `node tools/measure-compilation.mjs`.
 

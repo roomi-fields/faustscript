@@ -20,7 +20,7 @@ flowchart LR
   parser --- fx
   fx -->|one result per line · Faust text| host
   host -->|Faust text| faust
-  faust -->|compiled module| host
+  faust -->|compiled instance| host
 ```
 
 The command `faustx` (`bin/faustx.js`) is a host of its own: it reads the two files under `lib/` and a `.fx` file, applies the file to an empty graph, and writes the whole program.
@@ -29,7 +29,7 @@ The command `faustx` (`bin/faustx.js`) is a host of its own: it reads the two fi
 
 1. **The grammar generates the parser, and the signs of the language live in the files under `lib/`.** The code reads the names of the tree's nodes, the catalogue and the templates; the text of a sign appears only in `src/faustx.grammar` and `lib/translation.fx`. Reason: renaming a sign or changing what a form becomes in Faust changes a file the code reads, and the published grammar is the parser that runs.
 2. **A living graph is the state, and each line is a gesture on it.** The transpiler keeps the instances and the wires between calls; a line changes the graph and returns what it changed. Reason: a line typed while the sound plays describes a change, not a program, and only the graph knows what a name designates (`lpf1(fc:400)` is a call or a setting depending on what is placed).
-3. **Each instance is written alone, as one Faust definition.** A gesture that changes an instance's circuit returns that definition and the instances it cites. Reason: the host compiles one module instead of the program, which costs about nineteen times less for fifty modules (§8).
+3. **Each instance is written alone, as one Faust definition.** A gesture that changes an instance's circuit returns that definition and the instances it cites. Reason: the host compiles one instance instead of the program, which costs about nineteen times less for fifty instances (§8).
 4. **The program is written in stages as soon as a signal is shared.** When one instance feeds more than one destination, the program places the instances in stages and routes the channels between them, so each instance is written once. Reason: Faust builds one circuit for each occurrence of a name, so a name written twice would make two circuits with two memories.
 
 ## 3. Components
@@ -136,20 +136,20 @@ The transpiler is an ES module for Node 22 or later, and runs in the host's proc
 
 ## 8. Quality
 
-The cost that counts is the compilation the host performs after a gesture; the transpiler's own work per line is small beside it, and not measured. `tools/measure-compilation.mjs` measures what a gesture saves by recompiling one module: the median of twelve compilations after three warm-up rounds, with the compiler's cache defeated at each round. The figures move by about a tenth from one run to the next.
+The cost that counts is the compilation the host performs after a gesture; the transpiler's own work per line is small beside it, and not measured. `tools/measure-compilation.mjs` measures what a gesture saves by recompiling one instance: the median of twelve compilations after three warm-up rounds, with the compiler's cache defeated at each round. The figures move by about a tenth from one run to the next.
 
 | what is recompiled | browser (libfaust-wasm 0.16.6, Faust 2.86.2) | native (Faust 2.70.3, same WebAssembly backend, 34 ms start-up removed) |
 | --- | --- | --- |
-| one module | ~32 ms | ~30 ms |
-| 5 modules | ~64 ms | ~60 ms |
-| 20 modules | ~200 ms | ~185 ms |
-| 50 modules | ~620 ms | ~520 ms |
+| one instance | ~32 ms | ~30 ms |
+| 5 instances | ~64 ms | ~60 ms |
+| 20 instances | ~200 ms | ~185 ms |
+| 50 instances | ~620 ms | ~520 ms |
 
-A fifty-module program costs about 19 times one module (17 to 21 depending on the run): this ratio is why an instance is the unit of compilation (`CADRE.md` R16).
+A fifty-instance program costs about 19 times one instance (17 to 21 depending on the run): this ratio is why an instance is the unit of compilation (`CADRE.md` R16).
 
 The separation costs computation in the compiled program, measured with Faust 2.70.3:
 
-- compiling per module instead of as one block: +12.9 % operations, since Faust no longer optimises across modules;
+- compiling per instance instead of as one block: +12.9 % operations, since Faust no longer optimises across instances;
 - a controlled port instead of a constant: +17 % operations on a third-order filter;
 - the instance's name: no operation, since a Faust group is a label.
 

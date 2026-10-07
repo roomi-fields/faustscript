@@ -125,9 +125,9 @@ A port named this way cannot bear the name of a placed instance, and the reverse
 
 ### 3.4 Ports
 
-A port is a parameter that the author writes, at placement or later. A parameter that is not written stays a constant, which Faust precomputes; a control costs computation, so one names what one controls.
+A port is what a setting or a wire targets on an instance, by its name after the dot: each parameter of the instance's module that carries no nature, or each `key:value` the author named in a Faust body (§3.3). A port that is not written stays a constant, which Faust precomputes; a control costs computation, so one names what one controls.
 
-A port whose bounds are known becomes a control, a slider between those bounds. The bounds come from the catalogue, or from `min` and `max` written on the instance. A port without bounds stays a constant: FaustX guesses no range, and the author gives `min` and `max` to make the port controllable.
+A port that is written and whose bounds are known becomes a control, a slider between those bounds. The bounds come from the catalogue, or from `min` and `max` written on the instance. A port without bounds stays a constant: FaustX guesses no range, and the author gives `min` and `max` to make the port controllable.
 
 Setting a port that is still a constant recompiles the instance, so that the control exists.
 
@@ -164,11 +164,11 @@ A wire between two widths that Faust's `:` would refuse is written as the routin
 | what arrives | what happens |
 | --- | --- |
 | one channel into several | it is sent to all of them |
-| several channels into a module's input | they are summed |
+| several channels into an instance's input | they are summed |
 | several channels into a named port | the first channel is taken |
 | widths with no whole ratio | the destination takes the number of channels it accepts |
 
-The dot tells the two middle cases apart: a module's input carries audio, which is summed; a named port carries a control, which takes one value. Several wires into one port are summed, as an effect send sums its sources.
+The dot tells the two middle cases apart: an instance's input carries audio, which is summed; a named port carries a control, which takes one value. Several wires into one port are summed, as an effect send sums its sources.
 
 ### 4.3 A cut wire carries silence
 
@@ -271,7 +271,7 @@ src1.3 : dst1.5                      // channel 3 into channel 5
 lpfs.3.fc:400                        // the third filter of the bank
 ```
 
-In a bank of one-channel modules, the channel is the module: `lpfs.3` is the third filter.
+In a bank of one-channel bodies, the channel is the copy: `lpfs.3` is the third filter.
 
 ## 8. The sink and the inputs
 

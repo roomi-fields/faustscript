@@ -19,7 +19,7 @@ FaustX is a superset of Faust for live coding, and its transpiler: it reads a Fa
 
 ## 4. Knows
 
-- **R7.** Faust's syntax and the 998 modules its libraries declare, with their ports, starting values and bounds, through the catalogue.
+- **R7.** Faust's syntax and the 998 modules its libraries declare, with their parameters, starting values and bounds, through the catalogue.
 - **R8.** The signs of FaustX, through the grammar that generates its parser and through the templates.
 
 ## 5. Does not know
@@ -28,7 +28,7 @@ FaustX is a superset of Faust for live coding, and its transpiler: it reads a Fa
 
 ## 6. Refuses
 
-- **R10.** A line that does not read, an empty line or expression, an unknown form, a name already placed, a name that does not exist, a setting that is incomplete, does not target a port or targets a port the instance does not carry (a port of its catalogue module, or a setting its author named in its Faust body), a setting driven by a signal that carries one of the program's inputs, a wire that does not exist: the refusal carries a stable code and a sentence that names the cause and the name involved, and the line changes nothing.
+- **R10.** A line that does not read, an empty line or expression, an unknown form, a name already placed, a name that does not exist, a setting that is incomplete, does not target a port or targets a port the instance does not carry (a parameter of its module, or a `key:value` its author named in its Faust body), a port driven by a signal that carries one of the program's inputs, a wire that does not exist: the refusal carries a stable code and a sentence that names the cause and the name involved, and the line changes nothing.
 - **R11.** An error the Faust compiler raises on the Faust FaustX writes stays the compiler's message; the host receives it from the compiler.
 
 ## 7. Invariants
@@ -40,4 +40,4 @@ FaustX is a superset of Faust for live coding, and its transpiler: it reads a Fa
 
 ## 8. Cost
 
-- **R16.** One applied line has a measured cost, and a ceiling that only goes down. A gesture that recompiles returns one instance's Faust, so that the host compiles one module instead of the program.
+- **R16.** One applied line has a measured cost, and a ceiling that only goes down. A gesture that recompiles returns one instance's Faust, so that the host compiles one instance instead of the program.

@@ -34,5 +34,5 @@ When two written rules contradict each other, the first force of this list that 
 1. **Faust is the reference.** A writing that Faust reads keeps Faust's meaning. A statement about what Faust does cites its level: the compiler's execution, then its source, then its documentation.
 2. **The sound does not stop.** Between refusing a writing and giving it the meaning that keeps the sound going, the second wins when that meaning is unique.
 3. **The signs are fixed.** The signs of the language are those of `LANGUAGE.md`; a new expressiveness composes existing decorations, and adding a sign is a decision of Romain.
-4. **FaustX knows no host.** What concerns the output devices, musical time, scenes or the substitution of a running module belongs to the host, which knows FaustX.
+4. **FaustX knows no host.** What concerns the output devices, musical time, scenes or the substitution of a running instance belongs to the host, which knows FaustX.
 5. **One person maintains the project**, assisted by agents. At equal merit on everything else, the solution one person can maintain wins.

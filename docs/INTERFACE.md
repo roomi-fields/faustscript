@@ -80,14 +80,14 @@ The gesture says what the line does to the graph, and what the host has to compi
 | `place` | `let lpf1 lowpass(fc:800)` | adds the instance `lpf1` | `faust`, `needs` |
 | `replace` | `lpf1 lowpass(fc:400)` | replaces the body of `lpf1`; its other settings stay | `faust`, `needs` |
 | `release` | `!let lpf1` | deletes `lpf1` and its wires; the name becomes free | — |
-| `remove` | `!lpf1` | takes `lpf1` and its wires out of the flow; the name stays taken | `faust`, `needs` |
+| `remove` | `! lpf1` | takes `lpf1` and its wires out of the flow; the name stays taken | `faust`, `needs` |
 | `bypass` | `_ lpf1`, `!_ lpf1` | lets the signal through `lpf1`, or puts `lpf1` back | `faust`, `needs` |
 | `set` | `lpf1.fc:400` | records the value of the port `fc` | `port`, `value`, `path` |
 | `wire` | `osc1 : lpf1`, `osc1 !: lpf1` | adds or cuts wires | — |
 
-**The ports of an instance.** An instance whose body is a catalogue module carries that module's ports (§8). An instance whose body is a Faust expression carries the settings its author named in that body: `let lpf1 fi.lowpass(3, cutoff:800)` carries the port `cutoff`. A setting or a wire that targets any other port is refused (§5).
+**The ports of an instance.** An instance whose body is a module carries the parameters of that module that carry no nature (§8). An instance whose body is a Faust expression carries the ports its author named in that body: `let lpf1 fi.lowpass(3, cutoff:800)` carries the port `cutoff`. A setting or a wire that targets any other port is refused (§5).
 
-**The control path.** An instance becomes a Faust group named after it, and a port a slider inside that group: `let lpf1 lowpass(fc:800)` writes `lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc…", 800, 2, 8000, …)));`, and `lpf1.fc:400` returns the path `/lpf1/fc`. A `set` compiles nothing: the host writes the value on the running circuit at that path. The prefix that a compiled program adds above the program root is the host's.
+**The control path.** An instance becomes a Faust group named after it, and a control a slider inside that group: `let lpf1 lowpass(fc:800)` writes `lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc…", 800, 2, 8000, …)));`, and `lpf1.fc:400` returns the path `/lpf1/fc`. A `set` compiles nothing: the host writes the value on the running circuit at that path. The prefix that a compiled program adds above the program root is the host's.
 
 **Guard** — `tests/unit/transpiler.test.js` (each gesture says what it touched, and what has to be recompiled; a module driven by another names what it needs); target, faustx-zj5.9: a `set` returns its port, its value and its path; target, faustx-zj5.10: the interface test.
 
@@ -121,12 +121,12 @@ export type RefusalCode =
 | `INCOMPLETE_SETTING` | a setting without its port or its value | `incomplete setting: <text>` |
 | `SETTING_WITHOUT_PORT` | `lpf1:3` | `a setting targets a port: lpf1` |
 | `UNKNOWN_PORT` | a setting or a wire that targets a port the instance does not carry: `lpf1.nope:3`, `osc1 : lpf1.nope` | `lpf1 has no port nope` |
-| `SETTING_FROM_INPUT` | drives a setting with a signal that carries a program input | `in1 carries one of the program's inputs: a setting can only be driven by a signal` |
+| `SETTING_FROM_INPUT` | drives a port with a signal that carries a program input | `in1 carries one of the program's inputs: a port is driven by a signal, never by an input` |
 | `NO_SUCH_WIRE` | `osc1 !: lpf1` where no wire joins them | `no wire between osc1 and lpf1` |
 
 An error the Faust compiler raises on the Faust that FaustX writes is the compiler's message: the host receives it from the compiler.
 
-**Guard** — `tests/unit/transpiler.test.js` (a faulty line is refused without touching the graph; a setting cannot be driven by a program input); target, faustx-zj5.9: each code of the list is produced by its line, every refusal carries a code of the list, and the graph view after a refused line equals the view before it; target, faustx-zj5.7: each refused example of the language reference carries its code.
+**Guard** — `tests/unit/transpiler.test.js` (a faulty line is refused without touching the graph; a port cannot be driven by a program input); target, faustx-zj5.9: each code of the list is produced by its line, every refusal carries a code of the list, and the graph view after a refused line equals the view before it; target, faustx-zj5.7: each refused example of the language reference carries its code.
 
 ## 6. `write`
 
@@ -144,7 +144,7 @@ export interface GraphView {
 
 export interface InstanceView {
   readonly name: string
-  readonly module: string
+  readonly body: string
   readonly settings: Readonly<Record<string, string>>
   readonly bypassed: boolean
   readonly removed: boolean
@@ -164,7 +164,7 @@ export interface WireEnd {
 }
 ```
 
-`graph` returns a copy of the graph at the instant of the call, frozen in depth: a later `apply` does not change it, and writing into it throws without reaching the graph. Instances come in the order they were placed, wires in the order they were laid. `module` is the name of a catalogue module, or the Faust expression of the body as written. `removed` marks an instance taken out of the flow, whose name stays taken; `computed` marks a computed signal, an instance the transpiler places under a name of its own for an expression such as `lfo1 * 3800 + 400`. A wire end whose `port` is not `null` drives that port of the instance; the sink is a wire end under its reserved name, `process`. `width` is the number of instances a wire places (`saw1 :8 lpf1`), `null` when it places none; `loop` marks a feedback wire, whose output returns to the input.
+`graph` returns a copy of the graph at the instant of the call, frozen in depth: a later `apply` does not change it, and writing into it throws without reaching the graph. Instances come in the order they were placed, wires in the order they were laid. `body` is the name of the module the body calls, or the Faust expression of the body as written; its settings are in `settings`. `removed` marks an instance taken out of the flow, whose name stays taken; `computed` marks a computed signal, an instance the transpiler places under a name of its own for an expression such as `lfo1 * 3800 + 400`. A wire end whose `port` is not `null` drives that port of the instance; the sink is a wire end under its reserved name, `process`. `width` is the number of copies a wire places (`saw1 :8 lpf1`), `null` when it places none; `loop` marks a feedback wire, whose output returns to the input.
 
 **Guard** — target, faustx-zj5.10: the interface test checks that the view is frozen in depth, that a write into it throws and leaves `write()` unchanged, and that a view taken before a gesture is the same after it.
 
@@ -186,7 +186,7 @@ export interface Port {
 }
 ```
 
-`catalogue` returns the 998 modules the catalogue declares, as one value frozen in depth, the same at each call. A port is a parameter the author sets: its name, its starting value as written, and its bounds. A parameter that carries a nature (a function, a signal) is not a port.
+`catalogue` returns the 998 modules the catalogue declares, as one value frozen in depth, the same at each call. A `Port` is a parameter of the module that carries no nature (a function, a signal): its name, its starting value as written, and its bounds. Each one is a port of the instances whose body calls the module.
 
 **Guard** — `tests/unit/graph.test.js` (the catalogue carries the 998 Faust modules); target, faustx-zj5.10: the interface test checks that the value is frozen in depth and that a write into it throws.
 
