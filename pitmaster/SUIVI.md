@@ -6,7 +6,7 @@ sort et sa réponse va dans son ticket.
 ## Dernier tour
 
 - Date : 2026-10-07, fin d'après-midi.
-- Chantier courant : faustx-zj5 (FaustX au niveau de BPScript).
+- Chantier courant : faustx-zj5 (FaustScript au niveau de BPScript).
 - La séance a redémarré : l'agent de faustx-zj5.7 est perdu ; ses deux fichiers
   `tests/unit/language-examples*.js` restent non suivis, ticket en cours. Un agent neuf le reprend.
 - Tickets de code suspendus derrière faustx-zj5.27 (six paquets) : rien ne bouge dans `src/`
