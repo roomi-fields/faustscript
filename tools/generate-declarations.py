@@ -200,7 +200,11 @@ def files(root):
 
 
 def documented_blocks(root):
-    """Returns {name: (prefix, text of the block)} for each function a title names."""
+    """Returns {(prefix, name): text of the block} for each function a title names.
+
+    Two libraries may document the same name — `ma.SR` and `pl.SR`: each one
+    is a function of its own, under its prefix.
+    """
     out = {}
     for f in files(root):
         txt = f.read_text(errors='replace')
@@ -209,7 +213,7 @@ def documented_blocks(root):
             block = txt[title.end():following.start() if following else len(txt)]
             body = re.split(r'^//-{10,}\s*$', block, maxsplit=1, flags=re.M)[0]
             for prefix, name in TITLED.findall(title.group(1)):
-                out[name] = (prefix, body)
+                out[(prefix, name)] = body
     return out
 
 
@@ -1097,11 +1101,12 @@ def render(d):
     head = [f"{p}:{quote(d['values'][p])}" if p in d['values'] else p
             for p in d['params']
             if d['natures'].get(p) != 'signal']
-    body = f"{d['prefix']}.{d['name']}"
+    name = f"{d['prefix']}.{d['name']}"
+    body = name
     if d['params']:
         body += f"({', '.join(d['params'])})"
-    lines = [f"{d['name']}({', '.join(head)})  {body}" if head
-             else f"{d['name']}  {body}"]
+    lines = [f"{name}({', '.join(head)})  {body}" if head
+             else f"{name}  {body}"]
     for p in d['params']:
         if p in d['units']:
             lines.append(f"  {p}.unit:{d['units'][p]}")
@@ -1376,7 +1381,7 @@ def generate(root, versions):
     decls, failures = [], collections.Counter()
     stats = collections.Counter()
 
-    for name, (prefix, block) in sorted(blocks.items()):
+    for (prefix, name), block in sorted(blocks.items()):
         d, failure = declare(name, prefix, block, sigs.get(name), bodies.get(name, ''),
                              ui, uib, everywhere, stats)
         if failure:
@@ -1418,7 +1423,7 @@ def generate(root, versions):
     print('// @grame/faustwasm %s: libfaust %s, libraries %s (version.lib).'
           % (versions['faustwasm'], versions['libfaust'], versions['libraries']))
     print('// %d modules.' % len(done))
-    print('// A starting point to be corrected: the names are still Faust\'s own.')
+    print('// Each module bears Faust\'s name, its prefix included: fi.lowpass.')
     print('// Every declaration has been compiled with its starting values: the')
     print('// "N inputs, M outputs" line comes from the compiler, not from the text.')
     print('// A value marked GUESSED comes from no source: it is deduced from the')

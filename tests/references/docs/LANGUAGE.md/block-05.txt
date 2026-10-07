@@ -1,9 +1,9 @@
-FaustX reference output of the faustx block 5 of docs/LANGUAGE.md, which opens with let lpfs:8 lowpass.
+FaustX reference output of the faustx block 5 of docs/LANGUAGE.md, which opens with let lpfs:8 fi.lowpass.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let lpfs:8 lowpass
+1  let lpfs:8 fi.lowpass
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lpfs
@@ -15,7 +15,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: set
     name: lpfs
 
-2  lowpass
+2  fi.lowpass
     outcome: {"done":true,"reason":null}
     gesture: wire
     name: null

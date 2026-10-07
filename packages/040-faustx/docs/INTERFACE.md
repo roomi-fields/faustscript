@@ -80,8 +80,8 @@ The gesture says what the line does to the graph, and what the host has to compi
 
 | gesture | line | effect on the graph | returns |
 | --- | --- | --- | --- |
-| `place` | `let lpf1 lowpass(fc:800)` | adds the instance `lpf1` | `faust`, `needs` |
-| `replace` | `lpf1 lowpass(fc:400)` | replaces the body of `lpf1`; its other settings stay | `faust`, `needs` |
+| `place` | `let lpf1 fi.lowpass(fc:800)` | adds the instance `lpf1` | `faust`, `needs` |
+| `replace` | `lpf1 fi.lowpass(fc:400)` | replaces the body of `lpf1`; its other settings stay | `faust`, `needs` |
 | `release` | `!let lpf1` | deletes `lpf1` and its wires; the name becomes free | — |
 | `remove` | `! lpf1` | takes `lpf1` and its wires out of the flow; the name stays taken | `faust`, `needs` |
 | `bypass` | `_ lpf1`, `!_ lpf1` | lets the signal through `lpf1`, or puts `lpf1` back | `faust`, `needs` |
@@ -90,7 +90,7 @@ The gesture says what the line does to the graph, and what the host has to compi
 
 **The ports of an instance.** An instance whose body is a module carries the parameters of that module that carry no nature (§9). An instance whose body is a Faust expression carries the ports its author named in that body: `let lpf1 fi.lowpass(3, cutoff:800)` carries the port `cutoff`. A setting or a wire that targets any other port is refused (§5).
 
-**The control path.** An instance becomes a Faust group named after it, and a control a slider inside that group: `let lpf1 lowpass(fc:800)` writes `lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc…", 800, 2, 8000, …)));`, and `lpf1.fc:400` returns the path `/lpf1/fc`. A `set` compiles nothing: the host writes the value on the running circuit at that path. The prefix that a compiled program adds above the program root is the host's.
+**The control path.** An instance becomes a Faust group named after it, and a control a slider inside that group: `let lpf1 fi.lowpass(fc:800)` writes `lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc…", 800, 2, 8000, …)));`, and `lpf1.fc:400` returns the path `/lpf1/fc`. A `set` compiles nothing: the host writes the value on the running circuit at that path. The prefix that a compiled program adds above the program root is the host's.
 
 **Guard** — `tests/unit/transpiler.test.js` (each gesture says what it touched, and what has to be recompiled; a module driven by another names what it needs); target, faustx-zj5.9: a `set` returns its port, its value and its path; target, faustx-zj5.36: a blank line and a comment line return no result, and the next line keeps its number; the interface test.
 
@@ -134,7 +134,8 @@ export type RefusalCode =
 | `UNKNOWN_FORM` | a form the grammar reads and no gesture handles | `form` | `unknown form: <form>` |
 | `ALREADY_PLACED` | `let lpf1 …` when `lpf1` is placed | `name` | `lpf1 is already placed` |
 | `UNKNOWN_NAME` | names an instance that does not exist, or gives a new body to a name that is not placed | `name` | `ghost does not exist` |
-| `UNAVAILABLE_MODULE` | places or gives a body that calls a module the declared faustwasm does not provide: `let n1 rnoises` | `module`, `function` | `rnoises calls arc4random, which faustwasm does not provide` |
+| `UNKNOWN_NAME` | writes the last member of a catalogue module's name without its prefix, where no instance bears it: `let lpf1 lowpass`, `saw1 : lowpass` | `name`, `modules` | `lowpass is not a module; fi.lowpass is` |
+| `UNAVAILABLE_MODULE` | places or gives a body that calls a module the declared faustwasm does not provide: `let n1 no.rnoises` | `module`, `function` | `no.rnoises calls arc4random, which faustwasm does not provide` |
 | `INCOMPLETE_SETTING` | a setting without its port or its value | `text` | `incomplete setting: <text>` |
 | `SETTING_WITHOUT_PORT` | `lpf1:3` | `name` | `a setting targets a port: lpf1` |
 | `UNKNOWN_PORT` | a setting or a wire that targets a port the instance does not carry: `lpf1.nope:3`, `osc1 : lpf1.nope` | `name`, `port` | `lpf1 has no port nope` |
@@ -145,7 +146,7 @@ export type RefusalCode =
 
 A module that faustwasm does not provide is one whose Faust calls a foreign function that faustwasm's WebAssembly backend refuses; the catalogue marks it (§9), and its sentence names that function. An error the Faust compiler raises on the Faust that FaustX writes is the compiler's message: the host receives it from the compiler.
 
-**Guard** — `tests/unit/transpiler.test.js` (a faulty line is refused without touching the graph; a port cannot be driven by a program input); `tests/unit/language-examples.test.js` (each refused example of the language reference carries its code); target, faustx-zj5.9: each code of the list is produced by its line with its parameters and its origin, every refusal carries a code of the list, and the graph view after a refused line equals the view before it.
+**Guard** — `tests/unit/transpiler.test.js` (a faulty line is refused without touching the graph; a port cannot be driven by a program input; a name without its prefix is refused, and its sentence names the modules); `tests/unit/language-examples.test.js` (each refused example of the language reference carries its code); target, faustx-zj5.9: each code of the list is produced by its line with its parameters and its origin, every refusal carries a code of the list, and the graph view after a refused line equals the view before it.
 
 ## 6. `write`
 
@@ -225,7 +226,7 @@ export interface Port {
 }
 ```
 
-`catalogue` returns the modules the catalogue declares, as one value frozen in depth, the same at each call and for every session. A `Port` is a parameter of the module that carries no nature (a function, a signal): its name, its starting value as written, and its bounds. Each one is a port of the instances whose body calls the module. `unavailable` is the foreign function a module calls that the declared faustwasm does not provide, `null` for a module it compiles; placing a module whose `unavailable` is not `null` is refused (§5).
+`catalogue` returns the modules the catalogue declares, each under its Faust name, prefix included (`fi.lowpass`), as one value frozen in depth, the same at each call and for every session. A `Port` is a parameter of the module that carries no nature (a function, a signal): its name, its starting value as written, and its bounds. Each one is a port of the instances whose body calls the module. `unavailable` is the foreign function a module calls that the declared faustwasm does not provide, `null` for a module it compiles; placing a module whose `unavailable` is not `null` is refused (§5).
 
 **Guard** — `tests/unit/graph.test.js` (the catalogue carries every module its header counts); `tests/unit/catalogue-source.test.js` (a module faustwasm refuses is marked with the function it calls); target, faustx-zj5.36: the interface test checks that the value is frozen in depth and that a write into it throws.
 

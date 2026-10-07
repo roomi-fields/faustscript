@@ -17,35 +17,35 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     faust: pedale = vgroup("pedale", hslider("pedale", 0.5, 0, 1, 0.01));
     needs: []
 
-31  let porte1 gate_mono(thresh:-55, att:0.001, hold:0.15, rel:0.05)
+31  let porte1 ef.gate_mono(thresh:-55, att:0.001, hold:0.15, rel:0.05)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: porte1
     faust: porte1 = vgroup("porte1", ef.gate_mono(hslider("thresh", -55, -80, 0, 0.001), 0.001, hslider("hold[unit:s][scale:log]", 0.15, 0.001, 10, 0.001), hslider("rel[unit:s][scale:log]", 0.05, 0.001, 10, 0.001)));
     needs: []
 
-32  let comp1  compressor_mono(ratio:4, thresh:-18, att:0.005, rel:0.15)
+32  let comp1  co.compressor_mono(ratio:4, thresh:-18, att:0.005, rel:0.15)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: comp1
     faust: comp1 = vgroup("comp1", co.compressor_mono(hslider("ratio", 4, 1, 20, 0.001), hslider("thresh", -18, -80, 0, 0.001), hslider("att[unit:s][scale:log]", 0.005, 0.001, 10, 0.001), hslider("rel[unit:s][scale:log]", 0.15, 0.001, 10, 0.001)));
     needs: []
 
-33  let drive1 cubicnl(drive:0.6, offset:0)
+33  let drive1 ef.cubicnl(drive:0.6, offset:0)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: drive1
     faust: drive1 = vgroup("drive1", ef.cubicnl(hslider("drive", 0.6, 0, 1, 0.001), 0));
     needs: []
 
-34  let creux1 resonhp(fc:180, Q:0.8, gain:1)
+34  let creux1 fi.resonhp(fc:180, Q:0.8, gain:1)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: creux1
     faust: creux1 = vgroup("creux1", fi.resonhp(hslider("fc[unit:Hz][scale:log]", 180, 20, 20000, 0.001), hslider("Q[scale:log]", 0.8, 0.5, 50, 0.001), hslider("gain", 1, 0, 1, 0.001)));
     needs: []
 
-36  let corps1 lowpass(N:3, fc:4200)
+36  let corps1 fi.lowpass(N:3, fc:4200)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: corps1
@@ -72,14 +72,14 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: set
     name: corps1
 
-42  let dly1   echo(maxDuration:2, duration:0.375, feedback:0.42)
+42  let dly1   ef.echo(maxDuration:2, duration:0.375, feedback:0.42)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: dly1
     faust: dly1 = vgroup("dly1", ef.echo(2, 0.375, hslider("feedback", 0.42, 0, 1, 0.001)));
     needs: []
 
-43  let rev1   mono_freeverb(fb1:0.86, fb2:0.66, damp:0.5, spread:17)
+43  let rev1   re.mono_freeverb(fb1:0.86, fb2:0.66, damp:0.5, spread:17)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: rev1

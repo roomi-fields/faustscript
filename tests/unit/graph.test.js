@@ -17,27 +17,27 @@ const neuf = () => {
 
 test('the catalogue carries every module its header counts', () => {
   assert.equal(catalogue.size, Number(text.match(/^\/\/ (\d+) modules\.$/m)[1]))
-  assert.equal(catalogue.get('lowpass').parameters.length, 2)
-  assert.equal(catalogue.get('resonlp').attribute('fc', 'unit'), 'Hz')
+  assert.equal(catalogue.get('fi.lowpass').parameters.length, 2)
+  assert.equal(catalogue.get('fi.resonlp').attribute('fc', 'unit'), 'Hz')
 })
 
 test("un name ne se pose qu'une fois", () => {
   const g = neuf()
-  assert.ok(g.place('saw1', 'sawtooth').done)
-  assert.ok(!g.place('saw1', 'sawtooth').done)
+  assert.ok(g.place('saw1', 'os.sawtooth').done)
+  assert.ok(!g.place('saw1', 'os.sawtooth').done)
 })
 
 test('connect exige que les deux bouts existent', () => {
   const g = neuf()
-  g.place('lpf1', 'lowpass')
+  g.place('lpf1', 'fi.lowpass')
   assert.ok(!g.connect({ name: 'zorg' }, { name: 'lpf1' }).done)
   assert.equal(g.wires.length, 0, 'a refusal leaves no trace')
 })
 
 test('releasing a name takes its wires with it', () => {
   const g = neuf()
-  g.place('saw1', 'sawtooth')
-  g.place('lpf1', 'lowpass')
+  g.place('saw1', 'os.sawtooth')
+  g.place('lpf1', 'fi.lowpass')
   g.connect({ name: 'saw1' }, { name: 'lpf1' })
   g.release('lpf1')
   assert.equal(g.wires.length, 0)
@@ -46,7 +46,7 @@ test('releasing a name takes its wires with it', () => {
 
 test('bypass, then put back', () => {
   const g = neuf()
-  g.place('lpf1', 'lowpass')
+  g.place('lpf1', 'fi.lowpass')
   g.bypass('lpf1')
   assert.ok(g.instance('lpf1').bypassed)
   g.bypass('lpf1', false)

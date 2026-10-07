@@ -28,19 +28,19 @@ let guitare _
 let pedale  hslider("pedale", 0.5, 0, 1, 0.01)   // a control, not an audio input:
                                                  // Faust refuses to let an input drive a port
 
-let porte1 gate_mono(thresh:-55, att:0.001, hold:0.15, rel:0.05)
-let comp1  compressor_mono(ratio:4, thresh:-18, att:0.005, rel:0.15)
-let drive1 cubicnl(drive:0.6, offset:0)
-let creux1 resonhp(fc:180, Q:0.8, gain:1)
+let porte1 ef.gate_mono(thresh:-55, att:0.001, hold:0.15, rel:0.05)
+let comp1  co.compressor_mono(ratio:4, thresh:-18, att:0.005, rel:0.15)
+let drive1 ef.cubicnl(drive:0.6, offset:0)
+let creux1 fi.resonhp(fc:180, Q:0.8, gain:1)
 
-let corps1 lowpass(N:3, fc:4200)
+let corps1 fi.lowpass(N:3, fc:4200)
     corps1.fc.min:400
     corps1.fc.max:4200
     corps1.fc.scale:log
     corps1.fc.unit:Hz
 
-let dly1   echo(maxDuration:2, duration:0.375, feedback:0.42)
-let rev1   mono_freeverb(fb1:0.86, fb2:0.66, damp:0.5, spread:17)
+let dly1   ef.echo(maxDuration:2, duration:0.375, feedback:0.42)
+let rev1   re.mono_freeverb(fb1:0.86, fb2:0.66, damp:0.5, spread:17)
 
 let envoi1 *(niveau:0.3)
 let sortie *(gain:0.8)

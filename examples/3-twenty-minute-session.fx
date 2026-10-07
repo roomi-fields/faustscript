@@ -27,9 +27,9 @@
 
 // --- 00:00  what is loaded --------------------------------------------------
 
-let bat1   beat(t:112)
-let envb   ar(at:0.004, rt:0.16)
-let basse  sawtooth(freq:55)
+let bat1   ba.beat(t:112)
+let envb   en.ar(at:0.004, rt:0.16)
+let basse  os.sawtooth(freq:55)
 let vcab   *
 let sortie *(gain:0.5)
 
@@ -49,7 +49,7 @@ bat1 : envb.gate
 //    no obvious notation presented itself, so the three lines are what one
 //    writes; to be reopened if use shows the gesture comes up often.
 
-let lpf1 resonlp(fc:420, Q:6, gain:0.9)
+let lpf1 fi.resonlp(fc:420, Q:6, gain:0.9)
 
 vcab : lpf1
 lpf1 : sortie
@@ -70,7 +70,7 @@ vcab !: sortie
 //    known, and lets the signal through as it is otherwise -- nothing is
 //    guessed. (LANGUAGE.md §6.)
 
-let lfo1 osc(freq:0.13) * 380 + 520
+let lfo1 os.osc(freq:0.13) * 380 + 520
 lfo1 : lpf1.fc
 
 
@@ -87,23 +87,23 @@ lpf1.Q:16
 //    field in the C produced, while six distinct settings give six. So it
 //    takes six lines for the bank to exist at all -- and those six lines are
 //    not playable. What we wanted to write:
-//        let clic:6 resonbp(fc:311 * 1.5^i, Q:60, gain:1)
+//        let clic:6 fi.resonbp(fc:311 * 1.5^i, Q:60, gain:1)
 //
 //    SETTLED SINCE: `i` is the rank of the copy, taken over from Faust's
 //    `par(i,6,…)`, and this exact line is now the one to write.
 //    (LANGUAGE.md §2.3.)
 //
-// ⛔ GAP: `let bruit noise` and a second `let bruit2 noise` are, in the Faust
+// ⛔ GAP: `let bruit no.noise` and a second `let bruit2 no.noise` are, in the Faust
 //    emitted, THE SAME circuit -- measured, the two outputs are the same
 //    `fTemp0`. A module with no port has nothing to tell it apart from its
 //    twin and the compiler merges them; the catalogue holds hundreds of
 //    such modules. The rule "= duplicates" only holds for what has at
 //    least one port.
 
-let bruit noise
-let envc  ar(at:0.001, rt:0.09)
+let bruit no.noise
+let envc  en.ar(at:0.001, rt:0.09)
 let vcac  *
-let clic:6 resonbp(fc:900, Q:60, gain:1)
+let clic:6 fi.resonbp(fc:900, Q:60, gain:1)
 
 bat1 : envc.gate
 (bruit, envc) : vcac : clic
@@ -120,14 +120,14 @@ clic.6.fc:1866
 // --- 05:00  replace a body, the memory stays --------------------------------
 //
 // ⛔ AMBIGUOUS: the new body carries the same `freq` port. Does it take over
-//    the current value (55) or the one `square`'s declaration gives (220)?
+//    the current value (55) or the one `os.square`'s declaration gives (220)?
 //    The language said the memory stays; it said nothing about ports.
 //
 //    SETTLED SINCE: a replacement keeps the instance and its other settings,
 //    and a setting written in the new body is the one that applies.
 //    (LANGUAGE.md §5.)
 
-basse square(freq:55)
+basse os.square(freq:55)
 
 
 // --- 06:30  open a feedback loop --------------------------------------------
@@ -141,7 +141,7 @@ basse square(freq:55)
 //    constant. Nothing in docs/LANGUAGE.md keeps a port with known bounds
 //    from becoming a control.
 
-let dly1 fdelay(n:96000, d:13000)
+let dly1 de.fdelay(n:96000, d:13000)
 let fb1  *(retour:0.55)
 
 lpf1 : dly1
@@ -151,7 +151,7 @@ dly1 : sortie
 
 // --- 08:00  modulate the delay time -----------------------------------------
 
-let lfo2 osc(freq:0.07) * 4000 + 9000
+let lfo2 os.osc(freq:0.07) * 4000 + 9000
 lfo2 : dly1.d
 
 
@@ -173,7 +173,7 @@ _ lpf1
 //    `!` rule with nothing added. The line below is therefore no longer the
 //    way to do it. (LANGUAGE.md §5.)
 
-lpf1 resonlp(fc:420, Q:16, gain:0.9)
+lpf1 fi.resonlp(fc:420, Q:16, gain:0.9)
 
 
 // --- 11:00  take the bank out of the flow -----------------------------------
@@ -185,8 +185,8 @@ lpf1 resonlp(fc:420, Q:16, gain:0.9)
 //
 // ⛔ AMBIGUOUS, and it is the worst of the review: these two lines differ by
 //    ONE SPACE and mean two opposite things.
-//        clic:12 resonbp(…)     replace the bank with twelve instances
-//        clic :12 resonbp(…)    connect clic to resonbp, in twelve copies
+//        clic:12 fi.resonbp(…)     replace the bank with twelve instances
+//        clic :12 fi.resonbp(…)    connect clic to fi.resonbp, in twelve copies
 //    Nothing tells them apart when read back, and one types fast.
 //
 //    SETTLED SINCE: spacing is significant, and it is a rule of the whole
@@ -206,7 +206,7 @@ lpf1 resonlp(fc:420, Q:16, gain:0.9)
 //    therefore what one writes; `!` still has no inverse.
 
 !let clic
- let clic:12 resonbp(fc:900, Q:60, gain:1)
+ let clic:12 fi.resonbp(fc:900, Q:60, gain:1)
 
 vcac : clic
 clic : sortie
@@ -226,16 +226,16 @@ clic.7.fc:2489
 //    for a bank of one-channel modules the channel IS the module. One rule,
 //    one reading. (LANGUAGE.md §7.)
 //
-// ⛔ GAP: `lowpass(N:2, …)` -- the filter order, again.
+// ⛔ GAP: `fi.lowpass(N:2, …)` -- the filter order, again.
 //
 // ⛔ GAP: eight lines for eight pitches. That is the price of `:8` with no
 //    rank, and nobody types them while playing.
 //
 //    SETTLED SINCE: `i` is the rank of the copy, so the eight pitches fit on
-//    the one `let` -- `let voix:8 sawtooth(freq:110 * (i+1))`.
+//    the one `let` -- `let voix:8 os.sawtooth(freq:110 * (i+1))`.
 //    (LANGUAGE.md §2.3.)
 
-let voix:8 sawtooth : lowpass(N:2, fc:1200)
+let voix:8 os.sawtooth : fi.lowpass(N:2, fc:1200)
 voix : sortie
 
 voix.1.freq:110
@@ -273,7 +273,7 @@ voix.5 : dly1
 //    exactly how a stereo piece is written.
 //    (LANGUAGE.md §8.)
 
-let rev1  stereo_freeverb(fb1:0.88, fb2:0.7, damp:0.4, spread:23)
+let rev1  re.stereo_freeverb(fb1:0.88, fb2:0.7, damp:0.4, spread:23)
 let envoi *(niveau:0.25)
 
 sortie : envoi : rev1
@@ -292,7 +292,7 @@ rev1 : process
 //    (LANGUAGE.md §5.)
 
 !let rev1
- let rev1 mono_freeverb(fb1:0.94, fb2:0.75, damp:0.3, spread:19)
+ let rev1 re.mono_freeverb(fb1:0.94, fb2:0.75, damp:0.3, spread:19)
 
 sortie : envoi : rev1
 rev1 : process

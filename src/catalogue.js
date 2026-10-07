@@ -132,6 +132,16 @@ function readAttribute(text, node, module) {
   module.attributes.set(`${nomParametre}.${nomAttribut}`, contenu(text, value))
 }
 
+/** Does a call reach a module by the names of its parameters?
+ *
+ * `fi.lowpass(fc:800)` does: its arguments are named, in any order. A call
+ * that passes one argument without its name — `fi.lowpass(3, 800)`,
+ * `fi.lowpass(3, cutoff:800)` — is written in Faust's order, and stays Faust.
+ */
+export function callsByName(arguments_) {
+  return !arguments_ || childrenOf(arguments_, 'Argument').every(a => a.getChild('Key'))
+}
+
 // --- reading the tree ------------------------------------------------------
 
 function contenu(text, node) {

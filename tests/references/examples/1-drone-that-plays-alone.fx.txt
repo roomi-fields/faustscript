@@ -3,28 +3,28 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-26  let osc1 sawtooth(freq:110)
+26  let osc1 os.sawtooth(freq:110)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: osc1
     faust: osc1 = vgroup("osc1", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 110, 0.08, 220, 0.001)));
     needs: []
 
-27  let osc2 sawtooth(freq:110.6)
+27  let osc2 os.sawtooth(freq:110.6)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: osc2
     faust: osc2 = vgroup("osc2", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 110.6, 0.08, 220, 0.001)));
     needs: []
 
-28  let osc3 sawtooth(freq:55)
+28  let osc3 os.sawtooth(freq:55)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: osc3
     faust: osc3 = vgroup("osc3", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 55, 0.08, 220, 0.001)));
     needs: []
 
-30  let lpf1 lowpass(N:3, fc:800)
+30  let lpf1 fi.lowpass(N:3, fc:800)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lpf1
@@ -51,21 +51,21 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: set
     name: lpf1
 
-36  let lfo1 osc(freq:0.15) * 900 + 1100
+36  let lfo1 os.osc(freq:0.15) * 900 + 1100
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lfo1
     faust: lfo1 = vgroup("lfo1", vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.15, 0.1, 12000, 0.001))) * 900 + 1100);
     needs: []
 
-37  let bat1 beat(t:96)
+37  let bat1 ba.beat(t:96)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: bat1
     faust: bat1 = ba.beat(96);
     needs: []
 
-38  let env1 adsr(at:0.01, dt:0.35, sl:0.45, rt:1.4)
+38  let env1 en.adsr(at:0.01, dt:0.35, sl:0.45, rt:1.4)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: env1
@@ -79,7 +79,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     faust: vca1 = *;
     needs: []
 
-41  let rev1 mono_freeverb(fb1:0.92, fb2:0.72, damp:0.45, spread:23)
+41  let rev1 re.mono_freeverb(fb1:0.92, fb2:0.72, damp:0.45, spread:23)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: rev1

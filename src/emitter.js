@@ -1,4 +1,5 @@
 import { parser } from './parser.js'
+import { callsByName } from './catalogue.js'
 
 // The emitter: it writes the Faust the graph describes.
 //
@@ -234,7 +235,7 @@ function headOfBody(module) {
 
 /** Translates the modules recognised inside an expression written by hand.
  *
- * `osc(freq:0.15) * 900 + 1100` becomes Faust: every known module takes its
+ * `os.osc(freq:0.15) * 900 + 1100` becomes Faust: every known module takes its
  * body and its settings, the rest — operators, numbers, whatever is already
  * Faust — passes as it stands.
  *
@@ -254,7 +255,8 @@ function translateExpression(text, instanceName, catalogue, templates) {
           return false // do not go down: the call is already rendered
         }
       }
-      if (node.name === 'Path') {
+      // the head of a call is the call's: a module alone is its body
+      if (node.name === 'Path' && node.node.parent?.name !== 'NamedCall') {
         const name = text.slice(node.from, node.to)
         if (catalogue.has(name)) {
           remplacements.push({
@@ -275,42 +277,48 @@ function translateExpression(text, instanceName, catalogue, templates) {
   return rendered
 }
 
-/** A call: `lowpass(fc:800)` if the module is known, otherwise its keys alone. */
+/** A call: `fi.lowpass(fc:800)` if it reaches a module by its parameters'
+ *  names, otherwise its arguments in their order, each named one a free port. */
 function translateCall(text, node, instanceName, catalogue, templates) {
   const head = node.getChild('Path') ?? node.getChild('Operator')
   const name = head ? text.slice(head.from, head.to) : null
   const listeDArguments = node.getChild('Arguments')
 
-  const settings = new Map()
+  const arguments_ = []
   for (let e = listeDArguments?.firstChild; e; e = e.nextSibling) {
     if (e.name !== 'Argument') {
       continue
     }
     const key = e.node.getChild('Key')
     const value = e.node.getChild('Value')
-    if (key && value) {
-      settings.set(text.slice(key.from, key.to - 1), text.slice(value.from, value.to))
-    }
+    arguments_.push({
+      key: key ? text.slice(key.from, key.to - 1) : null,
+      value: value ? text.slice(value.from, value.to) : text.slice(e.from, e.to),
+    })
   }
 
-  if (catalogue.has(name)) {
+  if (catalogue.has(name) && callsByName(listeDArguments)) {
+    const settings = new Map(arguments_.map(({ key, value }) => [key, value]))
     return bodyOnly(instanceName, name, settings, catalogue, templates)
   }
 
-  // an operator, or a module we do not know: its keys become free ports
-  if (!settings.size) {
+  // an operator, a call in Faust's order, or a function the catalogue does
+  // not declare: what is named becomes a free port, the rest stays in place
+  if (!arguments_.some(({ key }) => key)) {
     return null
   }
-  const rendus = [...settings].map(([key, value]) =>
-    templates.fill('template.FreePort', {
-      label: key,
-      default: value,
-      min: templates.fallback('min'),
-      max: templates.fallback('max'),
-      step: templates.fallback('step'),
-    })
+  const rendus = arguments_.map(({ key, value }) =>
+    key
+      ? templates.fill('template.FreePort', {
+          label: key,
+          default: value,
+          min: templates.fallback('min'),
+          max: templates.fallback('max'),
+          step: templates.fallback('step'),
+        })
+      : value
   )
-  return `${name}(${rendus.join(', ')})`
+  return templates.fill('template.Call', { module: name, arguments: rendus.join(', ') })
 }
 
 /** The Faust body of a module, without the definition around it. */

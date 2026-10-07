@@ -6,6 +6,7 @@
 
 import { parser } from './parser.js'
 import { Outcome } from './graph.js'
+import { callsByName } from './catalogue.js'
 
 /** Applies a FaustX text to a graph, line by line.
  *
@@ -118,6 +119,10 @@ function slot(text, form, graph) {
   const multiplicity = multiple ? Number(contenu(text, multiple.getChild('Number'))) : 1
 
   const body = form.getChild('FreeBody')
+  const shortName = shortNameIn(text, body, graph)
+  if (shortName) {
+    return shortName
+  }
   const { module, settings } = readBody(text, body, graph)
   return graph.place(name, module, multiplicity, settings)
 }
@@ -127,9 +132,10 @@ function readBody(text, body, graph = null) {
   const appel = firstOf(body, 'NamedCall')
   if (appel && contenu(text, body) === contenu(text, appel)) {
     const name = contenu(text, appel.getChild('Path'))
-    // a module the catalogue does not know keeps its text: its arguments are
-    // positional, and reducing them to their name would lose them
-    if (graph && !graph.catalogue.has(name)) {
+    // a call in Faust's order, or to a function the catalogue does not
+    // declare, keeps its text: reducing its arguments to their names would
+    // lose the positional ones
+    if (graph && !(graph.catalogue.has(name) && callsByName(appel.getChild('Arguments')))) {
       return { module: contenu(text, body), settings: new Map() }
     }
     return {
@@ -158,6 +164,23 @@ function readArguments(text, node) {
   return settings
 }
 
+/** The refusal of a body that writes a module by the last member of its name.
+ *
+ * A module is written under its Faust name, prefix included: `lowpass` is not
+ * a writing of `fi.lowpass`. A name of one member that designates no placed
+ * instance and ends the name of a catalogue module is refused, and the refusal
+ * names the modules it ends.
+ */
+function shortNameIn(text, body, graph) {
+  for (const name of allOf(body, 'Path').map(path => contenu(text, path))) {
+    const sentence = graph.shortName(name)
+    if (sentence) {
+      return Outcome.refused(sentence)
+    }
+  }
+  return null
+}
+
 // --- the other gestures ------------------------------------------------------
 
 function bypass(text, form, graph) {
@@ -168,6 +191,10 @@ function bypass(text, form, graph) {
 function definir(text, form, graph) {
   const name = contenu(text, form.getChild('Path'))
   const body = form.getChild('NamedBody')
+  const shortName = shortNameIn(text, body, graph)
+  if (shortName) {
+    return shortName
+  }
   const { module, settings } = readBody(text, body, graph)
   // does the name designate a placed instance? then its body is replaced
   if (graph.instance(name)) {
@@ -342,6 +369,17 @@ function firstOf(node, type) {
     }
   }
   return null
+}
+
+/** Every node of this type, going down, in the order of the text. */
+function allOf(node, type, out = []) {
+  if (node?.name === type) {
+    out.push(node)
+  }
+  for (let e = node?.firstChild; e; e = e.nextSibling) {
+    allOf(e, type, out)
+  }
+  return out
 }
 
 function lineNumber(text, position) {

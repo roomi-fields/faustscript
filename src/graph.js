@@ -67,6 +67,29 @@ export class Graph {
     return this.catalogue.get(name)
   }
 
+  /** The modules whose Faust name ends with this member: `lowpass` gives
+   *  `fi.lowpass`, `SR` gives `ma.SR` and `pl.SR`. */
+  modulesEndingWith(member) {
+    if (!this.members) {
+      this.members = new Map()
+      for (const name of this.catalogue.keys()) {
+        const last = name.slice(name.lastIndexOf('.') + 1)
+        this.members.set(last, [...(this.members.get(last) ?? []), name])
+      }
+    }
+    return this.members.get(member) ?? []
+  }
+
+  /** What a name of one member that no instance bears is, when it ends the
+   *  name of catalogue modules: the sentence that names them; otherwise null. */
+  shortName(name) {
+    const modules = this.instances.has(name) ? [] : this.modulesEndingWith(name)
+    if (!modules.length || modules.includes(name)) {
+      return null
+    }
+    return `${name} is not a module; ${modules.join(', ')} ${modules.length > 1 ? 'are' : 'is'}`
+  }
+
   /** A name is free if it designates neither an instance nor a module. */
   free(name) {
     return !this.instances.has(name) && !this.catalogue.has(name)
@@ -134,7 +157,7 @@ export class Graph {
   connect(from, to, width = null, loop = false) {
     for (const end of [from, to]) {
       if (!this.known(end.name)) {
-        return Outcome.refused(`${end.name} does not exist`)
+        return Outcome.refused(this.shortName(end.name) ?? `${end.name} does not exist`)
       }
     }
     // a setting is driven by a signal, not by what travels through the program

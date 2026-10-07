@@ -40,18 +40,18 @@ A gesture sign written before a name is spaced from it: `_lpf1` and `!lpf1` are 
 `let` places an instance and names it: the first word is the name, the rest of the line is the body.
 
 ```faustx
-let lpf1 lowpass                     // one instance, every parameter at its starting value
-let lpf2 lowpass(fc:400)             // one parameter given
-let lpfs:8 lowpass                   // a bank of eight
-let voix:8 sawtooth : lowpass        // eight complete chains
+let lpf1 fi.lowpass                  // one instance, every parameter at its starting value
+let lpf2 fi.lowpass(fc:400)          // one parameter given
+let lpfs:8 fi.lowpass                // a bank of eight
+let voix:8 os.sawtooth : fi.lowpass  // eight complete chains
 let vca1 *                           // any Faust expression is a body
 ```
 
 A name is placed once. A second `let` on a placed name is refused, as Faust refuses a second definition of an identifier:
 
 ```faustx
-let lpf1 lowpass
-let lpf1 lowpass                     // refused: ALREADY_PLACED
+let lpf1 fi.lowpass
+let lpf1 fi.lowpass                  // refused: ALREADY_PLACED
 ```
 
 `let` is written at the root of the text. Faust's local scopes — `with{}`, `letrec{}`, `environment{}` — keep their Faust meaning and contain no `let`, because an instance named inside them could not be reached from outside.
@@ -61,9 +61,9 @@ let lpf1 lowpass                     // refused: ALREADY_PLACED
 A name placed by `let` designates one instance; Faust's `=` designates a definition that each use copies. Using a `let` name in two places connects the same circuit twice: the instance sums what enters it and sends its output to every destination, as an effect send does.
 
 ```faustx
-let voix1 sawtooth
-let voix2 sawtooth(freq:165)
-let rev1 mono_freeverb
+let voix1 os.sawtooth
+let voix2 os.sawtooth(freq:165)
+let rev1 re.mono_freeverb
 voix1 : rev1                         // both voices enter the same reverb
 voix2 : rev1
 rev1 : process
@@ -71,13 +71,13 @@ rev1 : process
 
 ### 2.3 Banks and the rank `i`
 
-A number stuck to the declared name makes the name designate that many copies of the body: `let lpfs:8 lowpass` is Faust's `par(i, 8, lowpass)`. The number belongs to the name, so a body made of several modules needs no parentheses: `let voix:8 sawtooth : lowpass`. The dot then reaches one copy, counted from 1 (`lpfs.3`), and the name alone reaches all of them.
+A number stuck to the declared name makes the name designate that many copies of the body: `let lpfs:8 fi.lowpass` is Faust's `par(i, 8, fi.lowpass)`. The number belongs to the name, so a body made of several modules needs no parentheses: `let voix:8 os.sawtooth : fi.lowpass`. The dot then reaches one copy, counted from 1 (`lpfs.3`), and the name alone reaches all of them.
 
 `i` is the rank of the copy inside a bank, from 0, as in Faust's `par(i, N, …)`. It lets the copies differ; eight identical copies would be reduced by Faust to one circuit.
 
 ```faustx
-let clic:6 resonbp(fc:311 * 1.5^i, Q:40)     // six resonators, six pitches
-let voix:8 sawtooth(freq:110 * (i+1))        // eight harmonics
+let clic:6 fi.resonbp(fc:311 * 1.5^i, Q:40)  // six resonators, six pitches
+let voix:8 os.sawtooth(freq:110 * (i+1))     // eight harmonics
 ```
 
 `i` has a meaning only in the body of a bank.
@@ -85,22 +85,28 @@ let voix:8 sawtooth(freq:110 * (i+1))        // eight harmonics
 The number of copies is a constant for Faust. A replacement that carries a new number resizes the bank:
 
 ```faustx
-let lpfs:8 lowpass
-lpfs:16 lowpass                      // the bank becomes sixteen filters
+let lpfs:8 fi.lowpass
+lpfs:16 fi.lowpass                   // the bank becomes sixteen filters
 ```
 
 ## 3. Modules
 
 ### 3.1 The catalogue
 
-A module is a Faust function that the catalogue declares with the names of its parameters and their starting values. The catalogue, `lib/faust.fx`, declares the public functions of Faust's libraries under Faust's own names, each name once, with bodies that call them by their usual prefixes (`fi.`, `os.`, `re.`…). A module is written by its name alone: `lowpass` is `fi.lowpass`, with its parameters in any order and by name.
+A module is a Faust function that the catalogue declares with the names of its parameters and their starting values. The catalogue, `lib/faust.fx`, declares the public functions of Faust's libraries under Faust's own names, prefix included: `fi.lowpass`, `os.osc`, `re.mono_freeverb`. Two libraries that define the same name give two modules, `ma.SR` and `pl.SR`, and a new version of a library adds a module without changing the meaning of a name already written.
+
+A module is written as Faust writes the function, and FaustX decorates the call: `fi.lowpass(fc:800)` gives its parameters by name, in any order. The name without its prefix designates no module, and the refusal names the modules whose name it ends:
+
+```faustx
+let lpf1 lowpass                     // refused: UNKNOWN_NAME
+```
 
 ### 3.2 Declaring a module
 
 A declaration gives the module's name, its parameters with their starting values, then its body; the lines that follow set the attributes of its parameters.
 
 ```faustx
-lowpass(N:4, fc:2000)  fi.lowpass(N, fc)
+fi.lowpass(N:4, fc:2000)  fi.lowpass(N, fc)
   fc.min:2
   fc.max:8000
   fc.scale:log
@@ -110,12 +116,12 @@ lowpass(N:4, fc:2000)  fi.lowpass(N, fc)
 The same word names the parameter in the body, the port of an instance, and the attribute that bounds it. The body is FaustX: it calls the modules already declared by their names, or Faust as it stands.
 
 ```faustx
-voix(freq:110, fc:800)  sawtooth(freq:freq) : lowpass(fc:fc)
+voix(freq:110, fc:800)  os.sawtooth(freq:freq) : fi.lowpass(fc:fc)
 ```
 
 ### 3.3 A Faust function the catalogue does not declare
 
-A Faust function the catalogue does not declare is called with Faust's own argument order. An argument written `key:value` becomes a port that the author names; Faust's parameter names cannot serve, since they are out of scope at the call site.
+A call that passes an argument without its name is written in Faust's argument order and keeps Faust's meaning: `fi.lowpass(3, 800)` is Faust's call. A Faust function the catalogue does not declare is called this way. In such a call, an argument written `key:value` becomes a port that the author names; Faust's parameter names cannot serve, since they are out of scope at the call site.
 
 ```faustx
 let lpf1 fi.lowpass(3, cutoff:800)   // Faust's order, a port named cutoff
@@ -138,8 +144,8 @@ The attributes are the ones Faust reads between brackets in a control's label: `
 ### 4.1 Wires
 
 ```faustx
-let saw1 sawtooth
-let lpf1 lowpass
+let saw1 os.sawtooth
+let lpf1 fi.lowpass
 saw1 : lpf1                          // connects
 saw1 !: lpf1                         // cuts
 saw1 :8 lpf1                         // connects as eight copies
@@ -175,8 +181,8 @@ The dot tells the two middle cases apart: an instance's input carries audio, whi
 Cutting a wire leaves the destination's width unchanged: the input that the wire fed receives zero. In the example below, `basse !: vcab` silences the bass branch; the other branch is not sent into the freed input.
 
 ```faustx
-let basse sawtooth(freq:55)
-let nappe sawtooth(freq:220)
+let basse os.sawtooth(freq:55)
+let nappe os.sawtooth(freq:220)
 let vcab si.bus(2) :> _
 basse : vcab
 nappe : vcab
@@ -207,8 +213,8 @@ The number says how many channels return; the inputs that receive no return stay
 ## 5. Changing a placed instance
 
 ```faustx
-let lpf1 lowpass
-lpf1 lowpass(fc:400)                 // replaces its body
+let lpf1 fi.lowpass
+lpf1 fi.lowpass(fc:400)              // replaces its body
 _ lpf1                               // bypasses it
 !_ lpf1                              // puts it back in the flow
 ! lpf1                               // removes it from the flow, with its wires
@@ -224,17 +230,17 @@ Replacing a body changes the circuit; a bypass leaves the body and changes the i
 Two ways to start again, and the author chooses:
 
 ```faustx
-let rev1 mono_freeverb
-rev1 mono_freeverb(damp:0.9)         // the same instance, with its settings
+let rev1 re.mono_freeverb
+rev1 re.mono_freeverb(damp:0.9)      // the same instance, with its settings
 !let rev1
-let rev1 mono_freeverb(damp:0.9)     // a new instance, from the module's starting values
+let rev1 re.mono_freeverb(damp:0.9)  // a new instance, from the module's starting values
 ```
 
 ## 6. Settings
 
 ```faustx
-let lpf1 lowpass(fc:800)
-let lfo1 osc(freq:0.2)
+let lpf1 fi.lowpass(fc:800)
+let lfo1 os.osc(freq:0.2)
 lpf1.fc:400                          // one port
 lpf1(fc:400, N:5)                    // several at once
 lpf1.fc.min:20                       // an attribute of the port
@@ -243,11 +249,11 @@ lfo1 : lpf1.fc                       // a signal drives the port
 
 The dot sets one port, the parentheses several. A port's attributes are reached the same way. What is written on the instance overrides what the catalogue gives the module.
 
-A signal connected to a port is rescaled from the range of the module that emits it to the bounds of the port, with Faust's `it.remap`: an `osc` from -1 to 1 sweeps `lpf1.fc` from 2 to 8000 Hz. When either range is unknown, the signal passes as it is, and the author writes the rescaling:
+A signal connected to a port is rescaled from the range of the module that emits it to the bounds of the port, with Faust's `it.remap`: an `os.osc` from -1 to 1 sweeps `lpf1.fc` from 2 to 8000 Hz. When either range is unknown, the signal passes as it is, and the author writes the rescaling:
 
 ```faustx
-let lfo1 osc(freq:0.2)
-let lpf1 lowpass(fc:800)
+let lfo1 os.osc(freq:0.2)
+let lpf1 fi.lowpass(fc:800)
 lfo1 : it.remap(-1, 1, 140, 900) : lpf1.fc
 ```
 
@@ -255,7 +261,7 @@ A port is driven by a signal, never by one of the program's inputs:
 
 ```faustx
 let micro _
-let lpf1 lowpass(fc:800)
+let lpf1 fi.lowpass(fc:800)
 micro : lpf1.fc                      // refused: SETTING_FROM_INPUT
 ```
 
@@ -266,7 +272,7 @@ A dot followed by a number designates a channel, counted from 1 as Faust's `rout
 ```faustx
 let src1 si.bus(4)
 let dst1 si.bus(8)
-let lpfs:8 lowpass
+let lpfs:8 fi.lowpass
 src1.3 : dst1.5                      // channel 3 into channel 5
 lpfs.3.fc:400                        // the third filter of the bank
 ```
@@ -278,9 +284,9 @@ In a bank of one-channel bodies, the channel is the copy: `lpfs.3` is the third 
 `process` is the sink: what arrives there is the program's output. It is Faust's own name; FaustX writes `process = <what arrives>`, and several wires into it are summed. It has channels like any instance.
 
 ```faustx
-let saw1 sawtooth
-let lpf1 lowpass
-let rev1 stereo_freeverb
+let saw1 os.sawtooth
+let lpf1 fi.lowpass
+let rev1 re.stereo_freeverb
 saw1 : lpf1 : process                // sounds
 lpf1 !: process                      // no longer goes out
 lpf1 : rev1
@@ -291,13 +297,13 @@ rev1.2 : process.2
 An input is Faust's wire `_`, written in a chain or placed under a name; both writings are FaustX.
 
 ```faustx
-let lpf1 lowpass
+let lpf1 fi.lowpass
 _ : lpf1 : process                   // the first input through a filter
 ```
 
 ```faustx
 let micro _
-let lpf1 lowpass
+let lpf1 fi.lowpass
 micro : lpf1 : process
 micro !: lpf1                        // unplugs the microphone from the filter
 ```
@@ -306,7 +312,7 @@ The order in which the inputs are placed is their order on the program: the firs
 
 ## 9. Imports
 
-The transpiler imports Faust's standard library and the catalogue into every program: `lowpass` needs no import and no prefix, and `fi.lowpass` stays valid. A Faust program that writes its own imports keeps them.
+The transpiler imports Faust's standard library and the catalogue into every program: `fi.lowpass` needs no import. A Faust program that writes its own imports keeps them.
 
 ```faustx
 import("mes-modules.fx")             // as in Faust
@@ -320,10 +326,10 @@ A line that the transpiler refuses changes nothing in the graph, and the lines a
 
 | writing | what it does |
 | --- | --- |
-| `let lpf1 lowpass` | places an instance |
-| `let lpfs:8 lowpass` | places a bank of eight |
+| `let lpf1 fi.lowpass` | places an instance |
+| `let lpfs:8 fi.lowpass` | places a bank of eight |
 | `i` | the rank of the copy, in a bank |
-| `lpf1 lowpass(fc:400)` | replaces its body |
+| `lpf1 fi.lowpass(fc:400)` | replaces its body |
 | `_ lpf1` · `!_ lpf1` | bypasses it · puts it back |
 | `! lpf1` | removes it from the flow, with its wires |
 | `!let lpf1` | gives its name back |

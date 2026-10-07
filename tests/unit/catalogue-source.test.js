@@ -35,20 +35,22 @@ it('declares every function a documentation title of the libraries names, alone 
   for (const file of fs.readdir(LIBRARIES).filter(f => f.endsWith('.lib'))) {
     const text = fs.readFile(`${LIBRARIES}/${file}`, { encoding: 'utf8' })
     for (const [title] of text.matchAll(/^\/\/-+.*`\(\w+\.\)\w+`.*$/gm)) {
-      for (const [, name] of title.matchAll(/`\(\w+\.\)(\w+)`/g)) {
-        titled.add(name)
+      for (const [, prefix, name] of title.matchAll(/`\((\w+)\.\)(\w+)`/g)) {
+        titled.add(`${prefix}.${name}`)
       }
     }
   }
-  expect(titled).toContain('cubicnl_nodc')
+  expect(titled).toContain('ef.cubicnl_nodc')
+  expect(titled).toContain('ma.SR')
+  expect(titled).toContain('pl.SR')
   expect([...titled].filter(name => !catalogue.has(name))).toEqual([])
 })
 
 it('marks a module that calls a foreign function faustwasm refuses, and that one only', async () => {
   const catalogue = readCatalogue(CATALOGUE)
   for (const [name, foreign] of [
-    ['erf', 'erff'],
-    ['rnoise', 'arc4random'],
+    ['ma.erf', 'erff'],
+    ['no.rnoise', 'arc4random'],
   ]) {
     const module = catalogue.get(name)
     expect(module.attribute('faustwasm', 'unavailable')).toBe(foreign)
@@ -56,12 +58,12 @@ it('marks a module that calls a foreign function faustwasm refuses, and that one
       `calling foreign function '${foreign}' is not allowed`
     )
   }
-  expect(catalogue.get('lowpass').attribute('faustwasm', 'unavailable')).toBe(undefined)
+  expect(catalogue.get('fi.lowpass').attribute('faustwasm', 'unavailable')).toBe(undefined)
 })
 
 it('gives a module faustwasm refuses no width, the compiler having measured none', () => {
   const catalogue = readCatalogue(CATALOGUE)
-  const rnoises = catalogue.get('rnoises')
+  const rnoises = catalogue.get('no.rnoises')
   expect(rnoises.attribute('faustwasm', 'unavailable')).toBe('arc4random')
   const unavailable = [...catalogue.values()].filter(module =>
     module.attribute('faustwasm', 'unavailable')
@@ -75,13 +77,13 @@ it('gives a module faustwasm refuses no width, the compiler having measured none
 
 it("reads a module's widths in its own entry only", () => {
   const catalogue = readCatalogue(
-    'J0  ma.J0\n  // DOES NOT COMPILE: refused\n\n' +
-      'lowpass(N:1, fc:1000)  fi.lowpass(N, fc)\n  // 1 input, 1 output\n\n' +
-      'erf  ma.erf\n  faustwasm.unavailable:erff\n' +
-      'osc(freq:440)  os.osc(freq)\n  // 0 input, 1 output\n'
+    'ma.J0  ma.J0\n  // DOES NOT COMPILE: refused\n\n' +
+      'fi.lowpass(N:1, fc:1000)  fi.lowpass(N, fc)\n  // 1 input, 1 output\n\n' +
+      'ma.erf  ma.erf\n  faustwasm.unavailable:erff\n' +
+      'os.osc(freq:440)  os.osc(freq)\n  // 0 input, 1 output\n'
   )
-  expect(catalogue.get('J0').inputs).toBeUndefined()
-  expect(catalogue.get('erf').outputs).toBeUndefined()
-  expect([catalogue.get('lowpass').inputs, catalogue.get('lowpass').outputs]).toEqual([1, 1])
-  expect([catalogue.get('osc').inputs, catalogue.get('osc').outputs]).toEqual([0, 1])
+  expect(catalogue.get('ma.J0').inputs).toBeUndefined()
+  expect(catalogue.get('ma.erf').outputs).toBeUndefined()
+  expect([catalogue.get('fi.lowpass').inputs, catalogue.get('fi.lowpass').outputs]).toEqual([1, 1])
+  expect([catalogue.get('os.osc').inputs, catalogue.get('os.osc').outputs]).toEqual([0, 1])
 })

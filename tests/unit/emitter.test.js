@@ -30,8 +30,8 @@ function emettre(poses, expression) {
 test('a generator and an adjustable filter', async () => {
   const faust = emettre(
     [
-      ['osc1', 'sawtooth', 1, [['freq', '110']]],
-      ['lpf1', 'lowpass', 1, [['fc', '800']]],
+      ['osc1', 'os.sawtooth', 1, [['freq', '110']]],
+      ['lpf1', 'fi.lowpass', 1, [['fc', '800']]],
     ],
     'osc1 : lpf1'
   )
@@ -40,13 +40,13 @@ test('a generator and an adjustable filter', async () => {
 
 test('a structural parameter stays constant', async () => {
   // a filter's order cannot be a slider: Faust loops forever
-  const faust = emettre([['lpf1', 'lowpass', 1, [['fc', '800']]]], '_ : lpf1')
+  const faust = emettre([['lpf1', 'fi.lowpass', 1, [['fc', '800']]]], '_ : lpf1')
   assert.ok(!faust.includes('nentry("N"'), 'N must not become a port')
   assert.equal(await compile(faust), null, faust)
 })
 
 test('a bank of eight', async () => {
-  const faust = emettre([['lpfs', 'lowpass', 8, [['fc', '1200']]]], 'lpfs')
+  const faust = emettre([['lpfs', 'fi.lowpass', 8, [['fc', '1200']]]], 'lpfs')
   assert.equal(await compile(faust), null, faust)
 })
 
@@ -55,7 +55,7 @@ test('a reverb and its bounded settings', async () => {
     [
       [
         'rev1',
-        'mono_freeverb',
+        're.mono_freeverb',
         1,
         [
           ['fb1', '0.92'],

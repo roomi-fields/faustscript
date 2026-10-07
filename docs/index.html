@@ -180,9 +180,9 @@
     width, <code>: 8</code> connects to the constant 8; <code>fc:800</code> assigns,
     <code>a : b</code> connects.</p>
 
-    <pre><code><span class="cx">let</span> lpf1 lowpass(fc:800)      <span class="cc">// place one instance, named</span>
+    <pre><code><span class="cx">let</span> lpf1 fi.lowpass(fc:800)   <span class="cc">// place one instance, named</span>
 saw1 : lpf1 : process        <span class="cc">// wire it to what sounds</span>
-    lpf1 lowpass(fc:400)     <span class="cc">// replace its body — its memory stays</span>
+    lpf1 fi.lowpass(fc:400)  <span class="cc">// replace its body — its memory stays</span>
     lpf1.fc:400              <span class="cc">// or just turn the knob</span>
    <span class="cx">!let</span> lpf1                 <span class="cc">// give the name back, the tail runs out</span></code></pre>
   </div>

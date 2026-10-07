@@ -14,8 +14,8 @@ It computes nothing. A FaustX program is **translated into Faust**, and Faust
 compiles it — with the functions its libraries declare, untouched.
 
 ```faustx
-let saw1 sawtooth(freq:110)
-let lpf1 lowpass(fc:800)
+let saw1 os.sawtooth(freq:110)
+let lpf1 fi.lowpass(fc:800)
 
 saw1 : lpf1 : process
 ```
@@ -61,9 +61,9 @@ connection, and what surrounds it qualifies it.
 | written | what it does | |
 |---|---|---|
 | `A : B` | connect | Faust |
-| `let lpf1 lowpass` | place **one** instance | FaustX |
-| `let lpfs:8 lowpass` | place eight | FaustX |
-| `lpf1 lowpass(fc:400)` | replace its body, memory kept | FaustX |
+| `let lpf1 fi.lowpass` | place **one** instance | FaustX |
+| `let lpfs:8 fi.lowpass` | place eight | FaustX |
+| `lpf1 fi.lowpass(fc:400)` | replace its body, memory kept | FaustX |
 | `!let lpf1` | give the name back | FaustX |
 | `saw1 :8 lpf1` | connect as eight instances | FaustX |
 | `saw1 !: lpf1` | cut the wire | FaustX |
@@ -176,7 +176,7 @@ As a library:
 import { createTranspiler } from 'faustx'
 
 const faustx = createTranspiler(catalogue, templates)
-faustx.apply('let lpf1 lowpass(fc:800)\n_ : lpf1 : process\n')
+faustx.apply('let lpf1 fi.lowpass(fc:800)\n_ : lpf1 : process\n')
 faustx.write()          // the Faust
 ```
 

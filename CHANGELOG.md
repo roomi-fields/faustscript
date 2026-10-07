@@ -14,7 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`npm run catalogue`); its header records the versions and the module count, and
   `faustwasm.unavailable` marks a module faustwasm refuses to compile.
 - The catalogue declares every function a documentation title of the libraries names, alone or
-  grouped (`(ef.)cubicnl`, `(ef.)cubicnl_nodc`): 1170 modules, `tf2`, `fft` and `conv` among them.
+  grouped (`(ef.)cubicnl`, `(ef.)cubicnl_nodc`): 1172 modules, `tf2`, `fft` and `conv` among them.
+- A module is written under its Faust name, prefix included: `let lpf1 fi.lowpass(fc:800)`. The
+  catalogue declares `fi.lowpass`, and both `ma.SR` and `pl.SR`; a name without
+  its prefix in a body is refused, `lowpass is not a module; fi.lowpass is`.
+- A call that passes an argument without its name keeps Faust's order and meaning:
+  `fi.lowpass(3, 800)` is Faust's call.
 - From the libraries 2.74.2: `os.osc` freq goes up to 12000 Hz (was 8000), `de.fdelay` n starts at
   512 samples on a log scale (was 44100), and `ba.selector` takes its channel as a constant.
 
@@ -23,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and release workflows.
 
 ### Fixed
+
+- A call in Faust's order that names one of its arguments keeps its other arguments:
+  `fi.lowpass(3, cutoff:800)` writes `fi.lowpass(3, nentry("cutoff", …))`.
 
 - A module without a width line in the catalogue has no width: reading no longer gives it the
   next module's, and generation no longer gives a module faustwasm refuses (`rnoises`) the

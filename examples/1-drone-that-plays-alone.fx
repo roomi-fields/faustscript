@@ -23,22 +23,22 @@
 //   envelope opens, `vol1` the master volume.
 // ============================================================================
 
-let osc1 sawtooth(freq:110)
-let osc2 sawtooth(freq:110.6)
-let osc3 sawtooth(freq:55)
+let osc1 os.sawtooth(freq:110)
+let osc2 os.sawtooth(freq:110.6)
+let osc3 os.sawtooth(freq:55)
 
-let lpf1 lowpass(N:3, fc:800)
+let lpf1 fi.lowpass(N:3, fc:800)
     lpf1.fc.min:40
     lpf1.fc.max:12000
     lpf1.fc.scale:log
     lpf1.fc.unit:Hz
 
-let lfo1 osc(freq:0.15) * 900 + 1100
-let bat1 beat(t:96)
-let env1 adsr(at:0.01, dt:0.35, sl:0.45, rt:1.4)
+let lfo1 os.osc(freq:0.15) * 900 + 1100
+let bat1 ba.beat(t:96)
+let env1 en.adsr(at:0.01, dt:0.35, sl:0.45, rt:1.4)
 
 let vca1 *
-let rev1 mono_freeverb(fb1:0.92, fb2:0.72, damp:0.45, spread:23)
+let rev1 re.mono_freeverb(fb1:0.92, fb2:0.72, damp:0.45, spread:23)
 let vol1 *(gain:0.35)
 
 // the wiring

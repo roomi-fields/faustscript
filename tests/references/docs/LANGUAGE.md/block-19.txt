@@ -1,22 +1,58 @@
-FaustX reference output of the faustx block 19 of docs/LANGUAGE.md, which opens with let lpf1 lowpass.
+FaustX reference output of the faustx block 19 of docs/LANGUAGE.md, which opens with let saw1 os.sawtooth.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let lpf1 lowpass
+1  let saw1 os.sawtooth
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: saw1
+    faust: saw1 = os.sawtooth(220);
+    needs: []
+
+2  let lpf1 fi.lowpass
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lpf1
     faust: lpf1 = fi.lowpass(4, 2000);
     needs: []
 
-2  _ : lpf1 : process
-    outcome: {"done":false,"reason":"_ does not exist"}
+3  let rev1 re.stereo_freeverb
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: rev1
+    faust: rev1 = re.stereo_freeverb(0.7, 0.5, 0.3, 30);
+    needs: []
+
+4  saw1 : lpf1 : process
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+5  lpf1 !: process
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+6  lpf1 : rev1
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+7  rev1.1 : process.1
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+8  rev1.2 : process.2
+    outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
 
 --- write
 
 import("stdfaust.lib");
+saw1 = os.sawtooth(220);
 lpf1 = fi.lowpass(4, 2000);
+rev1 = re.stereo_freeverb(0.7, 0.5, 0.3, 30);
 process = 0;

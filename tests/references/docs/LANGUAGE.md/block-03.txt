@@ -1,23 +1,23 @@
-FaustX reference output of the faustx block 3 of docs/LANGUAGE.md, which opens with let voix1 sawtooth.
+FaustX reference output of the faustx block 3 of docs/LANGUAGE.md, which opens with let voix1 os.sawtooth.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let voix1 sawtooth
+1  let voix1 os.sawtooth
     outcome: {"done":true,"reason":null}
     gesture: place
     name: voix1
     faust: voix1 = os.sawtooth(220);
     needs: []
 
-2  let voix2 sawtooth(freq:165)
+2  let voix2 os.sawtooth(freq:165)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: voix2
     faust: voix2 = vgroup("voix2", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 165, 0.08, 220, 0.001)));
     needs: []
 
-3  let rev1 mono_freeverb
+3  let rev1 re.mono_freeverb
     outcome: {"done":true,"reason":null}
     gesture: place
     name: rev1

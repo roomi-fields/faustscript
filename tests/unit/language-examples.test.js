@@ -23,8 +23,12 @@ const refused = (code, reason) => ({ done: false, code, reason })
 /** The checks the transpiler does not hold yet: the ticket of the defect, and what is seen today. */
 const KNOWN_DEFECTS = new Map([
   [
-    'refuses with ALREADY_PLACED: let lpf1 lowpass',
+    'refuses with ALREADY_PLACED: let lpf1 fi.lowpass',
     { ticket: 'faustx-zj5.9', now: [refused(null, 'lpf1 is already placed')] },
+  ],
+  [
+    'refuses with UNKNOWN_NAME: let lpf1 lowpass',
+    { ticket: 'faustx-zj5.9', now: [refused(null, 'lowpass is not a module; fi.lowpass is')] },
   ],
   [
     'refuses with SETTING_FROM_INPUT: micro : lpf1.fc',
@@ -39,21 +43,21 @@ const KNOWN_DEFECTS = new Map([
     },
   ],
   [
-    'applies: lpfs:16 lowpass',
+    'applies: lpfs:16 fi.lowpass',
     { ticket: 'faustx-zj5.22', now: [refused(null, 'a setting targets a port'), applied] },
   ],
   [
-    'applies: lowpass(N:4, fc:2000)  fi.lowpass(N, fc)',
+    'applies: fi.lowpass(N:4, fc:2000)  fi.lowpass(N, fc)',
     {
       ticket: 'faustx-zj5.21',
       now: [
-        refused(null, 'lowpass is not a placed instance'),
+        refused(null, 'fi.lowpass is not a placed instance'),
         ...Array(4).fill(refused(null, 'fc does not exist')),
       ],
     },
   ],
   [
-    'applies: voix(freq:110, fc:800)  sawtooth(freq:freq) : lowpass(fc:fc)',
+    'applies: voix(freq:110, fc:800)  os.sawtooth(freq:freq) : fi.lowpass(fc:fc)',
     { ticket: 'faustx-zj5.21', now: [refused(null, 'voix is not a placed instance'), applied] },
   ],
   [
@@ -61,7 +65,7 @@ const KNOWN_DEFECTS = new Map([
     { ticket: 'faustx-zj5.21', now: [refused(null, 'unknown form: Import')] },
   ],
   [
-    'compiles: the block that opens with let basse sawtooth(freq:55)',
+    'compiles: the block that opens with let basse os.sawtooth(freq:55)',
     { ticket: 'faustx-zj5.15', now: 'ERROR : sequential composition nappe:vcab' },
   ],
   [

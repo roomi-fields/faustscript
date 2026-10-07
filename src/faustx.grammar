@@ -28,7 +28,7 @@ Line {
 
 // --- placing and releasing --------------------------------------------------------
 
-// let lpf1 lowpass        let lpfs:8 lowpass(cutoff:400)
+// let lpf1 fi.lowpass     let lpfs:8 fi.lowpass(fc:400)
 // `clic:6` reads as a name stuck to a number: the lexer makes it a Key
 // followed by a Number, and the emitter sews them back together.
 Declaration { kw<"let"> (MultipleName | Name) FreeBody }
@@ -41,14 +41,14 @@ Release { bang kw<"let"> Name }
 // --- declaring a module -----------------------------------------------------
 
 // One and the same form serves three purposes, which only the graph tells apart:
-//   lowpass(order:3, cutoff:800)  fi.lowpass(order, cutoff)   declarer
-//   BS  pl.BS                                                 declarer sans parametre
-//   lpf1 lowpass(cutoff:400)                                  remplacer un corps
+//   fi.lowpass(N:4, fc:2000)  fi.lowpass(N, fc)              declarer
+//   pl.BS  pl.BS                                              declarer sans parametre
+//   lpf1 fi.lowpass(fc:400)                                   remplacer un corps
 // Is the name a known module, an instance already placed, or brand new?
 // The grammar cannot know; the graph can.
 Definition { Path Arguments? ~apres NamedBody }
 
-// lpf1 lowpass(cutoff:400) — le nom seul remplace le corps de l'exemplaire
+// lpf1 fi.lowpass(fc:400) — le nom seul remplace le corps de l'exemplaire
 // --- what Faust writes, and a superset must read --------------------
 
 // process = _ : fi.lowpass(3, 800);
