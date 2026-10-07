@@ -1,3 +1,17 @@
 node_modules/
 .rtfm/
 __pycache__/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+
+# Logs and caches
+*.log
+.eslintcache
+
+# Claude Code local settings
+.claude/settings.local.json

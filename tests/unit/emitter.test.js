@@ -1,19 +1,19 @@
 // The emitter is only right if Faust accepts what it writes. These tests
 // actually compile the result: that is the only judge.
-import { test } from 'node:test'
+import { test } from 'vitest'
 import assert from 'node:assert'
 import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { readCatalogue } from '../src/catalogue.js'
-import { readTemplates } from '../src/templates.js'
-import { Graph } from '../src/graph.js'
-import { writeInstance } from '../src/emitter.js'
+import { readCatalogue } from '../../src/catalogue.js'
+import { readTemplates } from '../../src/templates.js'
+import { Graph } from '../../src/graph.js'
+import { writeInstance } from '../../src/emitter.js'
 
 const lire = f => readFileSync(new URL(f, import.meta.url), 'utf8')
-const catalogue = readCatalogue(lire('../lib/faust.fx'))
-const templates = readTemplates(lire('../lib/translation.fx'))
+const catalogue = readCatalogue(lire('../../lib/faust.fx'))
+const templates = readTemplates(lire('../../lib/translation.fx'))
 const dossier = mkdtempSync(join(tmpdir(), 'faustx-'))
 
 /** Returns Faust's error message, or null if it accepts. */

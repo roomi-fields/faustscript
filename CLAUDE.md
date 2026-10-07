@@ -38,6 +38,10 @@ and no sign of the language is written in the code — a guard checks it.
 
 **What is left**: the fade of a bypass, and the sound — which belongs to the host.
 
+**Next operation: migrate the code to TypeScript.** The project tooling (`_project-structure`
+template) is in place and accepts JS meanwhile; the migration renames each `.js` to `.ts`,
+types it, and keeps the `.js` import specifiers.
+
 ## The sources
 
 In this repository:

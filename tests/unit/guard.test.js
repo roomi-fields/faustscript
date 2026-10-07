@@ -3,11 +3,11 @@
 // Les signs vivent dans la grammaire et dans les templates. Une occurrence ici
 // means a decision of the language has leaked into the engine — an
 // architectural defect, not a matter of style.
-import { test } from 'node:test'
+import { test } from 'vitest'
 import assert from 'node:assert'
 import { readFileSync, readdirSync } from 'node:fs'
 
-const dossier = new URL('../src/', import.meta.url)
+const dossier = new URL('../../src/', import.meta.url)
 
 // generated from the grammar: it IS the language, it does not copy it
 const ENGENDRES = ['parser.js', 'parser.terms.js']

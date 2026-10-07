@@ -1,13 +1,13 @@
 // Le graph refused ce qui n'a pas de sens, et ne bouge pas quand il refused :
 // c'est ce qui garantit qu'une line fautive n'interrompt pas le son.
-import { test } from 'node:test'
+import { test } from 'vitest'
 import assert from 'node:assert'
 import { readFileSync } from 'node:fs'
-import { readCatalogue } from '../src/catalogue.js'
-import { Graph } from '../src/graph.js'
+import { readCatalogue } from '../../src/catalogue.js'
+import { Graph } from '../../src/graph.js'
 
 const catalogue = readCatalogue(
-  readFileSync(new URL('../lib/faust.fx', import.meta.url), 'utf8'))
+  readFileSync(new URL('../../lib/faust.fx', import.meta.url), 'utf8'))
 
 const neuf = () => {
   const g = new Graph(catalogue)

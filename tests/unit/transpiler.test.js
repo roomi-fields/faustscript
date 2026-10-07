@@ -1,18 +1,18 @@
 // End to end: a FaustX text must become Faust that the compiler accepts.
 // This is the only test that proves the whole chain holds.
-import { test } from 'node:test'
+import { test } from 'vitest'
 import assert from 'node:assert'
 import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { createTranspiler } from '../src/transpiler.js'
+import { createTranspiler } from '../../src/transpiler.js'
 
 const lire = f => readFileSync(new URL(f, import.meta.url), 'utf8')
 const dossier = mkdtempSync(join(tmpdir(), 'faustx-'))
 
 function traduire(source) {
-  const t = createTranspiler(lire('../lib/faust.fx'), lire('../lib/translation.fx'))
+  const t = createTranspiler(lire('../../lib/faust.fx'), lire('../../lib/translation.fx'))
   const gestes = t.apply(source)
   return { faust: t.write(), refus: gestes.filter(g => !g.outcome.done), gestes }
 }
@@ -57,13 +57,13 @@ lpfs : process
 })
 
 test('the first complete piece compiles', () => {
-  const { faust, refus } = traduire(lire('../examples/1-drone-that-plays-alone.fx'))
+  const { faust, refus } = traduire(lire('../../examples/1-drone-that-plays-alone.fx'))
   assert.deepEqual(refus.map(r => r.text), [])
   assert.equal(compile(faust), null, faust)
 })
 
 test('a faulty line is refused without touching the graph', () => {
-  const t = createTranspiler(lire('../lib/faust.fx'), lire('../lib/translation.fx'))
+  const t = createTranspiler(lire('../../lib/faust.fx'), lire('../../lib/translation.fx'))
   t.apply('let osc1 sawtooth(freq:110)\nosc1 : process\n')
   const avant = t.write()
   const refus = t.apply('zorg : process\nlet osc1 sawtooth(freq:55)\n')
@@ -75,7 +75,7 @@ test('a faulty line is refused without touching the graph', () => {
 test('all three pieces translate with nothing refused', () => {
   for (const name of ['1-drone-that-plays-alone', '2-processed-guitar',
                      '3-twenty-minute-session']) {
-    const { refus } = traduire(lire(`../examples/${name}.fx`))
+    const { refus } = traduire(lire(`../../examples/${name}.fx`))
     assert.deepEqual(refus.map(r => r.text.trim()), [], name)
   }
 })
@@ -83,7 +83,7 @@ test('all three pieces translate with nothing refused', () => {
 test('the pieces compile', () => {
   for (const name of ['1-drone-that-plays-alone', '2-processed-guitar',
                      '3-twenty-minute-session']) {
-    const { faust } = traduire(lire(`../examples/${name}.fx`))
+    const { faust } = traduire(lire(`../../examples/${name}.fx`))
     assert.equal(compile(faust), null, `${name} :\n${faust}`)
   }
 })
@@ -192,8 +192,8 @@ _ rev1
 test('the command line translates a file', () => {
   const out = join(dossier, 'cli.dsp')
   execFileSync('node', [
-    new URL('../bin/faustx.js', import.meta.url).pathname,
-    new URL('../examples/1-drone-that-plays-alone.fx', import.meta.url).pathname,
+    new URL('../../bin/faustx.js', import.meta.url).pathname,
+    new URL('../../examples/1-drone-that-plays-alone.fx', import.meta.url).pathname,
     '-o', out,
   ], { stdio: 'pipe' })
   assert.equal(compile(readFileSync(out, 'utf8')), null)

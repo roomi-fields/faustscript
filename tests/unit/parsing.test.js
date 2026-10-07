@@ -1,12 +1,12 @@
 // The examples are the grammar's test bench: if they do not parse, it is
 // wrong. They existed before the transpiler, with their Faust translations
 // already verified.
-import { test } from 'node:test'
+import { test } from 'vitest'
 import assert from 'node:assert'
 import { readFileSync, readdirSync } from 'node:fs'
-import { parser } from '../src/parser.js'
+import { parser } from '../../src/parser.js'
 
-const dossier = new URL('../examples/', import.meta.url)
+const dossier = new URL('../../examples/', import.meta.url)
 
 for (const name of readdirSync(dossier).filter(f => f.endsWith('.fx'))) {
   test(`${name} parses without error`, () => {
@@ -25,7 +25,7 @@ function lineNumber(text, position) {
 
 test('the catalogue parses in full', () => {
   // it is written in FaustX: our own parser must read it without a single fault
-  const text = readFileSync(new URL('../lib/faust.fx', import.meta.url), 'utf8')
+  const text = readFileSync(new URL('../../lib/faust.fx', import.meta.url), 'utf8')
   const erreurs = []
   parser.parse(text).iterate({
     enter: n => { if (n.type.isError) erreurs.push(lineNumber(text, n.from)) },
