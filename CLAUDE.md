@@ -2,15 +2,15 @@
 
 FaustX is a superset of Faust for live coding, and its transpiler: a line of FaustX places a named instance or acts on it while the sound plays, and the transpiler writes the Faust that the host compiles and plays. This repository carries the language and its transpiler, as one TypeScript library with its command line.
 
-**Owner**: Romain. He validates `docs/LANGUAGE.md`, `docs/PRINCIPES.md`, `docs/ARCHITECTURE.md`, `docs/CADRE.md` and `docs/INTERFACE.md`; the supervisor validates the other documents.
+**Owner**: Romain. He validates `docs/LANGUAGE.md`, `docs/PRINCIPES.md`, `docs/ARCHITECTURE.md`, and each package's `CADRE.md`, `INTERFACE.md` and `ARCHITECTURE.md` under `packages/<x>/docs/`; the supervisor validates the other documents.
 
 ## What decides
 
-`docs/PRINCIPES.md`, then the specification (`docs/LANGUAGE.md`), then the frame (`docs/CADRE.md`, `docs/INTERFACE.md`, `docs/ARCHITECTURE.md`), then the code. A gap between the specification and the transpiler is a defect of the transpiler. A decision lives in the document it settles; a rule is affirmative, in the present, without date or author. `CONTEXT.md` gives each word of the domain its one sense.
+`docs/PRINCIPES.md`, then the specification (`docs/LANGUAGE.md`), then the architecture (`docs/ARCHITECTURE.md`) and each package's frame (`packages/<x>/docs/`), then the code. A gap between the specification and the transpiler is a defect of the transpiler. A decision lives in the document it settles; a rule is affirmative, in the present, without date or author. `CONTEXT.md` gives each word of the domain its one sense.
 
 - `docs/LANGUAGE.md` — how FaustX is written: read it before touching the grammar, a gesture or a translation.
-- `docs/INTERFACE.md` — what crosses FaustX's boundary: read it before changing an export, a line's result or a refusal.
-- `docs/CADRE.md` — FaustX's role and boundary (R1…): cite its rules in a ticket.
+- `packages/040-faustx/docs/INTERFACE.md` — what crosses FaustX's public boundary: read it before changing an export, a line's result or a refusal.
+- `packages/<x>/docs/CADRE.md` — a package's role and boundary (R1…): cite its rules in a ticket.
 
 ## How we arbitrate
 

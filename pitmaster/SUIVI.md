@@ -15,16 +15,10 @@ sort et sa réponse va dans son ticket.
 
 ## R — à confirmer par le responsable
 
-- **Le morceau joué (faustx-zj5.27, Q26)** — contexte : `createTranspiler()` crée en réalité un
-  graphe vivant ; Romain : « FaustX est le transpileur FaustX il n'y e a qu'un ». Exemple : les
-  tests créent un graphe neuf par test ; BPScript n'a pas tranché un graphe par scène, par acteur
-  ou par séance. Référence mature : SuperCollider, un serveur et des espaces de proxys séparés ;
-  TypeScript, un compilateur et un « programme » par projet. Existant : aucun. Exigence :
-  déterminisme (deux graphes ne partagent rien). Recommandation : le transpileur est la
-  bibliothèque et possède le catalogue lu une fois ; `createSession()` crée un morceau qui possède
-  son graphe et son compteur. Question : le nom (`Session` ou autre).
-- **`docs/ARCHITECTURE.md` (faustx-zj5.3)** — écrit au dépôt, en attente de relecture ; il sera
-  remplacé par l'architecture en six paquets.
+- **Architecture des six paquets (faustx-zj5.28)** — écrite au dépôt : `docs/ARCHITECTURE.md`
+  (883e1b5), cadre et interface de 040-faustx (87f83fb), lexique (a2ebd47). En attente de la
+  relecture de Romain, et de sa réponse sur l'analyse pour l'éditeur (session neuve ou session qui
+  joue).
 
 ## S — à surveiller
 
