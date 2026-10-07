@@ -12,6 +12,7 @@ fi
 
 missing=()
 
+command -v bd >/dev/null || missing+=("l'outil de tickets bd (Beads)")
 [ -d "$root/.beads" ] || missing+=("le magasin de tickets (Beads)")
 [ ! -f "$root/package.json" ] || [ -d "$root/node_modules" ] || missing+=("les dépendances npm")
 
@@ -27,7 +28,7 @@ done
 
 echo "## Projet à initialiser (framework _project-structure)"
 if [ ${#missing[@]} -gt 0 ]; then
-  echo "Manque : $(IFS=';'; echo "${missing[*]}" | sed "s/;/, /g"). Lance \`npm run setup\` toi-même avant tout autre geste : il est sans invite et idempotent."
+  echo "Manque : $(IFS=';'; echo "${missing[*]}" | sed "s/;/, /g"). Lance \`bash scripts/setup.sh\` toi-même avant tout autre geste : il est sans invite et idempotent."
 fi
 if [ ${#pending[@]} -gt 0 ]; then
   echo "À définir : $(IFS=';'; echo "${pending[*]}" | sed "s/;/, /g")."

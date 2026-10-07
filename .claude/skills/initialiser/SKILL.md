@@ -21,7 +21,7 @@ sous `packages/<x>/docs/`, et `docs/ARCHITECTURE.md` décrit l'ensemble.
 
 ## 1. Préparer le dépôt
 
-`npm run setup -- <préfixe>` s'il manque les tickets ou les dépendances : sans invite, idempotent.
+`bash scripts/setup.sh <préfixe>` s'il manque les tickets ou les dépendances : sans invite, idempotent.
 Le préfixe des tickets vient du nom du projet ; il se confirme au premier tour du grill.
 
 ## 2. Relever l'existant

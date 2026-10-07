@@ -12,7 +12,10 @@ if ! git -C "$root" rev-parse --git-dir >/dev/null 2>&1; then
   git -C "$root" init -q
 fi
 
-command -v bd >/dev/null || { echo "bd (Beads) is required: npm install -g @beads/bd" >&2; exit 1; }
+# Beads, the ticket store the skills work from
+if ! command -v bd >/dev/null; then
+  npm install -g @beads/bd || { echo "Installing Beads failed: run npm install -g @beads/bd, then bash scripts/setup.sh again." >&2; exit 1; }
+fi
 (cd "$root" && bd init --init-if-missing --non-interactive --skip-agents --quiet --prefix "$prefix")
 git -C "$root" config beads.role maintainer
 

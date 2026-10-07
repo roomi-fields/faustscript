@@ -24,6 +24,15 @@
     ]
   },
   "enabledPlugins": {
-    "mattpocock-skills@claude-plugins-official": true
+    "mattpocock-skills@claude-plugins-official": true,
+    "rtfm@roomi-fields": true
+  },
+  "extraKnownMarketplaces": {
+    "roomi-fields": {
+      "source": {
+        "source": "github",
+        "repo": "roomi-fields/claude-plugins"
+      }
+    }
   }
 }
