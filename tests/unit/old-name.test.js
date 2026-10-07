@@ -3,9 +3,9 @@
 // named `x.fx` is skipped without a word.
 //
 // What may write it: the tracker's prefix (`faustx-`, in lower case, opens every ticket id), the
-// tracker's data (.beads/) and the supervisor's journal (pitmaster/), which are history, this
-// guard, which names what it refuses, and the entries of CHANGELOG.md, which tell the history;
-// its link references are addresses, and are read.
+// tracker's data (.beads/), which is history, this guard, which names what it refuses, and the
+// entries of CHANGELOG.md, which tell the history; its link references are addresses, and are
+// read.
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { expect, it } from 'vitest'
@@ -18,7 +18,7 @@ const OLD_NAME = /faustx|\.fx\b/i
 /** A ticket id (`faustx-zj5.50`) or the tracker's prefix written alone (`faustx-` in backquotes). */
 const TRACKER = /faustx-(?:[a-z0-9]+(?:\.\d+)*|(?=`))/g
 
-const HISTORY = ['.beads/', 'pitmaster/']
+const HISTORY = ['.beads/']
 
 /** This guard's own path, relative to the root. */
 const SELF = import.meta.url.slice(ROOT.href.length)
@@ -77,6 +77,7 @@ it('refuses the old name in a path, a fence, a word and a link reference', () =>
     'examples/piece.fx': 'saw1 : lpf1\n',
     'docs/GUIDE.md': 'intro\n```faustx\nsaw1\n```\n',
     'README.md': 'FaustX plays.\nA FaustX-based tool.\n',
+    'pitmaster/SUIVI.md': 'FaustX au niveau de BPScript\n',
     'CHANGELOG.md': '- FaustX is born.\n[0.1.0]: https://github.com/roomi-fields/faustx/releases\n',
   }
   expect(oldNames(Object.keys(texts), p => texts[p])).toEqual([
@@ -84,6 +85,7 @@ it('refuses the old name in a path, a fence, a word and a link reference', () =>
     'docs/GUIDE.md:2',
     'README.md:1',
     'README.md:2',
+    'pitmaster/SUIVI.md:1',
     'CHANGELOG.md:2',
   ])
 })
@@ -92,7 +94,6 @@ it('lets the tracker prefix, the history and the new name pass', () => {
   const texts = {
     'docs/NOTE.md': 'see faustx-zj5.50; prefix `faustx-`; FaustScript, piece.fsc, the fx chain\n',
     '.beads/issues.jsonl': '{"title":"FaustX at BPScript\'s level"}\n',
-    'pitmaster/SUIVI.md': 'FaustX au niveau de BPScript\n',
   }
   expect(oldNames(Object.keys(texts), p => texts[p])).toEqual([])
 })
