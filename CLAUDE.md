@@ -20,7 +20,7 @@ FaustX is a superset of Faust for live coding, and its transpiler: a line of Fau
 4. The ticket closes on its targeted tests, the review (`mattpocock-skills:code-review`, which asks: does this notion already exist elsewhere?) and a commit.
 5. `/handoff` in the ticket, then `bd close`, with what is not done and why.
 
-A supervision session loads the `superviseur` skill; a development agent loads `developper`.
+A supervision session loads the supervisor (`pitmaster`); a development agent loads the developer (`grillardin`).
 
 ## What keeps the repository straight
 
@@ -37,7 +37,7 @@ A supervision session loads the `superviseur` skill; a development agent loads `
 - ⛔ **No command that can ask for a validation**: a prompt freezes the session. Every temporary file goes in the session scratchpad; no `cd` (`env -C <dir>` or `git -C`); a deletion targets a named path that was read.
 - **The index first**: every exploratory search starts with `rtfm_search` (mode `hybrid`), then `rtfm_expand` on the relevant results.
 - Tickets: Beads (`bd`), prefix `faustx-`, see `docs/agents/issue-tracker.md`.
-- Repository skills: `superviseur`, `developper`, `mesurer`, `rediger` (human reader), `release`. Flow: the `mattpocock-skills` plugin, prefix required; a document for an agent is written with `mattpocock-skills:writing-for-agents`.
+- Repository skills: the supervisor (`pitmaster`), the developer (`grillardin`), initialisation and architecture (`grill`), measurement (`thermometre`), the writer for a human reader (`menu`), release (`release`). Flow: the `mattpocock-skills` plugin, prefix required; a document for an agent is written with `mattpocock-skills:writing-for-agents`.
 - Answers in French; documents, code and API names in English.
 
 ## Commands
