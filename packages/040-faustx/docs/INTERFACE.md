@@ -1,46 +1,49 @@
 # FaustX — interface
 
-FaustX exports one function, `createTranspiler`, which returns a transpiler holding one graph of instances and wires. The host sends FaustX text to the transpiler's `apply`, which applies each line as a gesture on the graph and returns what each line did; it reads the Faust program, a frozen view of the graph and the catalogue from three other methods. This document lists each element that crosses that boundary: its form, what it returns, what it refuses, and the guard that holds it.
+FaustX's public package, `faustx` (`packages/040-faustx`), exports one function, `createSession`, which returns a session holding one graph of instances and wires: the piece being played. The host sends FaustX text to the session's `apply`, which applies each line as a gesture on the graph and returns what each line did; it reads the Faust program, a frozen view of the graph, the program's controls and the catalogue from four other methods. A second entry, `faustx/editor`, gives an editor the parser of the grammar and the refusals of a text as diagnostics. This document lists each element that crosses that boundary: its form, what it returns, what it refuses, and the guard that holds it.
 
 ## 1. The package
 
 | specifier | content |
 | --- | --- |
-| `faustx` | `createTranspiler` and the types of this document |
-| `faustx/lib/faust.fx` | the text of the catalogue |
-| `faustx/lib/translation.fx` | the text of the templates |
-| command `faustx` | the command line (§9) |
+| `faustx` | `createSession` and the types of §2 to §9 |
+| `faustx/editor` | `parser`, `diagnose` and the types of §10 |
+| command `faustx` | the command line (§11) |
+| peer dependency `@grame/faustwasm` | the faustwasm version the host compiles with, at one exact version |
 
-Every name, field, gesture, code and sentence form of this document is a contract: changing one is a breaking change, recorded in `CHANGELOG.md` under *Changed*.
+The package declares `@grame/faustwasm` as a peer dependency at one exact version, written in its `package.json`. The catalogue is generated from the Faust libraries that version embeds, and the tests compile the Faust FaustX writes with it: the host that installs that version plays the Faust the tests checked.
 
-**Guard** — the interface test (target, faustx-zj5.10): the package exports exactly the elements of this list, and their declared types are the signatures of this document.
+Every name, field, gesture, code and sentence form of this document is a contract: changing one is a breaking change, recorded in `CHANGELOG.md` under *Changed*. Changing the declared faustwasm version is a change of the same kind.
 
-## 2. `createTranspiler`
+**Guard** — the interface test (target, faustx-zj5.36): the package exports exactly the elements of this list, their declared types are the signatures of this document, and the declared faustwasm version is the one the catalogue records and the tests compile with.
+
+## 2. `createSession`
 
 ```ts
-export function createTranspiler(catalogueText: string, templatesText: string): Transpiler
+export function createSession(): Session
 ```
 
-It receives the text of `lib/faust.fx` and the text of `lib/translation.fx`, and returns a transpiler whose graph is empty. Two transpilers share no state: the same text, applied to each in the same order of gestures, returns the same results, to the character. It throws an `Error` whose message is `template missing: <key>` when the templates text lacks a key the transpiler reads; that error belongs to the files, never to a line.
+It returns a session whose graph is empty. The library reads the catalogue once, the first time a session needs it, and every session reads that same frozen value. Two sessions share no other state: the same text, applied to each in the same order of gestures, returns the same results, to the character.
 
-**Guard** — `tests/unit/parsing.test.js` (the catalogue parses in full); target, without a ticket yet: two transpilers given the same text return equal results.
+**Guard** — target, faustx-zj5.12: two sessions given the same text return equal results, and a computed signal of the second session is named as in the first.
 
-## 3. The transpiler
+## 3. The session
 
 ```ts
-export interface Transpiler {
+export interface Session {
   apply(text: string): readonly LineResult[]
   write(): string
   graph(): GraphView
+  controls(): readonly Control[]
   catalogue(): Catalogue
 }
 ```
 
-`apply` is the only method that changes the graph. `write`, `graph` and `catalogue` read it and change nothing.
+`apply` is the only method that changes the graph. `write`, `graph`, `controls` and `catalogue` read it and change nothing.
 
 ## 4. `apply` and the result of a line
 
-`apply` receives FaustX text, one or more lines, as the author wrote it. It applies the lines in order and returns one result per line, in the same order. A result describes its line at the moment it was applied: a later line of the same text that releases the instance does not change it.
+`apply` receives FaustX text, one or more lines, as the author wrote it. It applies the lines in order and returns one result per line that carries a statement, in the same order. A blank line, or a line that holds only a comment, returns no result; the other lines keep their number in the text. A result describes its line at the moment it was applied: a later line of the same text that releases the instance does not change it.
 
 ```ts
 export type Gesture = 'place' | 'replace' | 'release' | 'remove' | 'bypass' | 'set' | 'wire'
@@ -65,7 +68,7 @@ export type Outcome =
 
 | field | content |
 | --- | --- |
-| `line` | the line's number in the text passed to `apply`, from 1 |
+| `line` | the line's number in the text passed to `apply`, from 1, blank and comment lines counted |
 | `text` | the line, without its surrounding spaces |
 | `gesture` | the gesture the line expresses; `null` when the line has no form the grammar reads |
 | `name` | the instance the gesture touches; `null` for a wire |
@@ -85,11 +88,11 @@ The gesture says what the line does to the graph, and what the host has to compi
 | `set` | `lpf1.fc:400` | records the value of the port `fc` | `port`, `value`, `path` |
 | `wire` | `osc1 : lpf1`, `osc1 !: lpf1` | adds or cuts wires | — |
 
-**The ports of an instance.** An instance whose body is a module carries the parameters of that module that carry no nature (§8). An instance whose body is a Faust expression carries the ports its author named in that body: `let lpf1 fi.lowpass(3, cutoff:800)` carries the port `cutoff`. A setting or a wire that targets any other port is refused (§5).
+**The ports of an instance.** An instance whose body is a module carries the parameters of that module that carry no nature (§9). An instance whose body is a Faust expression carries the ports its author named in that body: `let lpf1 fi.lowpass(3, cutoff:800)` carries the port `cutoff`. A setting or a wire that targets any other port is refused (§5).
 
 **The control path.** An instance becomes a Faust group named after it, and a control a slider inside that group: `let lpf1 lowpass(fc:800)` writes `lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc…", 800, 2, 8000, …)));`, and `lpf1.fc:400` returns the path `/lpf1/fc`. A `set` compiles nothing: the host writes the value on the running circuit at that path. The prefix that a compiled program adds above the program root is the host's.
 
-**Guard** — `tests/unit/transpiler.test.js` (each gesture says what it touched, and what has to be recompiled; a module driven by another names what it needs); target, faustx-zj5.9: a `set` returns its port, its value and its path; target, faustx-zj5.10: the interface test.
+**Guard** — `tests/unit/transpiler.test.js` (each gesture says what it touched, and what has to be recompiled; a module driven by another names what it needs); target, faustx-zj5.9: a `set` returns its port, its value and its path; target, faustx-zj5.36: a blank line and a comment line return no result, and the next line keeps its number; the interface test.
 
 ## 5. Refusals
 
@@ -98,11 +101,11 @@ A refused line changes nothing in the graph, and the lines after it are applied.
 ```ts
 export type RefusalCode =
   | 'UNREADABLE'
-  | 'EMPTY_LINE'
   | 'EMPTY_EXPRESSION'
   | 'UNKNOWN_FORM'
   | 'ALREADY_PLACED'
   | 'UNKNOWN_NAME'
+  | 'UNAVAILABLE_MODULE'
   | 'INCOMPLETE_SETTING'
   | 'SETTING_WITHOUT_PORT'
   | 'UNKNOWN_PORT'
@@ -113,20 +116,20 @@ export type RefusalCode =
 | code | the line | sentence |
 | --- | --- | --- |
 | `UNREADABLE` | does not read by the grammar | `does not read: <text>` |
-| `EMPTY_LINE` | carries no form | `empty line` |
 | `EMPTY_EXPRESSION` | an expression with no term | `empty expression` |
 | `UNKNOWN_FORM` | a form the grammar reads and no gesture handles | `unknown form: <form>` |
 | `ALREADY_PLACED` | `let lpf1 …` when `lpf1` is placed | `lpf1 is already placed` |
 | `UNKNOWN_NAME` | names an instance that does not exist, or gives a new body to a name that is not placed | `ghost does not exist` |
+| `UNAVAILABLE_MODULE` | places or gives a body that calls a module the declared faustwasm does not provide: `let n1 rnoises` | `rnoises calls arc4random, which faustwasm does not provide` |
 | `INCOMPLETE_SETTING` | a setting without its port or its value | `incomplete setting: <text>` |
 | `SETTING_WITHOUT_PORT` | `lpf1:3` | `a setting targets a port: lpf1` |
 | `UNKNOWN_PORT` | a setting or a wire that targets a port the instance does not carry: `lpf1.nope:3`, `osc1 : lpf1.nope` | `lpf1 has no port nope` |
 | `SETTING_FROM_INPUT` | drives a port with a signal that carries a program input | `in1 carries one of the program's inputs: a port is driven by a signal, never by an input` |
 | `NO_SUCH_WIRE` | `osc1 !: lpf1` where no wire joins them | `no wire between osc1 and lpf1` |
 
-An error the Faust compiler raises on the Faust that FaustX writes is the compiler's message: the host receives it from the compiler.
+A module that faustwasm does not provide is one whose Faust calls a foreign function that faustwasm's WebAssembly backend refuses; the catalogue marks it (§9), and its sentence names that function. An error the Faust compiler raises on the Faust that FaustX writes is the compiler's message: the host receives it from the compiler.
 
-**Guard** — `tests/unit/transpiler.test.js` (a faulty line is refused without touching the graph; a port cannot be driven by a program input); target, faustx-zj5.9: each code of the list is produced by its line, every refusal carries a code of the list, and the graph view after a refused line equals the view before it; target, faustx-zj5.7: each refused example of the language reference carries its code.
+**Guard** — `tests/unit/transpiler.test.js` (a faulty line is refused without touching the graph; a port cannot be driven by a program input); `tests/unit/language-examples.test.js` (each refused example of the language reference carries its code); target, faustx-zj5.9: each code of the list is produced by its line, every refusal carries a code of the list, and the graph view after a refused line equals the view before it.
 
 ## 6. `write`
 
@@ -164,11 +167,30 @@ export interface WireEnd {
 }
 ```
 
-`graph` returns a copy of the graph at the instant of the call, frozen in depth: a later `apply` does not change it, and writing into it throws without reaching the graph. Instances come in the order they were placed, wires in the order they were laid. `body` is the name of the module the body calls, or the Faust expression of the body as written; its settings are in `settings`. `removed` marks an instance taken out of the flow, whose name stays taken; `computed` marks a computed signal, an instance the transpiler places under a name of its own for an expression such as `lfo1 * 3800 + 400`. A wire end whose `port` is not `null` drives that port of the instance; the sink is a wire end under its reserved name, `process`. `width` is the number of copies a wire places (`saw1 :8 lpf1`), `null` when it places none; `loop` marks a feedback wire, whose output returns to the input.
+`graph` returns a copy of the graph at the instant of the call, frozen in depth: a later `apply` does not change it, and writing into it throws without reaching the graph. Instances come in the order they were placed, wires in the order they were laid. `body` is the name of the module the body calls, or the Faust expression of the body as written; its settings are in `settings`. `removed` marks an instance taken out of the flow, whose name stays taken; `computed` marks a computed signal, an instance the session places under a name of its own for an expression such as `lfo1 * 3800 + 400`. A wire end whose `port` is not `null` drives that port of the instance; the sink is a wire end under its reserved name, `process`. `width` is the number of copies a wire places (`saw1 :8 lpf1`), `null` when it places none; `loop` marks a feedback wire, whose output returns to the input.
 
-**Guard** — target, faustx-zj5.10: the interface test checks that the view is frozen in depth, that a write into it throws and leaves `write()` unchanged, and that a view taken before a gesture is the same after it.
+**Guard** — target, faustx-zj5.36: the interface test checks that the view is frozen in depth, that a write into it throws and leaves `write()` unchanged, and that a view taken before a gesture is the same after it.
 
-## 8. `catalogue`
+## 8. `controls`
+
+```ts
+export interface Control {
+  readonly path: string
+  readonly instance: string
+  readonly port: string
+  readonly min: number
+  readonly max: number
+  readonly unit: string | null
+  readonly start: string
+  readonly smoothing: string | null
+}
+```
+
+`controls` returns the controls of the program `write` returns at the same instant, as one value frozen in depth: for each instance in the flow, in the order instances were placed, its controls in the order its body writes them. A control is a port that has a setting and bounds (`LANGUAGE.md` §3.4). `path` is its control path from the program root, the one a `set` returns; `min` and `max` are the bounds the slider carries; `unit` is the port's `unit` attribute, `null` when it has none; `start` is the value the slider starts at, as written; `smoothing` is the Faust function the program applies to the control's value before the circuit reads it (`si.smoo`), `null` when the value enters as it is. The host scales its values into the bounds and writes them by path; FaustX scales nothing.
+
+**Guard** — target, faustx-zj5.36: each control a compiled program exposes, read from the compiler's description of its interface, has an entry with the same path and bounds, and no entry lacks its control.
+
+## 9. `catalogue`
 
 ```ts
 export type Catalogue = Readonly<Record<string, CatalogueModule>>
@@ -176,6 +198,7 @@ export type Catalogue = Readonly<Record<string, CatalogueModule>>
 export interface CatalogueModule {
   readonly name: string
   readonly ports: readonly Port[]
+  readonly unavailable: string | null
 }
 
 export interface Port {
@@ -186,17 +209,48 @@ export interface Port {
 }
 ```
 
-`catalogue` returns the modules the catalogue declares, as one value frozen in depth, the same at each call. A `Port` is a parameter of the module that carries no nature (a function, a signal): its name, its starting value as written, and its bounds. Each one is a port of the instances whose body calls the module.
+`catalogue` returns the modules the catalogue declares, as one value frozen in depth, the same at each call and for every session. A `Port` is a parameter of the module that carries no nature (a function, a signal): its name, its starting value as written, and its bounds. Each one is a port of the instances whose body calls the module. `unavailable` is the foreign function a module calls that the declared faustwasm does not provide, `null` for a module it compiles; placing a module whose `unavailable` is not `null` is refused (§5).
 
-**Guard** — `tests/unit/graph.test.js` (the catalogue carries every module its header counts); target, faustx-zj5.10: the interface test checks that the value is frozen in depth and that a write into it throws.
+**Guard** — `tests/unit/graph.test.js` (the catalogue carries every module its header counts); `tests/unit/catalogue-source.test.js` (a module faustwasm refuses is marked with the function it calls); target, faustx-zj5.36: the interface test checks that the value is frozen in depth and that a write into it throws.
 
-## 9. The command line
+## 10. The editor entry
+
+```ts
+import type { LRParser } from '@lezer/lr'
+
+export const parser: LRParser
+export function diagnose(text: string): readonly Diagnostic[]
+
+export interface Diagnostic {
+  readonly range: Range
+  readonly severity: 1
+  readonly code: RefusalCode
+  readonly source: 'faustx'
+  readonly message: string
+}
+
+export interface Range {
+  readonly start: Position
+  readonly end: Position
+}
+
+export interface Position {
+  readonly line: number
+  readonly character: number
+}
+```
+
+`faustx/editor` serves an editor. `parser` is the Lezer parser generated from FaustX's grammar, the one the session reads with: a CodeMirror editor builds its language from it (`LRLanguage.define({ parser })`) and highlights FaustX by the grammar's node names. `diagnose` applies a text to a new session, as the command line applies a file, and returns one diagnostic per refused line, in the order of the lines. A `Diagnostic` has the form of the Language Server Protocol's: `range` covers the refused line without its surrounding spaces, its lines and characters counted from 0 in UTF-16 code units; `severity` is 1, an error; `code` and `message` are the refusal's code and sentence (§5).
+
+**Guard** — target, faustx-zj5.36: the interface test checks the two exports; each refused example of the language reference gives one diagnostic with its code and the range of its line.
+
+## 11. The command line
 
 ```
 faustx <file.fx> [-o <file.dsp>]
 faustx --version
 ```
 
-The command applies the file to an empty graph and writes the Faust program to standard output, or to the file given by `-o`. Each refused line goes to standard error as `<file>:<line>: refused <CODE> — <reason>`, followed by the line. It exits with 0 once the file is read, refused lines included, and with 2 when no file is given.
+The command applies the file to a new session and writes the Faust program to standard output, or to the file given by `-o`. Each refused line goes to standard error as `<file>:<line>: refused <CODE> — <reason>`, followed by the line. It exits with 0 once the file is read, refused lines included, and with 2 when no file is given.
 
 **Guard** — `tests/unit/transpiler.test.js` (the command line translates a file).
