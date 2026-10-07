@@ -13,7 +13,7 @@
 //   - a port driven by a signal: `lfo1 : lpf1.fc` (§6)
 //   - `process` as the sink one connects to (§8)
 //
-// `N:3` is the filter order: Faust requires a compile-time constant there,
+// `N=3` is the filter order: Faust requires a compile-time constant there,
 // and a port without bounds stays one (§3.4).
 // The Faust that FaustScript writes for this piece is engraved in
 // tests/references/examples/1-drone-that-plays-alone.fsc.txt.
@@ -23,23 +23,23 @@
 //   envelope opens, `vol1` the master volume.
 // ============================================================================
 
-let osc1 os.sawtooth(freq:110)
-let osc2 os.sawtooth(freq:110.6)
-let osc3 os.sawtooth(freq:55)
+let osc1 os.sawtooth(freq=110)
+let osc2 os.sawtooth(freq=110.6)
+let osc3 os.sawtooth(freq=55)
 
-let lpf1 fi.lowpass(N:3, fc:800)
-    lpf1.fc.min:40
-    lpf1.fc.max:12000
-    lpf1.fc.scale:log
-    lpf1.fc.unit:Hz
+let lpf1 fi.lowpass(N=3, fc=800)
+    lpf1.fc.min = 40
+    lpf1.fc.max = 12000
+    lpf1.fc.scale = log
+    lpf1.fc.unit = Hz
 
-let lfo1 os.osc(freq:0.15) * 900 + 1100
-let bat1 ba.beat(t:96)
-let env1 en.adsr(at:0.01, dt:0.35, sl:0.45, rt:1.4)
+let lfo1 os.osc(freq=0.15) * 900 + 1100
+let bat1 ba.beat(t=96)
+let env1 en.adsr(at=0.01, dt=0.35, sl=0.45, rt=1.4)
 
 let vca1 *
-let rev1 re.mono_freeverb(fb1:0.92, fb2:0.72, damp:0.45, spread:23)
-let vol1 *(gain:0.35)
+let rev1 re.mono_freeverb(fb1=0.92, fb2=0.72, damp=0.45, spread=23)
+let vol1 *(gain=0.35)
 
 // the wiring
 lfo1 : lpf1.fc

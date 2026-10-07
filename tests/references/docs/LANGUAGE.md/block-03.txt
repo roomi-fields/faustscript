@@ -14,7 +14,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lpf2
-    faust: lpf2 = fi.lowpass(fc=400);
+    faust: lpf2 = vgroup("lpf2", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 400, 2, 8000, 0.001)));
     needs: []
 
 3  let lpfs:8 fi.lowpass
@@ -42,7 +42,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 import("stdfaust.lib");
 lpf1 = fi.lowpass(4, 2000);
-lpf2 = fi.lowpass(fc=400);
+lpf2 = vgroup("lpf2", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 400, 2, 8000, 0.001)));
 lpfs = par(i,8,fi.lowpass(4, 2000));
 voix = par(i,8,os.sawtooth(220) : fi.lowpass(4, 2000));
 vca1 = *;

@@ -7,14 +7,14 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lfo1
-    faust: lfo1 = os.osc(freq=0.2);
+    faust: lfo1 = vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.2, 0.1, 12000, 0.001)));
     needs: []
 
 2  let lpf1 fi.lowpass(fc=800)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lpf1
-    faust: lpf1 = fi.lowpass(fc=800);
+    faust: lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 800, 2, 8000, 0.001)));
     needs: []
 
 3  lfo1 : it.remap(-1, 1, 140, 900) : lpf1.fc
@@ -25,6 +25,6 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 --- write
 
 import("stdfaust.lib");
-lfo1 = os.osc(freq=0.2);
-lpf1 = fi.lowpass(fc=800);
+lfo1 = vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.2, 0.1, 12000, 0.001)));
+lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 800, 2, 8000, 0.001)));
 process = 0;

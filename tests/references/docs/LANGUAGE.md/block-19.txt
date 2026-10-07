@@ -14,7 +14,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     outcome: {"done":true,"reason":null}
     gesture: replace
     name: rev1
-    faust: rev1 = re.mono_freeverb(damp=0.9);
+    faust: rev1 = vgroup("rev1", re.mono_freeverb(0.7, 0.5, hslider("damp", 0.9, 0, 1, 0.001), 30));
     needs: []
 
 3  !let rev1
@@ -26,11 +26,11 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     outcome: {"done":true,"reason":null}
     gesture: place
     name: rev1
-    faust: rev1 = re.mono_freeverb(damp=0.9);
+    faust: rev1 = vgroup("rev1", re.mono_freeverb(0.7, 0.5, hslider("damp", 0.9, 0, 1, 0.001), 30));
     needs: []
 
 --- write
 
 import("stdfaust.lib");
-rev1 = re.mono_freeverb(damp=0.9);
+rev1 = vgroup("rev1", re.mono_freeverb(0.7, 0.5, hslider("damp", 0.9, 0, 1, 0.001), 30));
 process = 0;

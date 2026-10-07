@@ -14,28 +14,28 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     outcome: {"done":true,"reason":null}
     gesture: replace
     name: lpf1
-    faust: lpf1 = fi.lowpass(fc=400);
+    faust: lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 400, 2, 8000, 0.001)));
     needs: []
 
 3  _ lpf1
     outcome: {"done":true,"reason":null}
     gesture: bypass
     name: lpf1
-    faust: lpf1 = fi.lowpass(fc=400);
+    faust: lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 400, 2, 8000, 0.001)));
     needs: []
 
 4  !_ lpf1
     outcome: {"done":true,"reason":null}
     gesture: bypass
     name: lpf1
-    faust: lpf1 = fi.lowpass(fc=400);
+    faust: lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 400, 2, 8000, 0.001)));
     needs: []
 
 5  ! lpf1
     outcome: {"done":true,"reason":null}
     gesture: remove
     name: lpf1
-    faust: lpf1 = fi.lowpass(fc=400);
+    faust: lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 400, 2, 8000, 0.001)));
     needs: []
 
 6  !let lpf1

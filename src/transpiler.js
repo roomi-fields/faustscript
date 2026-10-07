@@ -8,7 +8,7 @@ import { readCatalogue } from './catalogue.js'
 import { readTemplates } from './templates.js'
 import { Graph } from './graph.js'
 import { apply } from './reading.js'
-import { writeInstance, writeExpression } from './emitter.js'
+import { writeInstance, writeExpression, writeDefinition } from './emitter.js'
 import { writeInStages } from './stages.js'
 
 /** The gestures that change an instance's circuit, and so cost a compilation.
@@ -85,21 +85,37 @@ export class Transpiler {
    */
   write() {
     const lines = [this.templates.value('template.Header')]
+    for (const text of this.graph.definitions.values()) {
+      lines.push(writeDefinition(text, this.catalogue, this.templates))
+    }
     for (const instance of this.graph.instances.values()) {
       if (instance.removed) {
         continue
       }
       lines.push(writeInstance(instance, this.catalogue, this.templates, this.graph))
     }
-    const expression = this.shares()
+    const wires = this.shares()
       ? writeInStages(this.graph, this.catalogue, this.templates)
       : writeExpression(this.graph, this.catalogue, this.templates)
     lines.push(
       this.templates.fill('template.Sink', {
-        expression: expression ?? this.templates.value('template.Silence'),
+        expression: this.sinkReceives(wires) ?? this.templates.value('template.Silence'),
       })
     )
     return lines.join('\n') + '\n'
+  }
+
+  /** What the sink receives: what the wires bring, summed with what a Faust
+   *  definition of the sink sends into it. */
+  sinkReceives(wires) {
+    const sent = this.graph.sinkDefinition
+    if (sent === null) {
+      return wires
+    }
+    const definition = writeDefinition(sent, this.catalogue, this.templates)
+    return wires === null
+      ? definition
+      : this.templates.fill('template.SinkDefinition', { wires, definition })
   }
 
   /** Does one instance feed more than one destination? */

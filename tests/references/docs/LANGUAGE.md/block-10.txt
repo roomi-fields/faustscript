@@ -3,18 +3,13 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  voix(freq=110, fc=
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
-    gesture: null
-    name: null
+1  voix(freq=110, fc=800)  os.sawtooth(freq=freq)
+    outcome: {"done":false,"reason":"voix is not a placed instance"}
+    gesture: replace
+    name: voix
 
-1  800
+1  fi.lowpass(fc=fc)
     outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
-
-1  os.sawtooth(freq=freq) : fi.lowpass(fc=fc)
-    outcome: {"done":false,"reason":"os does not exist"}
     gesture: wire
     name: null
 

@@ -3,69 +3,69 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-26  let osc1 os.sawtooth(freq:110)
+26  let osc1 os.sawtooth(freq=110)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: osc1
     faust: osc1 = vgroup("osc1", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 110, 0.08, 220, 0.001)));
     needs: []
 
-27  let osc2 os.sawtooth(freq:110.6)
+27  let osc2 os.sawtooth(freq=110.6)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: osc2
     faust: osc2 = vgroup("osc2", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 110.6, 0.08, 220, 0.001)));
     needs: []
 
-28  let osc3 os.sawtooth(freq:55)
+28  let osc3 os.sawtooth(freq=55)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: osc3
     faust: osc3 = vgroup("osc3", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 55, 0.08, 220, 0.001)));
     needs: []
 
-30  let lpf1 fi.lowpass(N:3, fc:800)
+30  let lpf1 fi.lowpass(N=3, fc=800)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lpf1
     faust: lpf1 = vgroup("lpf1", fi.lowpass(3, hslider("fc[unit:Hz][scale:log]", 800, 2, 8000, 0.001)));
     needs: []
 
-31  lpf1.fc.min:40
+31  lpf1.fc.min = 40
     outcome: {"done":true,"reason":null}
     gesture: set
     name: lpf1
 
-32  lpf1.fc.max:12000
+32  lpf1.fc.max = 12000
     outcome: {"done":true,"reason":null}
     gesture: set
     name: lpf1
 
-33  lpf1.fc.scale:log
+33  lpf1.fc.scale = log
     outcome: {"done":true,"reason":null}
     gesture: set
     name: lpf1
 
-34  lpf1.fc.unit:Hz
+34  lpf1.fc.unit = Hz
     outcome: {"done":true,"reason":null}
     gesture: set
     name: lpf1
 
-36  let lfo1 os.osc(freq:0.15) * 900 + 1100
+36  let lfo1 os.osc(freq=0.15) * 900 + 1100
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lfo1
     faust: lfo1 = vgroup("lfo1", vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.15, 0.1, 12000, 0.001))) * 900 + 1100);
     needs: []
 
-37  let bat1 ba.beat(t:96)
+37  let bat1 ba.beat(t=96)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: bat1
     faust: bat1 = ba.beat(96);
     needs: []
 
-38  let env1 en.adsr(at:0.01, dt:0.35, sl:0.45, rt:1.4)
+38  let env1 en.adsr(at=0.01, dt=0.35, sl=0.45, rt=1.4)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: env1
@@ -79,14 +79,14 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     faust: vca1 = *;
     needs: []
 
-41  let rev1 re.mono_freeverb(fb1:0.92, fb2:0.72, damp:0.45, spread:23)
+41  let rev1 re.mono_freeverb(fb1=0.92, fb2=0.72, damp=0.45, spread=23)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: rev1
     faust: rev1 = vgroup("rev1", re.mono_freeverb(hslider("fb1", 0.92, 0, 1, 0.001), hslider("fb2", 0.72, 0, 1, 0.001), hslider("damp", 0.45, 0, 1, 0.001), 23));
     needs: []
 
-42  let vol1 *(gain:0.35)
+42  let vol1 *(gain=0.35)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: vol1

@@ -99,7 +99,7 @@ function readDefinition(text, node) {
     for (const argument of childrenOf(arguments_, 'Argument')) {
       const key = argument.getChild('Key')
       module.parameters.push({
-        name: key ? contenu(text, key).slice(0, -1) : contenu(text, argument),
+        name: key ? contenu(text, key) : contenu(text, argument),
         fallback: key ? contenu(text, argument.getChild('Value')) : null,
       })
     }
@@ -111,17 +111,14 @@ function readDefinition(text, node) {
   return module
 }
 
-/** `cutoff.min:20` on the line after a module sets an attribute on it. */
+/** `fc.min = 20` on the line after a module sets an attribute on it. */
 function readAttribute(text, node, module) {
-  const prefix = node.getChild('Prefix')
-  const key = node.getChild('Key')
   const value = node.getChild('Value')
-  if (!key || !value) {
+  if (!value) {
     return
   }
 
-  const chemin = prefix ? contenu(text, prefix) : ''
-  const membres = (chemin + contenu(text, key).slice(0, -1)).split('.').filter(Boolean)
+  const membres = contenu(text, node.getChild('DottedPath')).split('.').filter(Boolean)
 
   // the last member names the attribute, what precedes it names the parameter
   if (membres.length < 2) {
@@ -134,9 +131,9 @@ function readAttribute(text, node, module) {
 
 /** Does a call reach a module by the names of its parameters?
  *
- * `fi.lowpass(fc:800)` does: its arguments are named, in any order. A call
+ * `fi.lowpass(fc=800)` does: its arguments are named, in any order. A call
  * that passes one argument without its name — `fi.lowpass(3, 800)`,
- * `fi.lowpass(3, cutoff:800)` — is written in Faust's order, and stays Faust.
+ * `fi.lowpass(3, cutoff=800)` — is written in Faust's order, and stays Faust.
  */
 export function callsByName(arguments_) {
   return !arguments_ || childrenOf(arguments_, 'Argument').every(a => a.getChild('Key'))

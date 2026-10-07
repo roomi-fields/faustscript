@@ -56,6 +56,8 @@ export class Graph {
     this.catalogue = catalogue
     this.instances = new Map()
     this.wires = []
+    this.definitions = new Map() // a Faust statement's head -> its text
+    this.sinkDefinition = null // what a Faust definition of the sink sends into it
   }
 
   // --- what exists -----------------------------------------------------------
@@ -217,6 +219,21 @@ export class Graph {
     return this.wires.some(
       w => w.to.name === name && !w.to.member && this.carriesAnInput(w.from.name, seen)
     )
+  }
+
+  // --- what is written in Faust --------------------------------------------------
+
+  /** A Faust statement, kept as written; the same head replaces it. */
+  define(head, text) {
+    this.definitions.set(head, text)
+    return Outcome.ok()
+  }
+
+  /** A Faust definition of the sink: one more source into it, which a new
+   *  one replaces while the wires stay. */
+  feedSink(expression) {
+    this.sinkDefinition = expression
+    return Outcome.ok()
   }
 
   // --- setting -----------------------------------------------------------------

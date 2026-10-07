@@ -7,35 +7,30 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lpf1
-    faust: lpf1 = fi.lowpass(fc=800);
+    faust: lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 800, 2, 8000, 0.001)));
     needs: []
 
 2  let lfo1 os.osc(freq=0.2)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lfo1
-    faust: lfo1 = os.osc(freq=0.2);
+    faust: lfo1 = vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.2, 0.1, 12000, 0.001)));
     needs: []
 
-3  lpf1.fc = 400                        // one port
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
-    gesture: null
-    name: null
+3  lpf1.fc = 400
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: lpf1
 
-4  lpf1(fc=400, N=
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
-    gesture: null
-    name: null
-
-4  5
+4  lpf1(fc=400, N=5)
     outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
 
-5  lpf1.fc.min = 20                     // an attribute of the port
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
-    gesture: null
-    name: null
+5  lpf1.fc.min = 20
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: lpf1
 
 6  lfo1 : lpf1.fc
     outcome: {"done":true,"reason":null}
@@ -45,6 +40,6 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 --- write
 
 import("stdfaust.lib");
-lpf1 = fi.lowpass(fc=800);
-lfo1 = os.osc(freq=0.2);
+lpf1 = fi.lowpass(4, lfo1 : it.remap(-1, 1, 2, 8000));
+lfo1 = vgroup("lfo1", os.osc(hslider("freq[unit:Hz][scale:log]", 0.2, 0.1, 12000, 0.001)));
 process = 0;

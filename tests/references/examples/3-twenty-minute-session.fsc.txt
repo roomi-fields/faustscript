@@ -3,21 +3,21 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-30  let bat1   ba.beat(t:112)
+30  let bat1   ba.beat(t=112)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: bat1
     faust: bat1 = ba.beat(112);
     needs: []
 
-31  let envb   en.ar(at:0.004, rt:0.16)
+31  let envb   en.ar(at=0.004, rt=0.16)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: envb
     faust: envb = vgroup("envb", en.ar(hslider("at[unit:s][scale:log]", 0.004, 0.001, 0.1, 0.001), hslider("rt[unit:s][scale:log]", 0.16, 0.001, 0.8, 0.001), 0));
     needs: []
 
-32  let basse  os.sawtooth(freq:55)
+32  let basse  os.sawtooth(freq=55)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: basse
@@ -31,7 +31,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     faust: vcab = *;
     needs: []
 
-34  let sortie *(gain:0.5)
+34  let sortie *(gain=0.5)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: sortie
@@ -48,7 +48,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: wire
     name: null
 
-52  let lpf1 fi.resonlp(fc:420, Q:6, gain:0.9)
+52  let lpf1 fi.resonlp(fc=420, Q=6, gain=0.9)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lpf1
@@ -70,7 +70,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: wire
     name: null
 
-73  let lfo1 os.osc(freq:0.13) * 380 + 520
+73  let lfo1 os.osc(freq=0.13) * 380 + 520
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lfo1
@@ -82,7 +82,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: wire
     name: null
 
-79  lpf1.Q:16
+79  lpf1.Q = 16
     outcome: {"done":true,"reason":null}
     gesture: set
     name: lpf1
@@ -94,7 +94,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     faust: bruit = no.noise;
     needs: []
 
-104  let envc  en.ar(at:0.001, rt:0.09)
+104  let envc  en.ar(at=0.001, rt=0.09)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: envc
@@ -108,7 +108,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     faust: vcac = *;
     needs: []
 
-106  let clic:6 fi.resonbp(fc:900, Q:60, gain:1)
+106  let clic:6 fi.resonbp(fc=900, Q=60, gain=1)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: clic
@@ -130,51 +130,51 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: wire
     name: null
 
-112  clic.1.fc:311
+112  clic.1.fc = 311
     outcome: {"done":true,"reason":null}
     gesture: set
     name: clic
 
-113  clic.2.fc:466
+113  clic.2.fc = 466
     outcome: {"done":true,"reason":null}
     gesture: set
     name: clic
 
-114  clic.3.fc:622
+114  clic.3.fc = 622
     outcome: {"done":true,"reason":null}
     gesture: set
     name: clic
 
-115  clic.4.fc:933
+115  clic.4.fc = 933
     outcome: {"done":true,"reason":null}
     gesture: set
     name: clic
 
-116  clic.5.fc:1244
+116  clic.5.fc = 1244
     outcome: {"done":true,"reason":null}
     gesture: set
     name: clic
 
-117  clic.6.fc:1866
+117  clic.6.fc = 1866
     outcome: {"done":true,"reason":null}
     gesture: set
     name: clic
 
-130  basse os.square(freq:55)
+130  basse os.square(freq=55)
     outcome: {"done":true,"reason":null}
     gesture: replace
     name: basse
     faust: basse = vgroup("basse", os.square(hslider("freq[unit:Hz][scale:log]", 55, 20, 20000, 0.001)));
     needs: []
 
-144  let dly1 de.fdelay(n:96000, d:13000)
+144  let dly1 de.fdelay(n=96000, d=13000)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: dly1
     faust: dly1 = vgroup("dly1", de.fdelay(hslider("n[unit:samples][scale:log]", 96000, 512, 2.09715e+06, 0.001), 13000));
     needs: []
 
-145  let fb1  *(retour:0.55)
+145  let fb1  *(retour=0.55)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: fb1
@@ -196,7 +196,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: wire
     name: null
 
-154  let lfo2 os.osc(freq:0.07) * 4000 + 9000
+154  let lfo2 os.osc(freq=0.07) * 4000 + 9000
     outcome: {"done":true,"reason":null}
     gesture: place
     name: lfo2
@@ -215,7 +215,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     faust: lpf1 = vgroup("lpf1", fi.resonlp(lfo1, hslider("Q[scale:log]", 16, 0.5, 50, 0.001), hslider("gain", 0.9, 0, 1, 0.001)));
     needs: ["lfo1"]
 
-176  lpf1 fi.resonlp(fc:420, Q:16, gain:0.9)
+176  lpf1 fi.resonlp(fc=420, Q=16, gain=0.9)
     outcome: {"done":true,"reason":null}
     gesture: replace
     name: lpf1
@@ -234,7 +234,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: release
     name: clic
 
-209  let clic:12 fi.resonbp(fc:900, Q:60, gain:1)
+209  let clic:12 fi.resonbp(fc=900, Q=60, gain=1)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: clic
@@ -251,17 +251,17 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: wire
     name: null
 
-214  clic.1.fc:311
+214  clic.1.fc = 311
     outcome: {"done":true,"reason":null}
     gesture: set
     name: clic
 
-215  clic.7.fc:2489
+215  clic.7.fc = 2489
     outcome: {"done":true,"reason":null}
     gesture: set
     name: clic
 
-238  let voix:8 os.sawtooth : fi.lowpass(N:2, fc:1200)
+238  let voix:8 os.sawtooth : fi.lowpass(N=2, fc=1200)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: voix
@@ -273,42 +273,42 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: wire
     name: null
 
-241  voix.1.freq:110
+241  voix.1.freq = 110
     outcome: {"done":true,"reason":null}
     gesture: set
     name: voix
 
-242  voix.2.freq:165
+242  voix.2.freq = 165
     outcome: {"done":true,"reason":null}
     gesture: set
     name: voix
 
-243  voix.3.freq:220
+243  voix.3.freq = 220
     outcome: {"done":true,"reason":null}
     gesture: set
     name: voix
 
-244  voix.4.freq:277
+244  voix.4.freq = 277
     outcome: {"done":true,"reason":null}
     gesture: set
     name: voix
 
-245  voix.5.freq:330
+245  voix.5.freq = 330
     outcome: {"done":true,"reason":null}
     gesture: set
     name: voix
 
-246  voix.6.freq:440
+246  voix.6.freq = 440
     outcome: {"done":true,"reason":null}
     gesture: set
     name: voix
 
-247  voix.7.freq:554
+247  voix.7.freq = 554
     outcome: {"done":true,"reason":null}
     gesture: set
     name: voix
 
-248  voix.8.freq:660
+248  voix.8.freq = 660
     outcome: {"done":true,"reason":null}
     gesture: set
     name: voix
@@ -318,14 +318,14 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: wire
     name: null
 
-276  let rev1  re.stereo_freeverb(fb1:0.88, fb2:0.7, damp:0.4, spread:23)
+276  let rev1  re.stereo_freeverb(fb1=0.88, fb2=0.7, damp=0.4, spread=23)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: rev1
     faust: rev1 = vgroup("rev1", re.stereo_freeverb(hslider("fb1", 0.88, 0, 1, 0.001), hslider("fb2", 0.7, 0, 1, 0.001), hslider("damp", 0.4, 0, 1, 0.001), 23));
     needs: ["fb1"]
 
-277  let envoi *(niveau:0.25)
+277  let envoi *(niveau=0.25)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: envoi
@@ -347,7 +347,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: release
     name: rev1
 
-295  let rev1 re.mono_freeverb(fb1:0.94, fb2:0.75, damp:0.3, spread:19)
+295  let rev1 re.mono_freeverb(fb1=0.94, fb2=0.75, damp=0.3, spread=19)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: rev1
@@ -374,12 +374,12 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: wire
     name: null
 
-327  sortie.gain:0.2
+327  sortie.gain = 0.2
     outcome: {"done":true,"reason":null}
     gesture: set
     name: sortie
 
-328  sortie.gain:0
+328  sortie.gain = 0
     outcome: {"done":true,"reason":null}
     gesture: set
     name: sortie

@@ -7,14 +7,14 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     outcome: {"done":true,"reason":null}
     gesture: place
     name: basse
-    faust: basse = os.sawtooth(freq=55);
+    faust: basse = vgroup("basse", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 55, 0.08, 220, 0.001)));
     needs: []
 
 2  let nappe os.sawtooth(freq=220)
     outcome: {"done":true,"reason":null}
     gesture: place
     name: nappe
-    faust: nappe = os.sawtooth(freq=220);
+    faust: nappe = vgroup("nappe", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 220, 0.08, 220, 0.001)));
     needs: []
 
 3  let vcab si.bus(2) :> _
@@ -47,7 +47,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 --- write
 
 import("stdfaust.lib");
-basse = os.sawtooth(freq=55);
-nappe = os.sawtooth(freq=220);
+basse = vgroup("basse", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 55, 0.08, 220, 0.001)));
+nappe = vgroup("nappe", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 220, 0.08, 220, 0.001)));
 vcab = si.bus(2) :> _;
 process = nappe : vcab;

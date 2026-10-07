@@ -16,12 +16,12 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     name: null
 
 3  process = no.noise * 0.1;
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
+    outcome: {"done":true,"reason":null}
     gesture: null
     name: null
 
 4  process = no.noise * 0.05;
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
+    outcome: {"done":true,"reason":null}
     gesture: null
     name: null
 
@@ -29,4 +29,4 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 import("stdfaust.lib");
 saw1 = os.sawtooth(220);
-process = saw1;
+process = (saw1, no.noise * 0.05) :> si.bus(outputs(no.noise * 0.05));

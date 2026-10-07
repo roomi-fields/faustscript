@@ -14,7 +14,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     outcome: {"done":true,"reason":null}
     gesture: place
     name: voix2
-    faust: voix2 = os.sawtooth(freq=165);
+    faust: voix2 = vgroup("voix2", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 165, 0.08, 220, 0.001)));
     needs: []
 
 3  let rev1 re.mono_freeverb
@@ -43,6 +43,6 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 import("stdfaust.lib");
 voix1 = os.sawtooth(220);
-voix2 = os.sawtooth(freq=165);
+voix2 = vgroup("voix2", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 165, 0.08, 220, 0.001)));
 rev1 = re.mono_freeverb(0.7, 0.5, 0.3, 30);
 process = (voix1, voix2) :> rev1;

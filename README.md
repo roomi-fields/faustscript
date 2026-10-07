@@ -14,8 +14,8 @@ It computes nothing. A FaustScript program is **translated into Faust**, and Fau
 compiles it — with the functions its libraries declare, untouched.
 
 ```faustscript
-let saw1 os.sawtooth(freq:110)
-let lpf1 fi.lowpass(fc:800)
+let saw1 os.sawtooth(freq=110)
+let lpf1 fi.lowpass(fc=800)
 
 saw1 : lpf1 : process
 ```
@@ -31,7 +31,7 @@ process = saw1 : lpf1;
 
 The filter order stays a constant, `fc` becomes a slider with its real bounds
 and a logarithmic scale, and the instance name becomes the control path
-`/lpf1/fc`. All of that comes from the catalogue; you wrote `fc:800`.
+`/lpf1/fc`. All of that comes from the catalogue; you wrote `fc=800`.
 
 ---
 
@@ -63,24 +63,25 @@ connection, and what surrounds it qualifies it.
 | `A : B` | connect | Faust |
 | `let lpf1 fi.lowpass` | place **one** instance | FaustScript |
 | `let lpfs:8 fi.lowpass` | place eight | FaustScript |
-| `lpf1 fi.lowpass(fc:400)` | replace its body, memory kept | FaustScript |
+| `lpf1 fi.lowpass(fc=400)` | replace its body, memory kept | FaustScript |
 | `!let lpf1` | give the name back | FaustScript |
 | `saw1 :8 lpf1` | connect as eight instances | FaustScript |
 | `saw1 !: lpf1` | cut the wire | FaustScript |
 | `dly1 ~ fb1` · `dly1 !~ fb1` | close · open a feedback loop | Faust · FaustScript |
 | `_ lpf1` · `!_ lpf1` | bypass · un-bypass | FaustScript |
 | `! lpf1` | remove it and its wires | FaustScript |
-| `lpf1.fc:400` | set one control | FaustScript |
-| `lpf1(fc:400, q:2)` | set several at once | FaustScript |
+| `lpf1.fc = 400` | set one control | FaustScript |
+| `lpf1(fc=400, q=2)` | set several at once | FaustScript |
 | `lfo1 : lpf1.fc` | drive a control with a signal | FaustScript |
 | `saw1.3` | one channel of an instance | FaustScript |
 
 **Three rules, and nothing else to remember:** a `!` in front cancels what
 follows it, a digit after says how many, and the dot reaches into an instance.
 
-**Spacing is significant:** `:8` is a width,
-`: 8` connects to the constant 8; `fc:800` assigns, `a : b` connects. And one
-line is one statement.
+**`=` gives a value, `:` connects:** `fc=800` gives a parameter its value,
+`lpf1.fc = 400` sets a port, `a : b` connects, and on a wiring line `:8` or `: 8`
+connects as eight copies. A Faust definition runs up to its `;`, as in Faust;
+any other line is one gesture.
 
 The gain is measurable. `par(i,8,saw) : par(i,8,lpf)` is 28 characters;
 `saw1 :8 lpf1` is 12. **Live, that is the difference between typing while it
@@ -176,7 +177,7 @@ As a library:
 import { createTranspiler } from 'faustscript'
 
 const faustscript = createTranspiler(catalogue, templates)
-faustscript.apply('let lpf1 fi.lowpass(fc:800)\n_ : lpf1 : process\n')
+faustscript.apply('let lpf1 fi.lowpass(fc=800)\n_ : lpf1 : process\n')
 faustscript.write()          // the Faust
 ```
 

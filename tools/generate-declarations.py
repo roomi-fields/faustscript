@@ -31,9 +31,9 @@ passing through, an index the model passes to itself. These last ones receive no
 value but a nature — `function`, `table`, `signal`, `internal`, `expression` —
 and the example that illustrates it:
 
-    ADAA1(EPS:0.001, f, F1)  aa.ADAA1(EPS, f, F1, x)
-      f.nature:function
-      f.example:aa.clip(-1.0, 1.0)
+    ADAA1(EPS=0.001, f, F1)  aa.ADAA1(EPS, f, F1, x)
+      f.nature = function
+      f.example = aa.clip(-1.0, 1.0)
 
 They are outside the count of settings: giving them a number would make no
 sense, and leaving them empty without saying so would be lying.
@@ -927,8 +927,8 @@ def rendered_range(d):
         return []
     if r['state'] != 'measured':
         return ['  // %s: %s' % (RANGE_TROUBLES[r['state']], r['detail'])]
-    lines = ['  output.min:%g' % r['min'], '  output.max:%g' % r['max'],
-             '  output.measure:%s' % r['excitation']]
+    lines = ['  output.min = %g' % r['min'], '  output.max = %g' % r['max'],
+             '  output.measure = %s' % r['excitation']]
     s, n = r.get('silence'), r.get('noise')
     if s and n and max(abs(s[0]), abs(s[1])) > RESIDUE:
         # the module emits something even without receiving anything: the two
@@ -1049,7 +1049,7 @@ def declare(name, prefix, block, params, body, ui, uib, everywhere, stats):
         if 'documentation' in aside:
             d['remarks'].append(
                 f'  // the bounds stated for {p} ({span[0]:g} to {span[1]:g}) '
-                f'are not kept: {p}:{d["values"][p]} falls outside')
+                f'are not kept: {p}={d["values"][p]} falls outside')
         stats['bounds set aside, the start falls outside'] += len(aside)
         if low is None:
             continue
@@ -1098,7 +1098,7 @@ FOREIGN = re.compile(r"calling foreign function '(\w+)' is not allowed")
 
 def render(d):
     """The text of a declaration, once the compiler has gone over it."""
-    head = [f"{p}:{quote(d['values'][p])}" if p in d['values'] else p
+    head = [f"{p}={quote(d['values'][p])}" if p in d['values'] else p
             for p in d['params']
             if d['natures'].get(p) != 'signal']
     name = f"{d['prefix']}.{d['name']}"
@@ -1109,26 +1109,26 @@ def render(d):
              else f"{name}  {body}"]
     for p in d['params']:
         if p in d['units']:
-            lines.append(f"  {p}.unit:{d['units'][p]}")
+            lines.append(f"  {p}.unit = {d['units'][p]}")
         if p in d['bounds']:
             low, high, _ = d['bounds'][p]
-            lines.append(f'  {p}.min:{low:g}')
+            lines.append(f'  {p}.min = {low:g}')
             if high is not None:
-                lines.append(f'  {p}.max:{high:g}')
+                lines.append(f'  {p}.max = {high:g}')
         if p in d['scales']:
-            lines.append(f"  {p}.scale:{d['scales'][p]}")
+            lines.append(f"  {p}.scale = {d['scales'][p]}")
     for p in d['params']:
         if p in d['natures']:
-            lines.append(f"  {p}.nature:{d['natures'][p]}")
+            lines.append(f"  {p}.nature = {d['natures'][p]}")
             if p in d['examples']:
-                lines.append(f"  {p}.example:{quote(d['examples'][p])}")
+                lines.append(f"  {p}.example = {quote(d['examples'][p])}")
     foreign = re.search(FOREIGN, d['error'] or '')
     if foreign:
-        lines.append(f'  faustwasm.unavailable:{foreign.group(1)}')
+        lines.append(f'  faustwasm.unavailable = {foreign.group(1)}')
     lines += rendered_range(d)
     for p in d['params']:
         if p in d['guessed'] and p in d['values']:
-            lines.append(f"  // GUESSED: {p}:{d['values'][p]}, from {d['guessed'][p]}")
+            lines.append(f"  // GUESSED: {p}={d['values'][p]}, from {d['guessed'][p]}")
     for p in d['params']:
         if p in d['bounds'] and d['bounds'][p][2] in BOUNDS_EXPLAINED:
             low, high, origin = d['bounds'][p]
@@ -1414,9 +1414,9 @@ def generate(root, versions):
             stats['compile'] += 1
             if d['inputs'] == 0:
                 stats['without input'] += 1
-        if '.unit:' in text:    stats['with a unit'] += 1
+        if '.unit = ' in text:    stats['with a unit'] += 1
         if d['bounds']:         stats['with bounds'] += 1
-        if 'output.min:' in text: stats['with an output range'] += 1
+        if 'output.min = ' in text: stats['with an output range'] += 1
         if 'TO COMPLETE' not in text: stats['complete'] += 1
 
     print('// FaustScript module declarations, generated from the Faust libraries of')
@@ -1443,7 +1443,7 @@ def generate(root, versions):
     print('// `output.measure` says under which excitation. These are observed')
     print('// values, never theoretical bounds.')
     print('//')
-    print('// `faustwasm.unavailable:f` marks a module that faustwasm refuses to')
+    print('// `faustwasm.unavailable = f` marks a module that faustwasm refuses to')
     print('// compile: it calls the foreign function f, which the WebAssembly')
     print('// backend does not allow.')
     print('// Do not edit by hand: correct tools/generate-declarations.py.')

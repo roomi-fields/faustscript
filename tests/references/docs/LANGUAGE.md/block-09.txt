@@ -3,40 +3,30 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  fi.lowpass(N=4, fc=
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
-    gesture: null
-    name: null
-
-1  2000
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
-
-1  fi.lowpass(N, fc)
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
+1  fi.lowpass(N=4, fc=2000)  fi.lowpass(N, fc)
+    outcome: {"done":false,"reason":"fi.lowpass is not a placed instance"}
+    gesture: replace
+    name: fi.lowpass
 
 2  fc.min = 2
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
-    gesture: null
-    name: null
+    outcome: {"done":false,"reason":"fc does not exist"}
+    gesture: set
+    name: fc
 
 3  fc.max = 8000
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
-    gesture: null
-    name: null
+    outcome: {"done":false,"reason":"fc does not exist"}
+    gesture: set
+    name: fc
 
 4  fc.scale = log
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
-    gesture: null
-    name: null
+    outcome: {"done":false,"reason":"fc does not exist"}
+    gesture: set
+    name: fc
 
 5  fc.unit = Hz
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
-    gesture: null
-    name: null
+    outcome: {"done":false,"reason":"fc does not exist"}
+    gesture: set
+    name: fc
 
 --- write
 

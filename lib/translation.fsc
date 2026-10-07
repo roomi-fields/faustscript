@@ -59,6 +59,10 @@ template.Rescale       {signal} : it.remap({fromStart}, {fromEnd}, {toStart}, {t
 template.Header        import("stdfaust.lib");
 template.Sink          process = {expression};
 
+// a Faust definition of the sink is one more source into it: what it sends is
+// summed, channel by channel, with what the wires bring
+template.SinkDefinition  ({wires}, {definition}) :> si.bus(outputs({definition}))
+
 // what the sink receives when nothing feeds it any more: silence, and not the
 // absence of a program — a file without a sink does not compile
 template.Silence       0

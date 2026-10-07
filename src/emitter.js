@@ -91,7 +91,8 @@ function writeArgument(instance, module, parameter, templates, graph) {
   if (start === null || start === undefined) {
     return parameter.name
   }
-  if (pose === undefined) {
+  // a value given in a Faust definition is a constant: no instance carries it
+  if (pose === undefined || instance.constant) {
     return start
   }
 
@@ -233,30 +234,42 @@ function headOfBody(module) {
   return parenthese < 0 ? module.body : module.body.slice(0, parenthese)
 }
 
+/** Writes a Faust statement — a definition, an import, a declaration — as Faust.
+ *
+ * It keeps its Faust meaning: a module's name alone stays the Faust function,
+ * and only a call that gives its parameters by name is written in Faust's
+ * order, `os.sawtooth(freq=f)` as `os.sawtooth(f)`. The values it gives stay
+ * constants: a definition is no instance, and carries no port.
+ */
+export function writeDefinition(text, catalogue, templates) {
+  return translateExpression(text, null, catalogue, templates, true)
+}
+
 /** Translates the modules recognised inside an expression written by hand.
  *
- * `os.osc(freq:0.15) * 900 + 1100` becomes Faust: every known module takes its
+ * `os.osc(freq=0.15) * 900 + 1100` becomes Faust: every known module takes its
  * body and its settings, the rest — operators, numbers, whatever is already
- * Faust — passes as it stands.
+ * Faust — passes as it stands. In a Faust statement (`inFaust`), a module's
+ * name alone stays as written and a call by name takes constants.
  *
  * The text is read again by our own parser: it is the tree that says where
  * the calls are, not a search for parentheses.
  */
-function translateExpression(text, instanceName, catalogue, templates) {
+function translateExpression(text, instanceName, catalogue, templates, inFaust = false) {
   const arbre = parser.parse(text)
   const remplacements = []
 
   arbre.iterate({
     enter(node) {
       if (node.name === 'NamedCall' || node.name === 'OperatorCall') {
-        const rendered = translateCall(text, node.node, instanceName, catalogue, templates)
+        const rendered = translateCall(text, node.node, instanceName, catalogue, templates, inFaust)
         if (rendered !== null) {
           remplacements.push({ de: node.from, a: node.to, rendered })
           return false // do not go down: the call is already rendered
         }
       }
       // the head of a call is the call's: a module alone is its body
-      if (node.name === 'Path' && node.node.parent?.name !== 'NamedCall') {
+      if (!inFaust && node.name === 'Path' && node.node.parent?.name !== 'NamedCall') {
         const name = text.slice(node.from, node.to)
         if (catalogue.has(name)) {
           remplacements.push({
@@ -277,9 +290,9 @@ function translateExpression(text, instanceName, catalogue, templates) {
   return rendered
 }
 
-/** A call: `fi.lowpass(fc:800)` if it reaches a module by its parameters'
+/** A call: `fi.lowpass(fc=800)` if it reaches a module by its parameters'
  *  names, otherwise its arguments in their order, each named one a free port. */
-function translateCall(text, node, instanceName, catalogue, templates) {
+function translateCall(text, node, instanceName, catalogue, templates, inFaust) {
   const head = node.getChild('Path') ?? node.getChild('Operator')
   const name = head ? text.slice(head.from, head.to) : null
   const listeDArguments = node.getChild('Arguments')
@@ -292,14 +305,14 @@ function translateCall(text, node, instanceName, catalogue, templates) {
     const key = e.node.getChild('Key')
     const value = e.node.getChild('Value')
     arguments_.push({
-      key: key ? text.slice(key.from, key.to - 1) : null,
+      key: key ? text.slice(key.from, key.to) : null,
       value: value ? text.slice(value.from, value.to) : text.slice(e.from, e.to),
     })
   }
 
   if (catalogue.has(name) && callsByName(listeDArguments)) {
     const settings = new Map(arguments_.map(({ key, value }) => [key, value]))
-    return bodyOnly(instanceName, name, settings, catalogue, templates)
+    return bodyOnly(instanceName, name, settings, catalogue, templates, inFaust)
   }
 
   // an operator, a call in Faust's order, or a function the catalogue does
@@ -322,8 +335,8 @@ function translateCall(text, node, instanceName, catalogue, templates) {
 }
 
 /** The Faust body of a module, without the definition around it. */
-function bodyOnly(instanceName, nomDuModule, settings, catalogue, templates) {
-  const faux = { name: instanceName, module: nomDuModule, settings, multiplicity: 1 }
+function bodyOnly(instanceName, nomDuModule, settings, catalogue, templates, constant = false) {
+  const faux = { name: instanceName, module: nomDuModule, settings, multiplicity: 1, constant }
   const line = writeInstance(faux, catalogue, templates)
   return line.slice(line.indexOf('=') + 1, line.lastIndexOf(';')).trim()
 }

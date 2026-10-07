@@ -22,7 +22,7 @@ export function apply(text, graph, alsoNote = () => ({})) {
     const result = {
       line: lineNumber(text, line.from),
       text: contenu(text, line),
-      outcome: applyLine(text, line, graph),
+      outcome: readable(line) ? applyLine(text, line, graph) : unreadable(text, line),
       ...gestureOf(text, form),
     }
     // noted here and not once the text is over: a later line may release the
@@ -46,7 +46,7 @@ const GESTURES = {
   Removal: 'remove',
   Bypass: 'bypass',
   Setting: 'set',
-  Expression: 'wire',
+  Wiring: 'wire',
 }
 
 function gestureOf(text, form) {
@@ -63,18 +63,27 @@ function targetOf(text, form, gesture) {
     return declaredName(text, form)
   }
   if (gesture === 'set') {
-    const prefix = form.getChild('Prefix')
-    const key = form.getChild('Key')
-    if (!key) {
-      return null
-    }
-    return (
-      ((prefix ? contenu(text, prefix) : '') + contenu(text, key).slice(0, -1))
-        .split('.')
-        .filter(Boolean)[0] ?? null
-    )
+    return membersOf(text, form.getChild('DottedPath'))[0] ?? null
   }
   return nameOf(text, form)
+}
+
+/** Does the grammar read the whole line? A line it reads only in part is
+ *  refused whole, so that no gesture is applied from a piece of it. */
+function readable(node) {
+  if (node.type.isError) {
+    return false
+  }
+  for (let e = node.firstChild; e; e = e.nextSibling) {
+    if (!readable(e)) {
+      return false
+    }
+  }
+  return true
+}
+
+function unreadable(text, line) {
+  return Outcome.refused(`does not read: ${contenu(text, line)}`)
 }
 
 function applyLine(text, line, graph) {
@@ -96,8 +105,13 @@ function applyLine(text, line, graph) {
       return set(text, form, graph)
     case 'Definition':
       return definir(text, form, graph)
-    case 'Expression':
+    case 'Wiring':
       return wire(text, form, graph)
+    case 'FaustDefinition':
+      return defineInFaust(text, form, graph)
+    case 'Import':
+    case 'Declare':
+      return graph.define(statementKey(text, form), contenu(text, form))
     default:
       return Outcome.refused(`unknown form: ${form.name}`)
   }
@@ -108,9 +122,7 @@ function applyLine(text, line, graph) {
 /** The name a declaration lays down, whether single or a bank of several. */
 function declaredName(text, form) {
   const multiple = form.getChild('MultipleName')
-  return multiple
-    ? contenu(text, multiple.getChild('Key')).slice(0, -1)
-    : contenu(text, form.getChild('Name'))
+  return contenu(text, (multiple ?? form).getChild('Name'))
 }
 
 function slot(text, form, graph) {
@@ -158,7 +170,7 @@ function readArguments(text, node) {
   for (const argument of childrenOf(node, 'Argument')) {
     const key = argument.getChild('Key')
     if (key) {
-      settings.set(contenu(text, key).slice(0, -1), contenu(text, argument.getChild('Value')))
+      settings.set(contenu(text, key), contenu(text, argument.getChild('Value')))
     }
   }
   return settings
@@ -204,20 +216,43 @@ function definir(text, form, graph) {
 }
 
 function set(text, form, graph) {
-  const prefix = form.getChild('Prefix')
-  const key = form.getChild('Key')
   const value = form.getChild('Value')
-  if (!key || !value) {
+  if (!value) {
     return Outcome.refused('incomplete setting')
   }
+  const members = membersOf(text, form.getChild('DottedPath'))
+  return graph.set(members[0], members.slice(1).join('.'), contenu(text, value))
+}
 
-  const membres = ((prefix ? contenu(text, prefix) : '') + contenu(text, key).slice(0, -1))
-    .split('.')
-    .filter(Boolean)
-  if (membres.length < 2) {
-    return Outcome.refused('a setting targets a port')
+/** The members of a dotted name: `lpf1.fc.min` gives lpf1, fc, min. */
+function membersOf(text, node) {
+  return (contenu(text, node) ?? '').split('.').filter(Boolean)
+}
+
+// --- what is written in Faust ------------------------------------------------
+
+/** A Faust definition is kept as written, under its head: written again, it
+ *  replaces the definition it repeats. A definition of the sink without
+ *  parameters is one more source into it. */
+function defineInFaust(text, form, graph) {
+  const head = form.getChild('FaustHead')
+  const name = contenu(text, head.getChild('Name'))
+  if (name === graph.sink && !head.getChild('Arguments')) {
+    return graph.feedSink(contenu(text, form.getChild('Expression')))
   }
-  return graph.set(membres[0], membres.slice(1).join('.'), contenu(text, value))
+  return graph.define(
+    statementKey(text, head.getChild('Name'), head.getChild('Arguments')),
+    contenu(text, form)
+  )
+}
+
+/** What identifies a Faust statement: its text without spaces, from the
+ *  given nodes. Two writings that differ only by their spacing are one. */
+function statementKey(text, ...nodes) {
+  return nodes
+    .map(node => contenu(text, node) ?? '')
+    .join('')
+    .replace(/\s+/g, '')
 }
 
 // --- wiring ------------------------------------------------------------------
@@ -240,7 +275,7 @@ function wire(text, expression, graph) {
       const sign = piece.firstChild
       cutting = sign?.name === 'CutSeries' || sign?.name === 'CutFeedback'
       loop = sign?.name === 'Feedback' || sign?.name === 'WideFeedback'
-      width = sign?.name === 'WideSeries' ? Number(contenu(text, sign).slice(1)) : null
+      width = sign?.name === 'WideSeries' ? Number(contenu(text, sign.getChild('Number'))) : null
       continue
     }
     const right = pointsOf(text, piece)
@@ -319,7 +354,7 @@ function pointsOf(text, terme) {
     const inside = groupe.getChild('Expression')
     const points = []
     for (let e = inside?.firstChild; e; e = e.nextSibling) {
-      if (e.name !== 'Link') {
+      if (e.name === 'Term') {
         points.push(...pointsOf(text, e))
       }
     }

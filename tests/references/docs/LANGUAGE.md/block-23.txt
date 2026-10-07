@@ -29,10 +29,10 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
     gesture: wire
     name: null
 
-5  lpfs.3.fc = 400                      // the third filter of the bank
-    outcome: {"done":false,"reason":"unknown form: FaustDefinition"}
-    gesture: null
-    name: null
+5  lpfs.3.fc = 400
+    outcome: {"done":true,"reason":null}
+    gesture: set
+    name: lpfs
 
 --- write
 

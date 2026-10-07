@@ -77,9 +77,9 @@ it('gives a module faustwasm refuses no width, the compiler having measured none
 it("reads a module's widths in its own entry only", () => {
   const catalogue = readCatalogue(
     'ma.J0  ma.J0\n  // DOES NOT COMPILE: refused\n\n' +
-      'fi.lowpass(N:1, fc:1000)  fi.lowpass(N, fc)\n  // 1 input, 1 output\n\n' +
-      'ma.erf  ma.erf\n  faustwasm.unavailable:erff\n' +
-      'os.osc(freq:440)  os.osc(freq)\n  // 0 input, 1 output\n'
+      'fi.lowpass(N=1, fc=1000)  fi.lowpass(N, fc)\n  // 1 input, 1 output\n\n' +
+      'ma.erf  ma.erf\n  faustwasm.unavailable = erff\n' +
+      'os.osc(freq=440)  os.osc(freq)\n  // 0 input, 1 output\n'
   )
   expect(catalogue.get('ma.J0').inputs).toBeUndefined()
   expect(catalogue.get('ma.erf').outputs).toBeUndefined()

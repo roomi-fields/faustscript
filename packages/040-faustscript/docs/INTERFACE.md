@@ -80,17 +80,17 @@ The gesture says what the line does to the graph, and what the host has to compi
 
 | gesture | line | effect on the graph | returns |
 | --- | --- | --- | --- |
-| `place` | `let lpf1 fi.lowpass(fc:800)` | adds the instance `lpf1` | `faust`, `needs` |
-| `replace` | `lpf1 fi.lowpass(fc:400)` | replaces the body of `lpf1`; its other settings stay | `faust`, `needs` |
+| `place` | `let lpf1 fi.lowpass(fc=800)` | adds the instance `lpf1` | `faust`, `needs` |
+| `replace` | `lpf1 fi.lowpass(fc=400)` | replaces the body of `lpf1`; its other settings stay | `faust`, `needs` |
 | `release` | `!let lpf1` | deletes `lpf1` and its wires; the name becomes free | — |
 | `remove` | `! lpf1` | takes `lpf1` and its wires out of the flow; the name stays taken | `faust`, `needs` |
 | `bypass` | `_ lpf1`, `!_ lpf1` | lets the signal through `lpf1`, or puts `lpf1` back | `faust`, `needs` |
-| `set` | `lpf1.fc:400` | records the value of the port `fc` | `port`, `value`, `path` |
+| `set` | `lpf1.fc = 400` | records the value of the port `fc` | `port`, `value`, `path` |
 | `wire` | `osc1 : lpf1`, `osc1 !: lpf1` | adds or cuts wires | — |
 
-**The ports of an instance.** An instance whose body is a module carries the parameters of that module that carry no nature (§9). An instance whose body is a Faust expression carries the ports its author named in that body: `let lpf1 fi.lowpass(3, cutoff:800)` carries the port `cutoff`. A setting or a wire that targets any other port is refused (§5).
+**The ports of an instance.** An instance whose body is a module carries the parameters of that module that carry no nature (§9). An instance whose body is a Faust expression carries the ports its author named in that body: `let lpf1 fi.lowpass(3, cutoff=800)` carries the port `cutoff`. A setting or a wire that targets any other port is refused (§5).
 
-**The control path.** An instance becomes a Faust group named after it, and a control a slider inside that group: `let lpf1 fi.lowpass(fc:800)` writes `lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc…", 800, 2, 8000, …)));`, and `lpf1.fc:400` returns the path `/lpf1/fc`. A `set` compiles nothing: the host writes the value on the running circuit at that path. The prefix that a compiled program adds above the program root is the host's.
+**The control path.** An instance becomes a Faust group named after it, and a control a slider inside that group: `let lpf1 fi.lowpass(fc=800)` writes `lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc…", 800, 2, 8000, …)));`, and `lpf1.fc = 400` returns the path `/lpf1/fc`. A `set` compiles nothing: the host writes the value on the running circuit at that path. The prefix that a compiled program adds above the program root is the host's.
 
 **Guard** — `tests/unit/transpiler.test.js` (each gesture says what it touched, and what has to be recompiled; a module driven by another names what it needs); target, faustx-zj5.9: a `set` returns its port, its value and its path; target, faustx-zj5.36: a blank line and a comment line return no result, and the next line keeps its number; the interface test.
 
@@ -138,7 +138,7 @@ export type RefusalCode =
 | `UNAVAILABLE_MODULE` | places or gives a body that calls a module the declared faustwasm does not provide: `let n1 no.rnoises` | `module`, `function` | `no.rnoises calls arc4random, which faustwasm does not provide` |
 | `INCOMPLETE_SETTING` | a setting without its port or its value | `text` | `incomplete setting: <text>` |
 | `SETTING_WITHOUT_PORT` | `lpf1:3` | `name` | `a setting targets a port: lpf1` |
-| `UNKNOWN_PORT` | a setting or a wire that targets a port the instance does not carry: `lpf1.nope:3`, `osc1 : lpf1.nope` | `name`, `port` | `lpf1 has no port nope` |
+| `UNKNOWN_PORT` | a setting or a wire that targets a port the instance does not carry: `lpf1.nope = 3`, `osc1 : lpf1.nope` | `name`, `port` | `lpf1 has no port nope` |
 | `SETTING_FROM_INPUT` | drives a port with a signal that carries a program input | `name` | `in1 carries one of the program's inputs: a port is driven by a signal, never by an input` |
 | `NO_SUCH_WIRE` | `osc1 !: lpf1` where no wire joins them | `from`, `to` | `no wire between osc1 and lpf1` |
 

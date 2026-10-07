@@ -175,15 +175,15 @@
       </tbody>
     </table>
 
-    <p style="margin-top:18px"><strong>Spacing is significant.</strong> Tight, a sign qualifies;
-    spaced, it connects. Without that rule four writings would be ambiguous: <code>:8</code> is a
-    width, <code>: 8</code> connects to the constant 8; <code>fc:800</code> assigns,
-    <code>a : b</code> connects.</p>
+    <p style="margin-top:18px"><strong><code>=</code> gives a value, <code>:</code> connects.</strong>
+    <code>fc=800</code> gives a parameter its value, <code>lpf1.fc = 400</code> sets a port,
+    <code>a : b</code> connects, and on a wiring line <code>:8</code> or <code>: 8</code> connects as
+    eight copies. A Faust definition runs up to its <code>;</code>, as in Faust.</p>
 
-    <pre><code><span class="cs">let</span> lpf1 fi.lowpass(fc:800)   <span class="cc">// place one instance, named</span>
+    <pre><code><span class="cs">let</span> lpf1 fi.lowpass(fc=800)   <span class="cc">// place one instance, named</span>
 saw1 : lpf1 : process        <span class="cc">// wire it to what sounds</span>
-    lpf1 fi.lowpass(fc:400)  <span class="cc">// replace its body — its memory stays</span>
-    lpf1.fc:400              <span class="cc">// or just turn the knob</span>
+    lpf1 fi.lowpass(fc=400)  <span class="cc">// replace its body — its memory stays</span>
+    lpf1.fc = 400            <span class="cc">// or just turn the knob</span>
    <span class="cs">!let</span> lpf1                 <span class="cc">// give the name back, the tail runs out</span></code></pre>
   </div>
 </section>

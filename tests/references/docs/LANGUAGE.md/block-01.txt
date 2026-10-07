@@ -3,8 +3,41 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-throws: Cannot read properties of null (reading 'length')
+1  gain = 0.5;
+    outcome: {"done":true,"reason":null}
+    gesture: null
+    name: null
+
+2  voice(f) = os.sawtooth(f)
+  : fi.lowpass(2, 800);
+    outcome: {"done":true,"reason":null}
+    gesture: null
+    name: null
+
+4  let lpf1 fi.lowpass(fc=800)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: lpf1
+    faust: lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 800, 2, 8000, 0.001)));
+    needs: []
+
+5  let = 1;
+    outcome: {"done":true,"reason":null}
+    gesture: null
+    name: null
+
+6  voix2(f) = os.sawtooth(freq=f) : fi.lowpass(fc=800);
+    outcome: {"done":true,"reason":null}
+    gesture: null
+    name: null
 
 --- write
 
-throws: Cannot read properties of null (reading 'length')
+import("stdfaust.lib");
+gain = 0.5;
+voice(f) = os.sawtooth(f)
+  : fi.lowpass(2, 800);
+let = 1;
+voix2(f) = os.sawtooth(f) : fi.lowpass(4, 800);
+lpf1 = vgroup("lpf1", fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 800, 2, 8000, 0.001)));
+process = 0;

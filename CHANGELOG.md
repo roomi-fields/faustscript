@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `=` gives a value and `:` only connects: `fi.lowpass(fc=800)`, `lpf1.fc = 400`,
+  `lpf1.fc.min = 20`, and the catalogue declares `fi.lowpass(N=4, fc=2000)` and `fc.unit = Hz`.
+  On a wiring line a number after `:`, stuck or spaced, counts copies (`saw1 : 8 lpf1`); spacing
+  no longer changes what a sign means. A minus sign before a number is negative where a term is
+  awaited, and subtracts after a term (`10 -5`).
+- A Faust definition (`gain = 0.5;`, `voice(f) = …;`), an `import` and a `declare` are read as
+  Faust up to their `;`, over several lines, and written as they are; `let = 1;` is one of them. A
+  call by name inside a definition takes its values as constants. `process = expr;` is one more
+  source into the sink, summed with the wires; a new one replaces it.
 - FaustX is renamed FaustScript: the package and the command are `faustscript`, a file of the
   language ends in `.fsc` (`lib/faust.fsc`, `lib/translation.fsc`, `examples/*.fsc`), the grammar
   is `src/faustscript.grammar`, and a block of the language in a document is fenced `faustscript`.
@@ -19,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `faustwasm.unavailable` marks a module faustwasm refuses to compile.
 - The catalogue declares every function a documentation title of the libraries names, alone or
   grouped (`(ef.)cubicnl`, `(ef.)cubicnl_nodc`): 1172 modules, `tf2`, `fft` and `conv` among them.
-- A module is written under its Faust name, prefix included: `let lpf1 fi.lowpass(fc:800)`. The
+- A module is written under its Faust name, prefix included: `let lpf1 fi.lowpass(fc=800)`. The
   catalogue declares `fi.lowpass`, and both `ma.SR` and `pl.SR`; a name without
   its prefix in a body is refused, `lowpass is not a module; fi.lowpass is`.
 - A call that passes an argument without its name keeps Faust's order and meaning:
@@ -33,8 +42,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A line the grammar reads only in part is refused, `does not read: <line>`, and changes nothing;
+  `let = 1;` no longer throws.
 - A call in Faust's order that names one of its arguments keeps its other arguments:
-  `fi.lowpass(3, cutoff:800)` writes `fi.lowpass(3, nentry("cutoff", …))`.
+  `fi.lowpass(3, cutoff=800)` writes `fi.lowpass(3, nentry("cutoff", …))`.
 
 - A module without a width line in the catalogue has no width: reading no longer gives it the
   next module's, and generation no longer gives a module faustwasm refuses (`rnoises`) the

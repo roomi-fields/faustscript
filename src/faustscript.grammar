@@ -4,14 +4,20 @@
 //
 // What each form means is in docs/LANGUAGE.md.
 //
+// Two kinds of line: a Faust definition runs up to its `;`, over as many lines
+// as it takes; any other line is a gesture and ends at the newline. Which one
+// a newline ends is told by `tokens.js`, the part of the grammar that tracks
+// whether a Faust statement is open.
+//
 // Two forms cannot be told apart by syntax and are left to the graph,
 // which alone knows what exists:
-//   - `lpf1(cutoff:400)` is a call if lpf1 is a module, a grouped setting
+//   - `lpf1(fc=400)` is a call if lpf1 is a module, a grouped setting
 //     if it is an instance already placed;
 //   - `_` is an input inside an expression, and the bypass sign when it
 //     stands before a name.
 
-// One line, one statement: the newline ends what precedes it.
+@precedence { copies }
+
 @top Program { (Line? endOfLine)* Line? }
 
 Line {
@@ -23,16 +29,17 @@ Line {
   Definition |
   FaustDefinition |
   Import |
-  Expression
+  Declare |
+  Wiring
 }
 
 // --- placing and releasing --------------------------------------------------------
 
-// let lpf1 fi.lowpass     let lpfs:8 fi.lowpass(fc:400)
-// `clic:6` reads as a name stuck to a number: the lexer makes it a Key
-// followed by a Number, and the emitter sews them back together.
+// let lpf1 fi.lowpass     let lpfs:8 fi.lowpass(fc=400)     let voix : 8 os.sawtooth
+// `let` is a FaustScript word only at the start of a line followed by a name;
+// anywhere else it is a Faust identifier: `let = 1;` is a Faust definition.
 Declaration { kw<"let"> (MultipleName | Name) FreeBody }
-MultipleName { Key Number }
+MultipleName { Name colon Number }
 
 // !let lpf1
 Release { bang kw<"let"> Name }
@@ -41,21 +48,27 @@ Release { bang kw<"let"> Name }
 // --- declaring a module -----------------------------------------------------
 
 // One and the same form serves three purposes, which only the graph tells apart:
-//   fi.lowpass(N:4, fc:2000)  fi.lowpass(N, fc)              declarer
-//   pl.BS  pl.BS                                              declarer sans parametre
-//   lpf1 fi.lowpass(fc:400)                                   remplacer un corps
+//   fi.lowpass(N=4, fc=2000)  fi.lowpass(N, fc)              declares a module
+//   pl.BS  pl.BS                                              declares one without parameters
+//   lpf1 fi.lowpass(fc=400)                                   replaces a body
 // Is the name a known module, an instance already placed, or brand new?
 // The grammar cannot know; the graph can.
-Definition { Path Arguments? ~apres NamedBody }
+Definition { Path Arguments? NamedBody }
 
-// lpf1 fi.lowpass(fc:400) — le nom seul remplace le corps de l'exemplaire
 // --- what Faust writes, and a superset must read --------------------
 
-// process = _ : fi.lowpass(3, 800);
-FaustDefinition { Path Arguments? equals Expression semicolon }
+// gain = 0.5;     voice(f) = os.sawtooth(f) : fi.lowpass(2, 800);
+// A name, or a name with its parameters, followed by `=` opens a Faust
+// definition: Faust's grammar refuses `=` after a dotted name, which is a
+// setting.
+FaustDefinition { FaustHead Expression semicolon }
+FaustHead { "'"? Name ~head Arguments? equals }
 
 // import("stdfaust.lib");
-Import { kw<"import"> "(" String ")" semicolon }
+Import { faustKw<"import"> "(" String ")" semicolon }
+
+// declare name "drone";     declare fi.lowpass author "GRAME";
+Declare { faustKw<"declare"> (Name | DottedPath)? Name String semicolon }
 
 // --- gestures on an instance -------------------------------------------
 
@@ -67,13 +80,16 @@ Removal { bang Name }
 
 // --- setting -----------------------------------------------------------------
 
-// lpf1.cutoff:400 — and lpf1.cutoff.min:20, which the graph tells apart:
+// lpf1.fc = 400 — and lpf1.fc.min = 20, which the graph tells apart:
 // it knows whether the last member is a port or a port's attribute.
-Setting { Prefix? Key Value }
+Setting { DottedPath equals Value }
 
 // --- connecting ---------------------------------------------------------------
 
-Expression { Term (Link Term)* }
+// A wiring line connects placed instances. Its signs are FaustScript's, and a
+// number after `:` or `~`, stuck or spaced, counts copies: `saw1 :8 lpf1`,
+// `saw1 : 8 lpf1`, `dly1 ~4 fb1`.
+Wiring { Term (Link Term)* }
 
 Link {
   CutSeries | WideSeries | Series |
@@ -82,10 +98,10 @@ Link {
 }
 
 Series           { colon }
-WideSeries      { Width }
+WideSeries      { colon !copies Number }
 CutSeries     { bang colon }
 Feedback      { "~" }
-WideFeedback { LoopWidth }
+WideFeedback { "~" !copies Number }
 CutFeedback { bang "~" }
 Split     { "<:" }
 Merge          { ":>" }
@@ -94,69 +110,83 @@ Stack      { "," }
 Operator       { "*" | "+" | "-" | "/" | "^" | "%" | "@" | "&" | "|" |
                   ">" | "<" | ">=" | "<=" | "==" | "!=" }
 
-// `*` est une fonction en Faust : il se pose comme un term et s'appelle.
-Term { Call | Path | Number | NegativeNumber | String | Identity | bang | Operator | Group }
+// --- Faust as it stands -------------------------------------------------------
+
+// A body, a definition, a group: Faust's signs with their Faust meaning, where
+// `os.osc(440) : 0.5 * _` sends into the constant 0.5.
+Expression { Term (Sign Term)* Locals? }
+Sign { Series | Feedback | Split | Merge | Stack | Operator }
+
+// a value, inside a call's parentheses: the comma separates the arguments
+Value { Term (ValueSign Term)* }
+ValueSign { Series | Feedback | Split | Merge | Operator }
+
+// expr with { gain = 0.5; }     expr letrec { 'x = x + 1; }
+Locals { (faustKw<"with"> | faustKw<"letrec">) "{" FaustDefinition* "}" }
+
+// `*` is a function in Faust: it stands as a term and is called.
+Term {
+  Call | Path | Number | NegativeNumber | String | Identity | bang | Operator | Group |
+  Delayed | Environment
+}
+
+// A minus sign before a number is a negative number where a term is awaited —
+// `thresh=-40`, `(0.5, -0.5)`, `2 * -1` — and subtracts where a sign is: `10 -5`.
+NegativeNumber { "-" Number }
 
 Group { "(" Expression ")" }
 
+// x' — the signal one sample late
+Delayed { Term "'" }
+
+// environment { gain = 0.5; }
+Environment { faustKw<"environment"> "{" FaustDefinition* "}" }
+
 // a call, or an instance's grouped setting: the graph decides
 Call { NamedCall | OperatorCall }
-NamedCall { Path Arguments ~apres }
+NamedCall { Path Arguments }
 OperatorCall { Operator Arguments }
 Arguments { "(" commaSep<Argument> ")" }
-Argument { Key? Value }
+// fc=800: the name of a parameter, then its value
+Argument { (Key equals)? Value }
+Key { Name }
 
 // --- what gets named --------------------------------------------------------
 
-// lpf1     fi.lowpass     lpfs.3     lpf1.cutoff
-Path { Name ("." Member)* }
-Prefix { Name ("." Member)* "." }
-Member { Name | Number }
+// lpf1     fi.lowpass     lpfs.3     lpf1.fc
+Path { Name ~head | DottedPath }
 
 // a `let` body is free; a definition's body starts with a name, otherwise
 // `vca1 *` would be an unfinished multiplication
 FreeBody { Expression }
 NamedBody { NamedCall | Path }
-Value { Term (SimpleLink Term)* }
 
-SimpleLink {
-  CutSeries | WideSeries | Series |
-  CutFeedback | WideFeedback | Feedback |
-  Split | Merge | Operator
-}
+@skip { blank | Comment | continuation }
 
-@skip { blank | Comment }
+// Whether a Faust statement is open, which tells the newline what it ends.
+@context statements from "./tokens.js"
+
+// A newline ends a line, or continues an open Faust statement.
+@external tokens newlines from "./tokens.js" { endOfLine, continuation }
 
 @tokens {
   blank { $[ \t]+ }
-  endOfLine { $[\n\r] $[ \t\n\r]* }
   Comment { "//" ![\n]* }
 
   // a name may start with an underscore — `_b` — but the underscore alone
   // is Faust's identity, never a name
   Name { $[a-zA-Z] $[a-zA-Z0-9_]* | "_" $[a-zA-Z0-9_]+ }
-  // le signe moins est un operateur, jamais une part du nombre
-  // colle au chiffre, le moins fait un nombre negatif ; space, il
-  // subtracts. Same convention as for width.
-  NegativeNumber { "-" $[0-9]+ ("." $[0-9]+)? ($[eE] $[-+]? $[0-9]+)? }
 
-  // a number does not end with a dot: `a.1.b` is a path, and the dot that
-  // follows a digit takes the next member
+  // a name with its members, read whole: `fi.lowpass`, `lpfs.3`, `lpf1.fc.min`
+  DottedPath { Name ("." (Name | $[0-9]+))+ }
+
+  // a number does not end with a dot: `a.1.b` is a path
   Number { $[0-9]+ ("." $[0-9]+)? ($[eE] $[-+]? $[0-9]+)? }
-
-  // stuck to the sign, a digit says how many: `:8` `~8`. Spaced, it is
-  // a connection to a constant: `: 8`.
-  // un nom colle a un deux-points affecte ; space, le deux-points
-  // the convention of an earlier language of ours, and it removes every
-  // ambiguity between assigning and connecting.
-  Key { $[a-zA-Z_] $[a-zA-Z0-9_]* ":" }
-
-  Width { ":" $[0-9]+ }
-  LoopWidth { "~" $[0-9]+ }
 
   // Faust quotes labels between double quotes: `hslider("cutoff", ...)`
   String { '"' !["]* '"' }
 
+  // `=` gives a value: to a port, an attribute, a parameter, a Faust name
   equals { "=" }
   semicolon { ";" }
 
@@ -164,7 +194,7 @@ SimpleLink {
   bang { "!" }
   colon { ":" }
 
-  "(" ")" "." ","
+  "(" ")" "," "{" "}" "'"
   ":>" "<:" "~"
   "*" "+" "-" "/" "^" "%" "@" "&" "|" ">" "<" ">=" "<=" "==" "!="
 
@@ -172,15 +202,13 @@ SimpleLink {
   @precedence { "<:", "<=", "<" }
   @precedence { ":>", ">=", ">" }
   @precedence { "!=", bang }
+  @precedence { "==", equals }
   @precedence { Comment, "/" }
-  @precedence { NegativeNumber, "-" }
-  @precedence { Key, Width, Name, colon }
-  @precedence { Name, Identity }
-  @precedence { LoopWidth, "~" }
-  @precedence { ":>", colon }
+  @precedence { DottedPath, Name, Identity }
 }
 
-@precedence { attribut @left, reglage @left }
-
-kw<term> { @specialize[@name={term}]<Name, term> }
+// `let` is a word of FaustScript and a Faust identifier: the parser tries both
+kw<term> { @extend[@name={term}]<Name, term> }
+// `import`, `declare`, `with`, `letrec`, `environment` are Faust's own words
+faustKw<term> { @specialize[@name={term}]<Name, term> }
 commaSep<content> { (content ("," content)*)? }
