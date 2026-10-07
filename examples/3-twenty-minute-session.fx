@@ -53,7 +53,6 @@ bat1 : envb.gate
 //    SETTLED SINCE: ruled on, and set aside. Faust has no cable to modify and
 //    no obvious notation presented itself, so the three lines are what one
 //    writes; to be reopened if use shows the gesture comes up often.
-//    (faustx-specification.md, "What the first programs revealed".)
 
 let lpf1 resonlp(fc:420, Q:6, gain:0.9)
 
@@ -205,7 +204,6 @@ lpf1 resonlp(fc:420, Q:16, gain:0.9)
 //    AND its cables, the instance remains and its name stays taken, and
 //    giving the name back requires `!let`. The three lines below are
 //    therefore what one writes; `!` still has no inverse.
-//    (faustx-specification.md, "What the first programs revealed".)
 
 !let clic
  let clic:12 resonbp(fc:900, Q:60, gain:1)

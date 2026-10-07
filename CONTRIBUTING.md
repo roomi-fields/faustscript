@@ -3,8 +3,8 @@
 ## Before proposing a sign
 
 FaustX **decorates Faust's signs, it does not invent others**. Ask first: *does it decorate
-something that exists in Faust?* If not, it goes out. The design of each sign is in
-[`docs/faustx-specification.md`](docs/faustx-specification.md).
+something that exists in Faust?* If not, it goes out. The principles are in
+[`docs/PRINCIPES.md`](docs/PRINCIPES.md).
 
 FaustX computes nothing (all DSP is Faust), knows nothing of its host, and never modifies
 the Faust compiler.

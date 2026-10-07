@@ -4,7 +4,7 @@
 computes no sample, it plays nothing. What it returns, a Faust compiler takes as it is.
 
 This document says how it is built. What it translates is in `LANGUAGE.md`; why the signs are the ones
-they are, in `faustx-specification.md`.
+they are, in `PRINCIPES.md`.
 
 ---
 
@@ -60,7 +60,7 @@ returns **what has changed**, with the Faust needed for it. The result of each g
 `docs/INTERFACE.md` §4.
 
 **That is what makes it possible to recompile only one module** — some 32 ms instead of 620 for a
-fifty-module program — and it is measured in the specification.
+fifty-module program — and it is measured by `tools/measure-compilation.mjs`.
 
 **In file mode, a complete program is the sequence of its gestures** applied to an empty graph, then
 serialised into a `.dsp`. FaustX therefore stays usable on its own, without a host: that is the

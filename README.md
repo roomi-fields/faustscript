@@ -203,7 +203,7 @@ fails if any of it leaks into the engine.
 
 `docs/LANGUAGE.md` — the reference: how to write FaustX.
 `docs/ARCHITECTURE.md` — how the transpiler is built.
-`docs/faustx-specification.md` — the design: why each sign is the one it is.
+`docs/PRINCIPES.md` — the principles: why each sign is the one it is.
 
 ---
 
