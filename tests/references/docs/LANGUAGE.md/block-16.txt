@@ -1,40 +1,45 @@
-FaustScript reference output of the faustscript block 16 of docs/LANGUAGE.md, which opens with let src1 os.sawtooth.
+FaustScript reference output of the faustscript block 16 of docs/LANGUAGE.md, which opens with let basse os.sawtooth(freq=55).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let src1 os.sawtooth
+1  let basse os.sawtooth(freq=55)
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: src1
-    faust: src1 = os.sawtooth(220);
+    name: basse
+    faust: basse = vgroup("basse", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 55, 0.08, 220, 0.001)));
     needs: []
 
-2  let dly1 de.delay(4096, 1000)
+2  let nappe os.sawtooth(freq=220)
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: dly1
-    faust: dly1 = de.delay(4096, 1000);
+    name: nappe
+    faust: nappe = vgroup("nappe", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 220, 0.08, 220, 0.001)));
     needs: []
 
-3  let fb1 _ * 0.5
+3  let vcab si.bus(2) :> _
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: fb1
-    faust: fb1 = _ * 0.5;
+    name: vcab
+    faust: vcab = si.bus(2) :> _;
     needs: []
 
-4  src1 : dly1
+4  basse : vcab
     outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
 
-5  dly1 ~ fb1
+5  nappe : vcab
     outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
 
-6  dly1 : process
+6  vcab : process
+    outcome: {"done":true,"reason":null}
+    gesture: wire
+    name: null
+
+7  basse !: vcab
     outcome: {"done":true,"reason":null}
     gesture: wire
     name: null
@@ -42,7 +47,7 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 --- write
 
 import("stdfaust.lib");
-src1 = os.sawtooth(220);
-dly1 = de.delay(4096, 1000);
-fb1 = _ * 0.5;
-process = src1 : route(1, 1, 1,1) : ((+ : dly1) ~ fb1);
+basse = vgroup("basse", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 55, 0.08, 220, 0.001)));
+nappe = vgroup("nappe", os.sawtooth(hslider("freq[unit:Hz][scale:log]", 220, 0.08, 220, 0.001)));
+vcab = si.bus(2) :> _;
+process = nappe : vcab;

@@ -1,0 +1,15 @@
+FaustScript reference output of the faustscript block 32 of docs/LANGUAGE.md, which opens with import("mes-modules.fsc");.
+Engraved by `npm run references -- --update`, in a commit that names the gap.
+
+--- apply
+
+1  import("mes-modules.fsc");
+    outcome: {"done":true,"reason":null}
+    gesture: null
+    name: null
+
+--- write
+
+import("stdfaust.lib");
+import("mes-modules.fsc");
+process = 0;

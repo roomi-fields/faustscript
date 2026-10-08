@@ -1,17 +1,12 @@
-FaustScript reference output of the faustscript block 10 of docs/LANGUAGE.md, which opens with voix(freq=110, fc=800)  os.sawtooth(freq=freq) : fi.lowpass(fc=fc).
+FaustScript reference output of the faustscript block 10 of docs/LANGUAGE.md, which opens with let lpf1 lowpass.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  voix(freq=110, fc=800)  os.sawtooth(freq=freq)
-    outcome: {"done":false,"reason":"voix is not a placed instance"}
-    gesture: replace
-    name: voix
-
-1  fi.lowpass(fc=fc)
-    outcome: {"done":true,"reason":null}
-    gesture: wire
-    name: null
+1  let lpf1 lowpass
+    outcome: {"done":false,"reason":"lowpass is not a module; fi.lowpass is"}
+    gesture: place
+    name: lpf1
 
 --- write
 

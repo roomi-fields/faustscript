@@ -1,34 +1,29 @@
-FaustScript reference output of the faustscript block 9 of docs/LANGUAGE.md, which opens with fi.lowpass(N=4, fc=2000)  fi.lowpass(N, fc).
+FaustScript reference output of the faustscript block 9 of docs/LANGUAGE.md, which opens with let lpfs:8 fi.lowpass(fc=800).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  fi.lowpass(N=4, fc=2000)  fi.lowpass(N, fc)
-    outcome: {"done":false,"reason":"fi.lowpass is not a placed instance"}
+1  let lpfs:8 fi.lowpass(fc=800)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: lpfs
+    faust: lpfs = vgroup("lpfs", par(i,8,fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 800, 2, 8000, 0.001))));
+    needs: []
+
+2  lpfs:16                              // the bank becomes sixteen filters
+    outcome: {"done":false,"reason":"does not read: lpfs:16                              // the bank becomes sixteen filters"}
+    gesture: wire
+    name: null
+
+3  lpfs fi.highpass
+    outcome: {"done":true,"reason":null}
     gesture: replace
-    name: fi.lowpass
-
-2  fc.min = 2
-    outcome: {"done":false,"reason":"fc does not exist"}
-    gesture: set
-    name: fc
-
-3  fc.max = 8000
-    outcome: {"done":false,"reason":"fc does not exist"}
-    gesture: set
-    name: fc
-
-4  fc.scale = log
-    outcome: {"done":false,"reason":"fc does not exist"}
-    gesture: set
-    name: fc
-
-5  fc.unit = Hz
-    outcome: {"done":false,"reason":"fc does not exist"}
-    gesture: set
-    name: fc
+    name: lpfs
+    faust: lpfs = vgroup("lpfs", par(i,8,fi.highpass(4, hslider("fc[unit:Hz][scale:log]", 800, 20, 12000, 0.001))));
+    needs: []
 
 --- write
 
 import("stdfaust.lib");
+lpfs = vgroup("lpfs", par(i,8,fi.highpass(4, hslider("fc[unit:Hz][scale:log]", 800, 20, 12000, 0.001))));
 process = 0;

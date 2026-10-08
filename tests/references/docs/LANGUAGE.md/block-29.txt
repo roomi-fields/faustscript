@@ -1,0 +1,15 @@
+FaustScript reference output of the faustscript block 29 of docs/LANGUAGE.md, which opens with process(x) = x * 0.5;.
+Engraved by `npm run references -- --update`, in a commit that names the gap.
+
+--- apply
+
+1  process(x) = x * 0.5;
+    outcome: {"done":true,"reason":null}
+    gesture: null
+    name: null
+
+--- write
+
+import("stdfaust.lib");
+process(x) = x * 0.5;
+process = 0;

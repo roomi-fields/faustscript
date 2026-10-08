@@ -1,14 +1,25 @@
-FaustScript reference output of the faustscript block 8 of docs/LANGUAGE.md, which opens with let lpf1 lowpass.
+FaustScript reference output of the faustscript block 8 of docs/LANGUAGE.md, which opens with let clic:6 fi.resonbp(fc=311 * 1.5^i, Q=40).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let lpf1 lowpass
-    outcome: {"done":false,"reason":"lowpass is not a module; fi.lowpass is"}
+1  let clic:6 fi.resonbp(fc=311 * 1.5^i, Q=40)
+    outcome: {"done":true,"reason":null}
     gesture: place
-    name: lpf1
+    name: clic
+    faust: clic = vgroup("clic", par(i,6,fi.resonbp(hslider("fc[unit:Hz][scale:log]", 311 * 1.5^i, 20, 20000, 0.001), hslider("Q[scale:log]", 40, 0.5, 50, 0.001), 0.8)));
+    needs: []
+
+2  let voix:8 os.sawtooth(freq=110 * (i+1))
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: voix
+    faust: voix = vgroup("voix", par(i,8,os.sawtooth(hslider("freq[unit:Hz][scale:log]", 110 * (i+1), 0.08, 220, 0.001))));
+    needs: []
 
 --- write
 
 import("stdfaust.lib");
+clic = vgroup("clic", par(i,6,fi.resonbp(hslider("fc[unit:Hz][scale:log]", 311 * 1.5^i, 20, 20000, 0.001), hslider("Q[scale:log]", 40, 0.5, 50, 0.001), 0.8)));
+voix = vgroup("voix", par(i,8,os.sawtooth(hslider("freq[unit:Hz][scale:log]", 110 * (i+1), 0.08, 220, 0.001))));
 process = 0;

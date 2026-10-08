@@ -1,38 +1,28 @@
-FaustScript reference output of the faustscript block 2 of docs/LANGUAGE.md, which opens with let saw1 os.sawtooth.
+FaustScript reference output of the faustscript block 2 of docs/LANGUAGE.md, which opens with gain = 0.5;.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let saw1 os.sawtooth
+1  gain = 0.5;
     outcome: {"done":true,"reason":null}
-    gesture: place
-    name: saw1
-    faust: saw1 = os.sawtooth(220);
-    needs: []
-
-2  let lpf1 fi.lowpass
-    outcome: {"done":true,"reason":null}
-    gesture: place
-    name: lpf1
-    faust: lpf1 = fi.lowpass(4, 2000);
-    needs: []
-
-3  saw1 : 8 lpf1
-    outcome: {"done":true,"reason":null}
-    gesture: wire
+    gesture: null
     name: null
 
-4  let gate1 ef.gate_mono(thresh=-40)
+2  let vca1 *(gain)
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: gate1
-    faust: gate1 = vgroup("gate1", ef.gate_mono(hslider("thresh", -40, -80, 0, 0.001), 0.0001, 0.1, 0.02));
+    name: vca1
+    faust: vca1 = *(gain);
     needs: []
+
+3  gain = 0.25;
+    outcome: {"done":true,"reason":null}
+    gesture: null
+    name: null
 
 --- write
 
 import("stdfaust.lib");
-saw1 = os.sawtooth(220);
-lpf1 = fi.lowpass(4, 2000);
-gate1 = vgroup("gate1", ef.gate_mono(hslider("thresh", -40, -80, 0, 0.001), 0.0001, 0.1, 0.02));
+gain = 0.25;
+vca1 = *(gain);
 process = 0;
