@@ -48,7 +48,7 @@ A supervision session loads the supervisor (`pitmaster`); a development agent lo
 - **The index first**: every exploratory search starts with `rtfm_search` (mode `hybrid`), then `rtfm_expand` on the relevant results.
 - Tickets: Beads (`bd`), prefix `faustx-`, see `docs/agents/issue-tracker.md`.
 - Repository skills: the supervisor (`pitmaster`), the developer (`grillardin`), initialisation and architecture (`grill`), measurement (`thermometre`), the writer for a human reader (`menu`), release (`release`). Flow: the `mattpocock-skills` plugin, prefix required; a document for an agent is written with `mattpocock-skills:writing-for-agents`.
-- Answers in French; documents, code and API names in English.
+- Answers and reference documents (LANGUAGE, PRINCIPES, ARCHITECTURE, each package's CADRE, INTERFACE and ARCHITECTURE, CONTEXT) in French, so the owner reads what he validates; code, identifiers, API names, refusal messages and commit messages in English.
 
 ## Commands
 
