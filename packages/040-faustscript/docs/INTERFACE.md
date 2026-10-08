@@ -93,7 +93,7 @@ The gesture says what the line does to the graph, and what the host has to compi
 | --- | --- | --- | --- |
 | `define` | `gain = 0.25;`, `import("mes-modules.fsc");` | gives `gain` its Faust meaning, in place of an earlier definition; an import or a declaration reaches every name | `recompile` |
 | `place` | `let lpf1 fi.lowpass(fc=800)` | adds the instance `lpf1` | `faust`, `needs` |
-| `replace` | `lpf1 fi.lowpass(fc=400)`, `lpfs:16` | replaces the body of `lpf1`, or the number of copies of `lpfs`, an instance without a number having one; the name, the wires, the number of copies and the settings whose port the body carries stay | `faust`, `needs` |
+| `replace` | `lpf1 fi.lowpass(fc=400)`, `lpfs:16` | replaces the body of `lpf1`, whose name, wires, number of copies and settings whose port the new body carries stay; or the number of copies of `lpfs`, an instance without a number having one, whose body, wires and settings stay | `faust`, `needs` |
 | `release` | `!let lpf1` | deletes `lpf1` and its wires; the name becomes free | — |
 | `remove` | `! lpf1` | takes `lpf1` and its wires out of the flow; the name stays taken | `faust`, `needs` |
 | `bypass` | `_ lpf1`, `!_ lpf1` | lets the signal through `lpf1`, or puts `lpf1` back | `faust`, `needs` |

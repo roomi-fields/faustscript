@@ -433,7 +433,7 @@ The order in which the inputs are placed is their order on the program: the firs
 
 ## 9. Imports
 
-The transpiler imports Faust's standard library and the catalogue into every program: `fi.lowpass` needs no import. A Faust program that writes its own imports keeps them.
+The transpiler imports Faust's standard library and the catalogue into every program: `fi.lowpass` needs no import. A Faust program that writes its own imports keeps them; an `import` line is the gesture `define` and recompiles every placed instance (§1.1).
 
 ```faustscript
 import("mes-modules.fsc");           // as in Faust
@@ -447,7 +447,7 @@ A line that the transpiler refuses changes nothing in the graph, and the lines a
 
 | writing | what it does |
 | --- | --- |
-| `name = expr;` | defines in Faust, up to the `;` |
+| `name = expr;` | defines in Faust, up to the `;` (`define`) |
 | `let lpf1 fi.lowpass` | places an instance |
 | `let lpfs:8 fi.lowpass` | places a bank of eight |
 | `lpfs:16` | resizes the bank to sixteen |
