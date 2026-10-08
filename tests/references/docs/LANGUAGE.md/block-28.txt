@@ -1,32 +1,30 @@
-FaustScript reference output of the faustscript block 28 of docs/LANGUAGE.md, which opens with let saw1 os.sawtooth.
+FaustScript reference output of the faustscript block 28 of docs/LANGUAGE.md, which opens with let src2 si.bus(3).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let saw1 os.sawtooth
+1  let src2 si.bus(3)
     outcome: {"done":true,"reason":null}
     gesture: place
-    name: saw1
-    faust: saw1 = os.sawtooth(220);
+    name: src2
+    faust: src2 = si.bus(3);
     needs: []
 
-2  saw1 : process
+2  let dst3 si.bus(4)
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: dst3
+    faust: dst3 = si.bus(4);
+    needs: []
+
+3  src2.2 :4 dst3.1
     outcome: {"done":true,"reason":null}
     gesture: wire
-    name: null
-
-3  process = no.noise * 0.1;
-    outcome: {"done":true,"reason":null}
-    gesture: null
-    name: null
-
-4  process = no.noise * 0.05;
-    outcome: {"done":true,"reason":null}
-    gesture: null
     name: null
 
 --- write
 
 import("stdfaust.lib");
-saw1 = os.sawtooth(220);
-process = (saw1, no.noise * 0.05) :> si.bus(outputs(no.noise * 0.05));
+src2 = si.bus(3);
+dst3 = si.bus(4);
+process = 0;

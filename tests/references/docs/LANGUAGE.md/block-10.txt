@@ -1,14 +1,42 @@
-FaustScript reference output of the faustscript block 10 of docs/LANGUAGE.md, which opens with let lpf1 lowpass.
+FaustScript reference output of the faustscript block 10 of docs/LANGUAGE.md, which opens with let lpfs:8 fi.lowpass(fc=800).
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  let lpf1 lowpass
-    outcome: {"done":false,"reason":"lowpass is not a module; fi.lowpass is"}
+1  let lpfs:8 fi.lowpass(fc=800)
+    outcome: {"done":true,"reason":null}
     gesture: place
-    name: lpf1
+    name: lpfs
+    faust: lpfs = vgroup("lpfs", par(i,8,fi.lowpass(4, hslider("fc[unit:Hz][scale:log]", 800, 2, 8000, 0.001))));
+    needs: []
+
+2  lpfs:16                              // the bank becomes sixteen filters
+    outcome: {"done":false,"reason":"does not read: lpfs:16                              // the bank becomes sixteen filters"}
+    gesture: wire
+    name: null
+
+3  lpfs fi.highpass
+    outcome: {"done":true,"reason":null}
+    gesture: replace
+    name: lpfs
+    faust: lpfs = vgroup("lpfs", par(i,8,fi.highpass(4, hslider("fc[unit:Hz][scale:log]", 800, 20, 12000, 0.001))));
+    needs: []
+
+4  let hpf2 fi.highpass
+    outcome: {"done":true,"reason":null}
+    gesture: place
+    name: hpf2
+    faust: hpf2 = fi.highpass(4, 500);
+    needs: []
+
+5  hpf2:4                               // hpf2 becomes a bank of four
+    outcome: {"done":false,"reason":"does not read: hpf2:4                               // hpf2 becomes a bank of four"}
+    gesture: wire
+    name: null
 
 --- write
 
 import("stdfaust.lib");
+lpfs = vgroup("lpfs", par(i,8,fi.highpass(4, hslider("fc[unit:Hz][scale:log]", 800, 20, 12000, 0.001))));
+hpf2 = fi.highpass(4, 500);
 process = 0;

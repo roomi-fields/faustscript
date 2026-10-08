@@ -1,9 +1,9 @@
-FaustScript reference output of the faustscript block 31 of docs/LANGUAGE.md, which opens with process(x) = x * 0.5;.
+FaustScript reference output of the faustscript block 34 of docs/LANGUAGE.md, which opens with import("mes-modules.fsc");.
 Engraved by `npm run references -- --update`, in a commit that names the gap.
 
 --- apply
 
-1  process(x) = x * 0.5;
+1  import("mes-modules.fsc");
     outcome: {"done":true,"reason":null}
     gesture: null
     name: null
@@ -11,5 +11,5 @@ Engraved by `npm run references -- --update`, in a commit that names the gap.
 --- write
 
 import("stdfaust.lib");
-process(x) = x * 0.5;
+import("mes-modules.fsc");
 process = 0;
