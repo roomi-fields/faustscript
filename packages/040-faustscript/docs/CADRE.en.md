@@ -38,9 +38,9 @@ FaustScript is a superset of Faust for live coding, and its transpiler: it reads
 
 - **R12.** The same text, in the same order of gestures, gives the same result, to the character.
 - **R13.** A refused line leaves the graph as it was.
-- **R14.** No sign of the language is written in the code: the grammar and the files under `lib/` carry them.
-- **R15.** FaustScript computes no signal and modifies nothing of Faust; its output is Faust that the declared faustwasm version compiles.
-- **R18.** Two sessions share no state; they read the same frozen catalogue.
+- **R14.** The signs of the language live only in the grammar and in the files under `lib/`, which the code reads.
+- **R15.** All signal computation belongs to Faust, which FaustScript leaves as GRAME publishes it; its output is Faust that the declared faustwasm version compiles.
+- **R18.** The frozen catalogue is the only state the sessions share.
 
 ## 8. Cost
 

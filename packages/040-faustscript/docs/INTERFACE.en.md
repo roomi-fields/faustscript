@@ -25,7 +25,7 @@ Every name, field, gesture, code, parameter and sentence form of this document i
 export function createSession(channels: number): Session
 ```
 
-It returns a session whose graph is empty and whose master bus, `process`, has `channels` channels: the host fixes that number once, when it creates the session, and each source into the master bus adapts to it (`LANGUAGE.md` §8). It throws a `RangeError` when `channels` is not a positive integer. The library reads the catalogue once, the first time a session needs it, and every session reads that same frozen value. Two sessions share no other state: the same text, applied to each in the same order of gestures, returns the same results, to the character.
+It returns a session whose graph is empty and whose master bus, `process`, has `channels` channels: the host fixes that number once, when it creates the session, and each source into the master bus adapts to it (`LANGUAGE.md` §8). It throws a `RangeError` when `channels` is not a positive integer. The library reads the catalogue once, the first time a session needs it, and every session reads that same frozen value. That catalogue is the only state the sessions share: the same text, applied to each in the same order of gestures, returns the same results, to the character.
 
 **Guard** — target, faustx-zj5.12: two sessions given the same text return equal results, and a computed signal of the second session is named as in the first; target, faustx-zj5.54: the program `write` returns has as many outputs as the session's master bus has channels, and a count that is not a positive integer throws.
 

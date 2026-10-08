@@ -36,9 +36,9 @@ FaustScript est un sur-ensemble de Faust pour le live coding, et son transpileur
 
 - **R12.** Le même texte, dans le même ordre de gestes, donne le même résultat, au caractère près.
 - **R13.** Une ligne refusée laisse le graphe tel qu'il était.
-- **R14.** Aucun signe du langage n'est écrit dans le code : la grammaire et les fichiers de `lib/` les portent.
-- **R15.** FaustScript ne calcule aucun signal et ne modifie rien de Faust ; sa sortie est du Faust que la version déclarée de faustwasm compile.
-- **R18.** Deux sessions ne partagent aucun état ; elles lisent le même catalogue figé.
+- **R14.** Les signes du langage vivent seulement dans la grammaire et dans les fichiers de `lib/`, que le code lit.
+- **R15.** Tout le calcul du signal appartient à Faust, que FaustScript laisse tel que GRAME le publie ; sa sortie est du Faust que la version déclarée de faustwasm compile.
+- **R18.** Le catalogue figé est le seul état que les sessions partagent.
 
 ## 8. Le coût
 

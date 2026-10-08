@@ -23,7 +23,7 @@ Chaque nom, champ, geste, code, paramètre et forme de phrase de ce document est
 export function createSession(channels: number): Session
 ```
 
-Elle retourne une session dont le graphe est vide et dont le bus master, `process`, a `channels` canaux : l'hôte fixe ce nombre une fois, quand il crée la session, et chaque source vers le bus master s'y adapte (`LANGUAGE.md` §8). Elle lève une `RangeError` quand `channels` n'est pas un entier positif. La bibliothèque lit le catalogue une fois, la première fois qu'une session en a besoin, et chaque session lit cette même valeur figée. Deux sessions ne partagent aucun autre état : le même texte, appliqué à chacune dans le même ordre de gestes, retourne les mêmes résultats, au caractère près.
+Elle retourne une session dont le graphe est vide et dont le bus master, `process`, a `channels` canaux : l'hôte fixe ce nombre une fois, quand il crée la session, et chaque source vers le bus master s'y adapte (`LANGUAGE.md` §8). Elle lève une `RangeError` quand `channels` n'est pas un entier positif. La bibliothèque lit le catalogue une fois, la première fois qu'une session en a besoin, et chaque session lit cette même valeur figée. Ce catalogue est le seul état que les sessions partagent : le même texte, appliqué à chacune dans le même ordre de gestes, retourne les mêmes résultats, au caractère près.
 
 **Garde** — cible, faustx-zj5.12 : deux sessions qui reçoivent le même texte retournent des résultats égaux, et un signal calculé de la seconde session est nommé comme dans la première ; cible, faustx-zj5.54 : le programme que retourne `write` a autant de sorties que le bus master de la session a de canaux, et un nombre qui n'est pas un entier positif lève une erreur.
 

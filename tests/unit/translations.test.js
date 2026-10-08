@@ -1,7 +1,8 @@
 /**
  * The English translations of the reference documents: each tracked `<name>.en.md` stands next to its
  * French `<name>.md`, which decides, and carries the same numbered sections and the same rule numbers
- * (`R1`…), in the same order, and the same fenced blocks, byte for byte.
+ * (`R1`…), in the same order, and the same fenced blocks in the same order: a diagram (a `mermaid`
+ * block) is text in the document's language, and every other block is identical byte for byte.
  */
 
 import { execFileSync } from 'node:child_process'
@@ -24,8 +25,9 @@ const TRANSLATIONS = execFileSync('git', ['ls-files', '*.en.md'], { cwd: ROOT, e
   .split('\n')
   .filter(f => f !== '')
 
-/** The fenced blocks of `doc`, each as its fence line and body. */
-const blocksOf = doc => fences(doc).map(f => [f.fence, ...f.body].join('\n'))
+/** The fenced blocks of `doc`, each as its fence line and body, and whether it is a diagram. */
+const blocksOf = doc =>
+  fences(doc).map(f => ({ text: [f.fence, ...f.body].join('\n'), diagram: f.info === 'mermaid' }))
 
 /** The lines of `doc` outside its fenced blocks, in order. */
 function proseOf(doc) {
@@ -63,7 +65,13 @@ function gaps(french, english) {
     out.push(`${fb.length} fenced blocks in French, ${eb.length} in English`)
   }
   fb.forEach((block, k) => {
-    if (eb[k] !== undefined && eb[k] !== block) {
+    const other = eb[k]
+    if (other === undefined) {
+      return
+    }
+    if (block.diagram !== other.diagram) {
+      out.push(`fenced block ${k + 1} is a diagram in one language only`)
+    } else if (!block.diagram && other.text !== block.text) {
       out.push(`fenced block ${k + 1} differs`)
     }
   })
@@ -87,7 +95,7 @@ describe('the English translations of the reference documents', () => {
     expect(gaps(fr, en)).toEqual([])
   })
 
-  it('name a moved section and a changed block', () => {
+  it('name a moved section, a changed block and a misplaced diagram', () => {
     const french = '# T\n\n## 1. A\n\n```ts\nx\n```\n\n## 2. B\n'
     expect(gaps(french, french)).toEqual([])
     expect(gaps(french, '# T\n\n## 2. B\n\n```ts\nx\n```\n\n## 1. A\n')).toEqual([
@@ -102,6 +110,16 @@ describe('the English translations of the reference documents', () => {
     ])
     expect(gaps(french, '# T\n\n## 1. A\n\n## 2. B\n')).toEqual([
       '1 fenced blocks in French, 0 in English',
+    ])
+    const diagram = label => '```mermaid\nflowchart LR\n  a[' + label + ']\n```\n'
+    expect(gaps(diagram('analyseur') + french, diagram('parser') + french)).toEqual([])
+    expect(gaps(diagram('analyseur') + french, french + diagram('parser'))).toEqual([
+      'fenced block 1 is a diagram in one language only',
+      'fenced block 2 is a diagram in one language only',
+    ])
+    expect(gaps(diagram('analyseur') + french, french)).toEqual([
+      '2 fenced blocks in French, 1 in English',
+      'fenced block 1 is a diagram in one language only',
     ])
   })
 })
