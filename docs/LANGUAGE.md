@@ -6,7 +6,7 @@ FaustScript is Faust with named instances. A FaustScript text is a sequence of l
 
 ### 1.1 Two kinds of line
 
-A line that starts as a Faust definition is Faust up to its `;`, and it may run over several lines: a name or a name with its parameters followed by `=`, an `import(`, a `declare`. Any other line is a FaustScript gesture — it places, connects, sets or changes an instance — and ends at the newline; the indented lines under a module's declaration belong to it (§3.2). A comment starts with `//` and runs to the end of the line.
+A line that starts as a Faust definition is Faust up to its `;`, and it may run over several lines: a name or a name with its parameters followed by `=`, an `import(`, a `declare`. Any other line is a FaustScript line — it places, connects, sets or changes an instance — and ends at the newline; the indented lines under a module's declaration belong to it (§3.2). A comment starts with `//` and runs to the end of the line.
 
 ```faustscript
 gain = 0.5;                          // a Faust definition, up to its ;
@@ -18,6 +18,21 @@ voix2(f) = os.sawtooth(freq=f) : fi.lowpass(fc=800);  // named settings in a Fau
 ```
 
 A Faust definition gives a module's parameters by name, `freq=f`, as a gesture does: Faust's grammar refuses `=` in a call. The decorations of wiring stay on wiring lines (§4.1).
+
+A Faust definition of a name is the gesture `define`. It gives the name its Faust meaning for the whole text, and each instance whose body cites the name is recompiled with the new definition; a later definition of the same name replaces the earlier one.
+
+```faustscript
+gain = 0.5;
+let vca1 *(gain)
+gain = 0.25;                         // defines gain again: vca1 is recompiled
+```
+
+A name designates either a Faust definition or an instance. A Faust definition of a placed instance's name is refused; an instance changes through its ports (§6) or a new body (§5).
+
+```faustscript
+let hpf1 fi.highpass
+hpf1 = 3;                            // refused: NAME_IS_INSTANCE
+```
 
 A text sent while the sound plays is applied to the graph as it stands, and a file is the same sequence of lines applied to an empty graph.
 
@@ -48,13 +63,14 @@ FaustScript qualifies Faust's signs with three decorations, each with one meanin
 
 Spaces separate words as in Faust, and a FaustScript sign is read by its place in the line. Two writings are fixed: `_lpf1` is one Faust identifier, so the bypass is written `_ lpf1`; the `!` that cancels a sign is stuck to it: `!:`, `!~`, `!let`, `!_`.
 
-On a wiring line, a number after `:`, stuck or spaced, is a number of copies (§4.1). A negative number follows only `=`.
+On a wiring line, a number after `:`, stuck or spaced, is a number of lanes (§4.1). A negative number is written as in Faust, a `-` before the number, wherever Faust accepts a number.
 
 ```faustscript
 let saw1 os.sawtooth
 let lpf1 fi.lowpass
 saw1 : 8 lpf1                        // eight copies, as saw1 :8 lpf1
 let gate1 ef.gate_mono(thresh=-40)   // a negative number, after =
+let gate2 ef.gate_mono(-40, 0.001, 0.1, 0.05)  // a negative number, in Faust's order
 ```
 
 ## 2. Placing an instance
@@ -110,12 +126,15 @@ let voix:8 os.sawtooth(freq=110 * (i+1))     // eight harmonics
 
 `i` has a meaning only in the body of a bank.
 
-The number of copies is a constant for Faust. A replacement that carries a new number resizes the bank:
+The number of copies is a constant for Faust. A placed name followed by a number, alone on its line, gives the instance that many copies of its body; its body, its wires and its settings stay. A new body keeps the number of copies (§5).
 
 ```faustscript
-let lpfs:8 fi.lowpass
-lpfs:16 fi.lowpass                   // the bank becomes sixteen filters
+let lpfs:8 fi.lowpass(fc=800)
+lpfs:16                              // the bank becomes sixteen filters
+lpfs fi.highpass                     // sixteen high-pass filters, fc stays 800
 ```
+
+A number between two names is always a wire: `lpfs:16 lpf2` connects `lpfs` to `lpf2` over sixteen lanes (§4.1).
 
 ## 3. Modules
 
@@ -186,13 +205,13 @@ saw1 !: lpf1                         // cuts
 saw1 :8 lpf1                         // connects as eight copies
 ```
 
-`saw1 :8 lpf1` is Faust's `par(i, 8, saw1) : par(i, 8, lpf1)`: it repeats the circuit, and declares no name. A number after the colon, stuck or spaced, means that many copies, whether it follows a declared name or stands between two names.
+A number after the colon, stuck or spaced, says over how many lanes the wire runs. Between two names, a lane is a copy: `saw1 :8 lpf1` is Faust's `par(i, 8, saw1) : par(i, 8, lpf1)`, it repeats the circuit and declares no name. After a channel, a lane is a channel, and the wire carries that many consecutive channels (§7).
 
 A line sent alone adds its wires to the graph: `voix2 : rev1` adds one branch and leaves the others. Faust's `,` stacks two circuits that keep their own inputs and outputs, and stays available inside an expression; the studio's parallel, Faust's `A <: (X, Y) :> B`, is what two wires to one instance write.
 
 | Faust's sign | what it does | in FaustScript |
 | --- | --- | --- |
-| `:` | series | `:8` copies, `!:` cuts, and widths adapt (§4.2) |
+| `:` | series | `:8` over eight lanes, `!:` cuts, and widths adapt (§4.2) |
 | `,` | stacks | unchanged |
 | `<:` | splits | written by connecting one instance to several |
 | `:>` | merges | written by connecting several instances to one |
@@ -267,7 +286,7 @@ _ lpf1                               // bypasses it
 !let lpf1                            // gives its name back
 ```
 
-A placed name followed by a body replaces the body; the instance and its other settings stay. What becomes of the running circuit's state belongs to the host, which substitutes the compiled instance. `let` places, the name alone replaces. The body of a replacement starts with a name: `vca1 *` would read as an unfinished multiplication, so a replacement by an operator goes through a declared module.
+A placed name followed by a body replaces the body; the instance keeps its name, its wires, its number of copies, and the settings whose port the new body carries. What becomes of the running circuit's state belongs to the host, which substitutes the compiled instance. `let` places, the name alone replaces. The body of a replacement starts with a name: `vca1 *` would read as an unfinished multiplication, so a replacement by an operator goes through a declared module.
 
 Replacing a body changes the circuit; a bypass leaves the body and changes the instance's place in the flow: the bypassed instance receives silence, the signal passes around it, and its output stays summed in, so what rings inside it runs out. Faust's `ba.bypass_fade` clears the module's state instead.
 
@@ -335,9 +354,21 @@ lpfs.3.fc = 400                      // the third filter of the bank
 
 In a bank of one-channel bodies, the channel is the copy: `lpfs.3` is the third filter.
 
-## 8. The sink and the inputs
+A number after the colon that follows a channel carries that many consecutive channels, from the channel named on each side: `src1.1 :4 dst1.1` routes channels 1 to 4 of `src1` into channels 1 to 4 of `dst1`. One source is split into several destinations by one line per range.
 
-`process` is the sink: what arrives there is the program's output. It is Faust's own name; FaustScript writes `process = <what arrives>`, and several wires into it are summed. It has channels like any instance.
+```faustscript
+let src1 si.bus(7)
+let dst1 si.bus(4)
+let lpf1 fi.lowpass
+let dst2 si.bus(2)
+src1.1 :4 dst1.1                     // channels 1 to 4 into channels 1 to 4 of dst1
+src1.5 : lpf1                        // channel 5 into lpf1
+src1.6 :2 dst2.1                     // channels 6 and 7 into channels 1 and 2 of dst2
+```
+
+## 8. The master bus and the inputs
+
+`process` is the master bus: it mixes the sources that arrive there into the program's output. It is Faust's own name; FaustScript writes `process = <what arrives>`, and several sources into it are summed. Its number of channels is fixed by the host when it creates the session, and each source adapts to it by §4.2: a one-channel source is sent to every channel, a source as wide as the master bus enters channel by channel. A dot reaches one of its channels, as on any instance. The examples of this document play on a master bus of two channels.
 
 ```faustscript
 let saw1 os.sawtooth
@@ -350,13 +381,19 @@ rev1.1 : process.1                   // a stereo output
 rev1.2 : process.2
 ```
 
-A Faust definition of `process` is one more source into the sink, summed with the wires into `process`. Defining it again replaces that definition and leaves the wires.
+A Faust definition of `process` is one more source into the master bus, summed with the wires into `process`. Defining it again replaces that definition and leaves the wires.
 
 ```faustscript
 let saw1 os.sawtooth
 saw1 : process
 process = no.noise * 0.1;            // the noise is summed with saw1
 process = no.noise * 0.05;           // replaces the noise, saw1 stays
+```
+
+The master bus takes no parameter: a Faust definition that gives `process` parameters is refused.
+
+```faustscript
+process(x) = x * 0.5;                // refused: MASTER_WITH_PARAMETER
 ```
 
 An input is Faust's wire `_`, written in a chain or placed under a name; both writings are FaustScript.
@@ -394,6 +431,7 @@ A line that the transpiler refuses changes nothing in the graph, and the lines a
 | `name = expr;` | defines in Faust, up to the `;` |
 | `let lpf1 fi.lowpass` | places an instance |
 | `let lpfs:8 fi.lowpass` | places a bank of eight |
+| `lpfs:16` | resizes the bank to sixteen |
 | `i` | the rank of the copy, in a bank |
 | `lpf1 fi.lowpass(fc=400)` | replaces its body |
 | `_ lpf1` · `!_ lpf1` | bypasses it · puts it back |
@@ -405,7 +443,8 @@ A line that the transpiler refuses changes nothing in the graph, and the lines a
 | `lpf1.fc = 400` · `lpf1(fc=400, N=5)` | sets a port · several |
 | `lpf1.fc.min = 20` | sets an attribute |
 | `saw1.3` | a channel |
-| `: process` | the output |
-| `process = expr;` | one more source into the output |
+| `src1.1 :4 dst1.1` | four consecutive channels |
+| `: process` | into the master bus |
+| `process = expr;` | one more source into the master bus |
 | `_` | an input |
 | `name(p=1) body` | declares a module |

@@ -42,9 +42,37 @@ const KNOWN_DEFECTS = new Map([
       ],
     },
   ],
+  ['refuses with NAME_IS_INSTANCE: hpf1 = 3;', { ticket: 'faustx-zj5.54', now: [applied] }],
   [
-    'applies: lpfs:16 fi.lowpass',
-    { ticket: 'faustx-zj5.22', now: [refused(null, 'fi does not exist')] },
+    'compiles: the block that opens with let hpf1 fi.highpass',
+    {
+      ticket: 'faustx-zj5.54',
+      now: "ERROR : [file program : 5] : multiple definitions of symbol 'hpf1'",
+    },
+  ],
+  [
+    'applies: lpfs:16',
+    {
+      ticket: 'faustx-zj5.54',
+      now: [
+        refused(
+          null,
+          'does not read: lpfs:16                              // the bank becomes sixteen filters'
+        ),
+      ],
+    },
+  ],
+  [
+    'compiles: the block that opens with let src1 si.bus(7)',
+    { ticket: 'faustx-zj5.54', now: 'ERROR : sequential composition A:B' },
+  ],
+  [
+    'refuses with MASTER_WITH_PARAMETER: process(x) = x * 0.5;',
+    { ticket: 'faustx-zj5.54', now: [applied] },
+  ],
+  [
+    'compiles: the block that opens with process(x) = x * 0.5;',
+    { ticket: 'faustx-zj5.54', now: 'ERROR : [file program : 4] : in the definition of process' },
   ],
   [
     'applies: fi.lowpass(N=4, fc=2000)  fi.lowpass(N, fc)',
