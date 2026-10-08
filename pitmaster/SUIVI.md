@@ -25,8 +25,6 @@ sort et sa réponse va dans son ticket.
   ticket et « aujourd'hui » dans ARCHITECTURE §9, « décision de Romain » dans PRINCIPES).
   Recommandation : un ticket les corrige dans les deux langues.
 - **Branche locale `zj5.53`**, fusionnée — la suppression attend son accord (règle globale).
-- **Retour sur le métacadre** — la règle « un seul équipier commite » ne nomme pas l'équipier, et
-  contredit « l'agent écrit … les commits ».
 
 ## S — à surveiller
 
