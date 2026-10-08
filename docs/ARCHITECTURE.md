@@ -4,7 +4,7 @@ FaustScript is a TypeScript library, with its command line, that holds the graph
 
 ## 1. Context
 
-The host creates a session for each piece, sends it FaustScript text, and compiles the Faust it returns with faustwasm, at the exact version the package declares as a peer dependency. An editor reads the grammar's parser and the diagnostics of a text from a second entry of the same package. Two tools prepare inputs before any run: the generator builds the catalogue from the Faust libraries that faustwasm version embeds, and `lezer-generator` builds the parser from the grammar.
+The host creates a session for each piece, sends it FaustScript text, and compiles the Faust it returns with faustwasm, at the exact version the package declares as a peer dependency. An editor reads the grammar's parser from a second entry of the same package, and the diagnostics of a text from the session that plays. Two tools prepare inputs before any run: the generator builds the catalogue from the Faust libraries that faustwasm version embeds, and `lezer-generator` builds the parser from the grammar.
 
 ```mermaid
 flowchart LR
@@ -65,7 +65,7 @@ An arrow is an import. A package imports only packages with a lower number; a de
 - **010-syntax** holds the grammar, the parser generated from it, and the FaustScript AST the parser's tree is read into, with the position of every node. A line that does not read is refused here. It imports `@lezer/lr` at run time, and no other package of the six. Its documents: `packages/010-syntax/docs/`.
 - **020-graph** holds the living model of a piece: instances, wires, settings, marks and the counter of computed signals. It applies a line's AST as one gesture, resolves its names against the model and the catalogue, and returns either a new model or a coded refusal that leaves the model unchanged. It imports 010-syntax and 001-catalogue. Its documents: `packages/020-graph/docs/`.
 - **030-lowering** translates a frozen model into a Faust AST: one definition per instance, the program written directly or in stages, the routing between stages, the adaptation of widths, a control for each set port. It imports 020-graph, 001-catalogue and 000-faust. Its documents: `packages/030-lowering/docs/`.
-- **040-faustscript** is the published package `faustscript`: `createSession` and the `Session`, the entry `faustscript/editor`, and the command line. It calls the other five in order and returns their results in the public forms; the translation rules belong to them. Its documents: `packages/040-faustscript/docs/`.
+- **040-faustscript** is the published package `faustscript`: `createSession` and the `Session`, the entry `faustscript/editor` with the parser, and the command line. It calls the other five in order and returns their results in the public forms; the translation rules belong to them. Its documents: `packages/040-faustscript/docs/`.
 
 ## 4. Data
 
@@ -110,7 +110,7 @@ sequenceDiagram
   S-->>H: one result per statement
 ```
 
-`write` lowers the whole model and prints it. The program is written directly when every instance feeds at most one destination, and in stages otherwise: Faust builds one circuit for each occurrence of a name, so a shared signal is written once and its destinations read it; an empty model gives a silent program. `controls` reads the set, bounded ports of the lowered program. `diagnose`, in `faustscript/editor`, applies a text to a new session and turns each refusal into a diagnostic at the position its FaustScript AST node carries.
+`write` lowers the whole model and prints it. The program is written directly when every instance feeds at most one destination, and in stages otherwise: Faust builds one circuit for each occurrence of a name, so a shared signal is written once and its destinations read it; an empty model gives a silent program. `controls` reads the set, bounded ports of the lowered program. `diagnose` reads a text against the session's graph as `apply` would, keeps none of its effects, and turns each refusal into a diagnostic at the position its FaustScript AST node carries.
 
 ## 6. Run time
 

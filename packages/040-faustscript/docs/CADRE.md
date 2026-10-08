@@ -9,14 +9,14 @@ FaustScript is a superset of Faust for live coding, and its transpiler: it reads
 
 ## 2. Receives
 
-- **R3.** At the creation of a session, nothing: the catalogue belongs to the library, which reads it once for every session.
+- **R3.** At the creation of a session, the number of channels of its master bus; the catalogue belongs to the library, which reads it once for every session.
 - **R4.** Then, FaustScript text, as the author wrote it, one or more lines at a time.
 
 ## 3. Returns
 
-- **R5.** For each line that carries a statement, in order: the line, the gesture, the instance it touched, and either its outcome or its refusal; for a gesture that recompiles, the instance's Faust and the instances that Faust cites; for a setting, the port, the value and the control path. A blank line or a comment returns nothing.
+- **R5.** For each line that carries a statement, in order: the line, the gesture, the instance it touched, and either its outcome or its refusal; for a gesture that recompiles, the instance's Faust and the instances that Faust cites; for a Faust definition, the instances to recompile; for a setting, the port, the value and the control path. A blank line or a comment returns nothing.
 - **R6.** On request, the whole Faust program of the graph at that instant, a frozen view of the graph, the list of the program's controls with their paths, bounds, units, starting values and smoothing, and the catalogue as a frozen value that marks the modules faustwasm does not provide.
-- **R17.** For an editor, the parser of the grammar and the refusals of a text as diagnostics of the Language Server Protocol.
+- **R17.** For an editor, the parser of the grammar, and what a text would do on the session that plays: its refusals as diagnostics of the Language Server Protocol, without changing the session.
 
 ## 4. Knows
 
@@ -29,7 +29,7 @@ FaustScript is a superset of Faust for live coding, and its transpiler: it reads
 
 ## 6. Refuses
 
-- **R10.** A line that does not read, an empty expression, an unknown form, a name already placed, a name that does not exist, a module that faustwasm does not provide, a setting that is incomplete, does not target a port or targets a port the instance does not carry (a parameter of its module, or a `key=value` its author named in its Faust body), a port driven by a signal that carries one of the program's inputs, a wire that does not exist: the refusal carries a fault with the fields of BPScript's: a stable code, a sentence that names the cause and the name involved, the values it is written from, and the position of the writing at fault; the line changes nothing.
+- **R10.** A line that does not read, an empty expression, an unknown form, a name already placed, a name that does not exist, a module that faustwasm does not provide, a setting that is incomplete or targets a port the instance does not carry (a parameter of its module, or a `key=value` its author named in its Faust body), a port driven by a signal that carries one of the program's inputs, a wire that does not exist, a Faust definition of an instance's name or an instance on a Faust definition's name, a master bus given parameters, a range of channels past a width: the refusal carries a fault with the fields of BPScript's: a stable code, a sentence that names the cause and the name involved, the values it is written from, and the position of the writing at fault; the line changes nothing.
 - **R11.** An error the Faust compiler raises on the Faust FaustScript writes stays the compiler's message; the host receives it from the compiler.
 
 ## 7. Invariants

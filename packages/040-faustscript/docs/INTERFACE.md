@@ -1,13 +1,13 @@
 # FaustScript — interface
 
-FaustScript's public package, `faustscript` (`packages/040-faustscript`), exports one function, `createSession`, which returns a session holding one graph of instances and wires: the piece being played. The host sends FaustScript text to the session's `apply`, which applies each line as a gesture on the graph and returns what each line did; it reads the Faust program, a frozen view of the graph, the program's controls and the catalogue from four other methods. A second entry, `faustscript/editor`, gives an editor the parser of the grammar and the refusals of a text as diagnostics. This document lists each element that crosses that boundary: its form, what it returns, what it refuses, and the guard that holds it.
+FaustScript's public package, `faustscript` (`packages/040-faustscript`), exports one function, `createSession`, which returns a session holding one graph of instances and wires: the piece being played. The host sends FaustScript text to the session's `apply`, which applies each line as a gesture on the graph and returns what each line did; it reads the Faust program, a frozen view of the graph, the program's controls and the catalogue from four other methods, and an editor reads from `diagnose` what a text would do on the session, as diagnostics. A second entry, `faustscript/editor`, gives an editor the parser of the grammar. This document lists each element that crosses that boundary: its form, what it returns, what it refuses, and the guard that holds it.
 
 ## 1. The package
 
 | specifier | content |
 | --- | --- |
-| `faustscript` | `createSession` and the types of §2 to §9 |
-| `faustscript/editor` | `parser`, `diagnose` and the types of §10 |
+| `faustscript` | `createSession` and the types of §2 to §10 |
+| `faustscript/editor` | `parser` (§10) |
 | command `faustscript` | the command line (§11) |
 | peer dependency `@grame/faustwasm` | the faustwasm version the host compiles with, at one exact version |
 
@@ -36,10 +36,11 @@ export interface Session {
   graph(): GraphView
   controls(): readonly Control[]
   catalogue(): Catalogue
+  diagnose(text: string): readonly Diagnostic[]
 }
 ```
 
-`apply` is the only method that changes the graph. `write`, `graph`, `controls` and `catalogue` read it and change nothing.
+`apply` is the only method that changes the graph. `write`, `graph`, `controls`, `catalogue` and `diagnose` read it and change nothing.
 
 ## 4. `apply` and the result of a line
 
@@ -249,14 +250,9 @@ export interface Port {
 
 **Guard** — `tests/unit/graph.test.js` (the catalogue carries every module its header counts); `tests/unit/catalogue-source.test.js` (a module faustwasm refuses is marked with the function it calls); target, faustx-zj5.36: the interface test checks that the value is frozen in depth and that a write into it throws.
 
-## 10. The editor entry
+## 10. `diagnose` and the editor entry
 
 ```ts
-import type { LRParser } from '@lezer/lr'
-
-export const parser: LRParser
-export function diagnose(text: string): readonly Diagnostic[]
-
 export interface Diagnostic {
   readonly range: Range
   readonly severity: 1
@@ -276,9 +272,17 @@ export interface Position {
 }
 ```
 
-`faustscript/editor` serves an editor. `parser` is the Lezer parser generated from FaustScript's grammar, the one the session reads with: a CodeMirror editor builds its language from it (`LRLanguage.define({ parser })`) and highlights FaustScript by the grammar's node names. `diagnose` applies a text to a new session, as the command line applies a file, and returns one diagnostic per refused line, in the order of the lines: the fault of §5, printed in the form of the Language Server Protocol. `range` is the fault's `origin`, its lines and characters counted from 0 in UTF-16 code units; `severity` is 1, an error; `code` and `message` are the fault's.
+`session.diagnose(text)` says what a text would do on the session that plays, in the state of its graph at that instant, and changes nothing: it reads the lines as `apply` would, each in the state the lines before it would leave, with the session's master bus and its number of channels, and keeps none of their effects. It returns one diagnostic per line `apply` would refuse, in the order of the lines: the fault of §5, printed in the form of the Language Server Protocol. `range` is the fault's `origin`, its lines and characters counted from 0 in UTF-16 code units in the text passed to `diagnose`; `severity` is 1, an error; `code` and `message` are the fault's.
 
-**Guard** — target, faustx-zj5.36: the interface test checks the two exports; each refused example of the language reference gives one diagnostic with its code and the range of its fault's origin.
+```ts
+import type { LRParser } from '@lezer/lr'
+
+export const parser: LRParser
+```
+
+`faustscript/editor` serves an editor. `parser` is the Lezer parser generated from FaustScript's grammar, the one the session reads with: a CodeMirror editor builds its language from it (`LRLanguage.define({ parser })`) and highlights FaustScript by the grammar's node names.
+
+**Guard** — target, faustx-zj5.36: the interface test checks the export of `parser`; each refused example of the language reference gives one diagnostic with its code and the range of its fault's origin; target, faustx-zj5.54: the graph view, `write` and `controls` after `diagnose` equal those before it, and a line diagnosed on a session gives the refusal `apply` gives on that session.
 
 ## 11. The command line
 
