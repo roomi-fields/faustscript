@@ -26,11 +26,11 @@ The aim is a mature, professional product that holds its domain's requirements.
 
 1. `bd ready`, `bd update <id> --claim`, read the ticket and the frame of what it touches.
 2. A decision remains to be taken: `/grill-me` before writing, its questions in the ticket. A structure decision (split, packages, modules, interfaces, frontiers) goes through the `grill` skill and is settled on goals, consumers, data representations and axes of change, never on the code's size. A reported defect is first an architecture question: its ticket opens on an « Architecture » section (the mature model named, the address in the architecture, the common mechanism), never on a local compensation.
-3. The plan goes in the ticket (`bd update <id> -d`), the work is done in `/tdd`. A commit that changes a behaviour corrects in the same commit every text that describes it.
-4. The ticket closes on its targeted tests, the review (`mattpocock-skills:code-review`, which asks: does this notion already exist elsewhere in the project, in this component or another?) and a commit.
+3. The plan goes in the ticket (`bd update <id> -d`). A change of behaviour takes two tickets: the tests first (agent `testeur`), then the code that makes them pass (agent `developpeur`). A commit that changes a behaviour corrects in the same commit every text that describes it.
+4. The ticket closes on its targeted tests, the verdict of the `relecteur` agent on the lot, and the commit of the `integrateur` agent, the only one to commit.
 5. `/handoff` in the ticket, then `bd close`, with what is not done and why.
 
-A supervision session loads the supervisor (`pitmaster`); a development agent loads the developer (`grillardin`).
+A supervision session loads the supervisor (`pitmaster`). The roles are project agents (`.claude/agents/`): `testeur`, `developpeur`, `relecteur`, `integrateur`, each under its write locks.
 
 ## What keeps the repository straight
 
@@ -47,7 +47,7 @@ A supervision session loads the supervisor (`pitmaster`); a development agent lo
 - ⛔ **No command that can ask for a validation**: a prompt freezes the session. Every temporary file goes in the session scratchpad; no `cd` (`env -C <dir>` or `git -C`); a deletion targets a named path that was read.
 - **The index first**: every exploratory search starts with `rtfm_search` (mode `hybrid`), then `rtfm_expand` on the relevant results.
 - Tickets: Beads (`bd`), prefix `faustx-`, see `docs/agents/issue-tracker.md`.
-- Repository skills: the supervisor (`pitmaster`), the developer (`grillardin`), initialisation and architecture (`grill`), measurement (`thermometre`), the writer for a human reader (`menu`), release (`release`). Flow: the `mattpocock-skills` plugin, prefix required; a document for an agent is written with `mattpocock-skills:writing-for-agents`.
+- Repository skills: the supervisor (`pitmaster`), the four roles (`testeur`, `developpeur`, `relecteur`, `integrateur`), initialisation and architecture (`grill`), measurement (`mesure`), the writer for a human reader (`redacteur`), release (`release`). Flow: the `mattpocock-skills` plugin, prefix required; a document for an agent is written with `mattpocock-skills:writing-for-agents`.
 - Answers and reference documents (LANGUAGE, PRINCIPES, ARCHITECTURE, each package's CADRE, INTERFACE and ARCHITECTURE, CONTEXT) in French, so the owner reads what he validates; code, identifiers, API names, refusal messages and commit messages in English.
 
 ## Commands
