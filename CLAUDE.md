@@ -25,7 +25,7 @@ The aim is a mature, professional product that holds its domain's requirements.
 ## The flow of a task
 
 1. `bd ready`, `bd update <id> --claim`, read the ticket and the frame of what it touches.
-2. A decision remains to be taken: `/grill-me` before writing, its questions in the ticket.
+2. A decision remains to be taken: `/grill-me` before writing, its questions in the ticket. A structure decision (split, packages, modules, interfaces, frontiers) goes through the `grill` skill and is settled on goals, consumers, data representations and axes of change, never on the code's size. A reported defect is first an architecture question: its ticket opens on an « Architecture » section (the mature model named, the address in the architecture, the common mechanism), never on a local compensation.
 3. The plan goes in the ticket (`bd update <id> -d`), the work is done in `/tdd`. A commit that changes a behaviour corrects in the same commit every text that describes it.
 4. The ticket closes on its targeted tests, the review (`mattpocock-skills:code-review`, which asks: does this notion already exist elsewhere?) and a commit.
 5. `/handoff` in the ticket, then `bd close`, with what is not done and why.
