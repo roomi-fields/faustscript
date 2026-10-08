@@ -6,7 +6,7 @@ FaustScript is a superset of Faust for live coding, and its transpiler: a line o
 
 ## What decides
 
-`docs/PRINCIPES.md`, then the specification (`docs/LANGUAGE.md`), then the architecture (`docs/ARCHITECTURE.md`) and each package's frame (`packages/<x>/docs/`), then the code. A gap between the specification and the transpiler is a defect of the transpiler. A decision lives in the document it settles; a rule is affirmative, in the present, without date or author. `CONTEXT.md` gives each word of the domain its one sense.
+`docs/PRINCIPES.md`, then the specification (`docs/LANGUAGE.md`), then the architecture (`docs/ARCHITECTURE.md`) and each package's frame (`packages/<x>/docs/`), then the code. A gap between the specification and the transpiler is a defect of the transpiler. A decision lives in the document it settles; a rule is affirmative, in the present, without date or author, at the scale of the work it frames: it names its objects (a computation, a component, a datum, a published form), the act it requires and what happens when it is missing. An example illuminates it; a list of cases does not replace it, it would read as closed. `CONTEXT.md` gives each word of the domain its one sense.
 
 - `docs/LANGUAGE.md` — how FaustScript is written: read it before touching the grammar, a gesture or a translation.
 - `packages/040-faustscript/docs/INTERFACE.md` — what crosses FaustScript's public boundary: read it before changing an export, a line's result or a refusal.
@@ -27,7 +27,7 @@ The aim is a mature, professional product that holds its domain's requirements.
 1. `bd ready`, `bd update <id> --claim`, read the ticket and the frame of what it touches.
 2. A decision remains to be taken: `/grill-me` before writing, its questions in the ticket. A structure decision (split, packages, modules, interfaces, frontiers) goes through the `grill` skill and is settled on goals, consumers, data representations and axes of change, never on the code's size. A reported defect is first an architecture question: its ticket opens on an « Architecture » section (the mature model named, the address in the architecture, the common mechanism), never on a local compensation.
 3. The plan goes in the ticket (`bd update <id> -d`), the work is done in `/tdd`. A commit that changes a behaviour corrects in the same commit every text that describes it.
-4. The ticket closes on its targeted tests, the review (`mattpocock-skills:code-review`, which asks: does this notion already exist elsewhere?) and a commit.
+4. The ticket closes on its targeted tests, the review (`mattpocock-skills:code-review`, which asks: does this notion already exist elsewhere in the project, in this component or another?) and a commit.
 5. `/handoff` in the ticket, then `bd close`, with what is not done and why.
 
 A supervision session loads the supervisor (`pitmaster`); a development agent loads the developer (`grillardin`).
