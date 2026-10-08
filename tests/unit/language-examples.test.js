@@ -51,6 +51,33 @@ const KNOWN_DEFECTS = new Map([
     },
   ],
   [
+    'refuses with NAME_IS_DEFINITION: let level os.osc',
+    { ticket: 'faustx-zj5.54', now: [applied] },
+  ],
+  [
+    'compiles: the block that opens with level = 0.5;',
+    {
+      ticket: 'faustx-zj5.54',
+      now: "ERROR : [file program : 5] : multiple definitions of symbol 'level'",
+    },
+  ],
+  [
+    'applies: hpf2:4',
+    {
+      ticket: 'faustx-zj5.54',
+      now: [
+        refused(
+          null,
+          'does not read: hpf2:4                               // hpf2 becomes a bank of four'
+        ),
+      ],
+    },
+  ],
+  [
+    'refuses with CHANNEL_OUT_OF_RANGE: src2.2 :4 dst3.1',
+    { ticket: 'faustx-zj5.54', now: [applied] },
+  ],
+  [
     'applies: lpfs:16',
     {
       ticket: 'faustx-zj5.54',

@@ -23,9 +23,9 @@ Every name, field, gesture, code, parameter and sentence form of this document i
 export function createSession(channels: number): Session
 ```
 
-It returns a session whose graph is empty and whose master bus, `process`, has `channels` channels: the host fixes that number once, when it creates the session, and each source into the master bus adapts to it (`LANGUAGE.md` §8). The library reads the catalogue once, the first time a session needs it, and every session reads that same frozen value. Two sessions share no other state: the same text, applied to each in the same order of gestures, returns the same results, to the character.
+It returns a session whose graph is empty and whose master bus, `process`, has `channels` channels: the host fixes that number once, when it creates the session, and each source into the master bus adapts to it (`LANGUAGE.md` §8). It throws a `RangeError` when `channels` is not a positive integer. The library reads the catalogue once, the first time a session needs it, and every session reads that same frozen value. Two sessions share no other state: the same text, applied to each in the same order of gestures, returns the same results, to the character.
 
-**Guard** — target, faustx-zj5.12: two sessions given the same text return equal results, and a computed signal of the second session is named as in the first; target, faustx-zj5.54: the program `write` returns has as many outputs as the session's master bus has channels.
+**Guard** — target, faustx-zj5.12: two sessions given the same text return equal results, and a computed signal of the second session is named as in the first; target, faustx-zj5.54: the program `write` returns has as many outputs as the session's master bus has channels, and a count that is not a positive integer throws.
 
 ## 3. The session
 
@@ -80,19 +80,19 @@ export type Outcome =
 | `line` | the line's number in the text passed to `apply`, from 1, blank and comment lines counted |
 | `text` | the line, without its surrounding spaces |
 | `gesture` | the gesture the line expresses; `null` when the line has no form the grammar reads |
-| `name` | the instance the gesture touches, or the name a `define` gives its Faust meaning; `null` for a wire |
+| `name` | the instance the gesture touches, or the name a `define` gives its Faust meaning; `null` for a wire, an `import` and a `declare` |
 | `outcome` | applied, or refused with its fault (§5) |
 | `faust`, `needs` | present when a `place`, `replace`, `bypass` or `remove` is applied: the Faust definition of that instance alone, and the other instances that definition cites, which the host compiles with it |
-| `recompile` | present when a `define` is applied: the instances whose body cites the defined name, in the order they were placed, which the host recompiles |
+| `recompile` | present when a `define` is applied: the instances whose body cites the defined name, or every placed instance for an `import` or a `declare`, in the order they were placed, which the host recompiles |
 | `port`, `value`, `path` | present when a `set` is applied: the port, the value as written, and the control path from the program root |
 
 The gesture says what the line does to the graph, and what the host has to compile:
 
 | gesture | line | effect on the graph | returns |
 | --- | --- | --- | --- |
-| `define` | `gain = 0.25;` | gives `gain` its Faust meaning, in place of an earlier definition | `recompile` |
+| `define` | `gain = 0.25;`, `import("mes-modules.fsc");` | gives `gain` its Faust meaning, in place of an earlier definition; an import or a declaration reaches every name | `recompile` |
 | `place` | `let lpf1 fi.lowpass(fc=800)` | adds the instance `lpf1` | `faust`, `needs` |
-| `replace` | `lpf1 fi.lowpass(fc=400)`, `lpfs:16` | replaces the body of `lpf1`, or the number of copies of `lpfs`; the name, the wires, the number of copies and the settings whose port the body carries stay | `faust`, `needs` |
+| `replace` | `lpf1 fi.lowpass(fc=400)`, `lpfs:16` | replaces the body of `lpf1`, or the number of copies of `lpfs`, an instance without a number having one; the name, the wires, the number of copies and the settings whose port the body carries stay | `faust`, `needs` |
 | `release` | `!let lpf1` | deletes `lpf1` and its wires; the name becomes free | — |
 | `remove` | `! lpf1` | takes `lpf1` and its wires out of the flow; the name stays taken | `faust`, `needs` |
 | `bypass` | `_ lpf1`, `!_ lpf1` | lets the signal through `lpf1`, or puts `lpf1` back | `faust`, `needs` |
@@ -136,7 +136,9 @@ export type RefusalCode =
   | 'SETTING_FROM_INPUT'
   | 'NO_SUCH_WIRE'
   | 'NAME_IS_INSTANCE'
+  | 'NAME_IS_DEFINITION'
   | 'MASTER_WITH_PARAMETER'
+  | 'CHANNEL_OUT_OF_RANGE'
 ```
 
 | code | the line | `params` | message |
@@ -153,13 +155,16 @@ export type RefusalCode =
 | `SETTING_FROM_INPUT` | drives a port with a signal that carries a program input | `name` | `in1 carries one of the program's inputs: a port is driven by a signal, never by an input` |
 | `NO_SUCH_WIRE` | `osc1 !: lpf1` where no wire joins them | `from`, `to` | `no wire between osc1 and lpf1` |
 | `NAME_IS_INSTANCE` | a Faust definition of a placed instance's name: `lpf1 = 3;` | `name`, `port`, `value` | `lpf1 is an instance; set a port (lpf1.fc = 3) or give the definition another name` |
+| `NAME_IS_INSTANCE` | the same, when the instance carries no port: `let vca1 *` then `vca1 = 3;` | `name` | `vca1 is an instance; replace its body (vca1 …) or give the definition another name` |
+| `NAME_IS_DEFINITION` | `let gain …` when a Faust definition gives `gain` | `name` | `gain is a Faust definition; give the instance another name` |
 | `MASTER_WITH_PARAMETER` | a Faust definition that gives the master bus parameters: `process(x) = x;` | `name` | `process is the master bus; it takes no parameter` |
+| `CHANNEL_OUT_OF_RANGE` | a range of channels that runs past the last channel of its source or destination: `src2.2 :4 dst3.1` when `src2` has 3 | `name`, `first`, `last`, `channels` | `src2 has 3 channels; 2 to 5 runs past them` |
 
-`params` holds, under the names of its column, the values the message is written from, as they appear in the line; for `NAME_IS_INSTANCE`, `port` is the first port the instance carries and `value` the expression the definition gives. `origin` is the span of the writing at fault in the text passed to `apply`: the node the refusal names (the name, the port, the wire), or the line without its surrounding spaces for `UNREADABLE`, `EMPTY_EXPRESSION` and `UNKNOWN_FORM`. Its lines count from 1 as `line` does, its columns from 1 in UTF-16 code units; `endColumn` is just past the last character.
+`params` holds, under the names of its column, the values the message is written from, as they appear in the line; for `NAME_IS_INSTANCE`, `port` is the first port the instance carries and `value` the expression the definition gives; for `CHANNEL_OUT_OF_RANGE`, `name` is the end the range runs past, `first` and `last` the channels the range reaches on it, and `channels` its number of channels. `origin` is the span of the writing at fault in the text passed to `apply`: the node the refusal names (the name, the port, the wire), or the line without its surrounding spaces for `UNREADABLE`, `EMPTY_EXPRESSION` and `UNKNOWN_FORM`. Its lines count from 1 as `line` does, its columns from 1 in UTF-16 code units; `endColumn` is just past the last character.
 
 A module that faustwasm does not provide is one whose Faust calls a foreign function that faustwasm's WebAssembly backend refuses; the catalogue marks it (§9), and its sentence names that function. An error the Faust compiler raises on the Faust that FaustScript writes is the compiler's message: the host receives it from the compiler.
 
-**Guard** — `tests/unit/transpiler.test.js` (a faulty line is refused without touching the graph; a port cannot be driven by a program input; a name without its prefix is refused, and its sentence names the modules); `tests/unit/language-examples.test.js` (each refused example of the language reference carries its code); target, faustx-zj5.54: `NAME_IS_INSTANCE` and `MASTER_WITH_PARAMETER` are produced by their lines; target, faustx-zj5.9: each code of the list is produced by its line with its parameters and its origin, every refusal carries a code of the list, and the graph view after a refused line equals the view before it.
+**Guard** — `tests/unit/transpiler.test.js` (a faulty line is refused without touching the graph; a port cannot be driven by a program input; a name without its prefix is refused, and its sentence names the modules); `tests/unit/language-examples.test.js` (each refused example of the language reference carries its code); target, faustx-zj5.54: `NAME_IS_INSTANCE`, `NAME_IS_DEFINITION`, `MASTER_WITH_PARAMETER` and `CHANNEL_OUT_OF_RANGE` are produced by their lines; target, faustx-zj5.9: each code of the list is produced by its line with its parameters and its origin, every refusal carries a code of the list, and the graph view after a refused line equals the view before it.
 
 ## 6. `write`
 
@@ -194,10 +199,11 @@ export interface WireView {
 export interface WireEnd {
   readonly name: string
   readonly port: string | null
+  readonly channel: number | null
 }
 ```
 
-`graph` returns a copy of the graph at the instant of the call, frozen in depth: a later `apply` does not change it, and writing into it throws without reaching the graph. Instances come in the order they were placed, wires in the order they were laid. `body` is the name of the module the body calls, or the Faust expression of the body as written; its settings are in `settings`. `removed` marks an instance taken out of the flow, whose name stays taken; `computed` marks a computed signal, an instance the session places under a name of its own for an expression such as `lfo1 * 3800 + 400`. A wire end whose `port` is not `null` drives that port of the instance; the master bus is a wire end under its reserved name, `process`. `width` is the number of lanes a wire runs over, copies between two names (`saw1 :8 lpf1`) or consecutive channels after a channel (`src1.1 :4 dst1.1`), `null` when it names none; `loop` marks a feedback wire, whose output returns to the input.
+`graph` returns a copy of the graph at the instant of the call, frozen in depth: a later `apply` does not change it, and writing into it throws without reaching the graph. Instances come in the order they were placed, wires in the order they were laid. `body` is the name of the module the body calls, or the Faust expression of the body as written; its settings are in `settings`. `removed` marks an instance taken out of the flow, whose name stays taken; `computed` marks a computed signal, an instance the session places under a name of its own for an expression such as `lfo1 * 3800 + 400`. A wire end whose `port` is not `null` drives that port of the instance; a wire end whose `channel` is not `null` is that channel of the instance, counted from 1, the first of the range when `width` is not `null`; the master bus is a wire end under its reserved name, `process`. `width` is the number of lanes a wire runs over, copies between two names (`saw1 :8 lpf1`) or consecutive channels after a channel (`src1.1 :4 dst1.1`), `null` when it names none; `loop` marks a feedback wire, whose output returns to the input.
 
 **Guard** — target, faustx-zj5.36: the interface test checks that the view is frozen in depth, that a write into it throws and leaves `write()` unchanged, and that a view taken before a gesture is the same after it.
 
@@ -277,10 +283,10 @@ export interface Position {
 ## 11. The command line
 
 ```
-faustscript <file.fsc> [-o <file.dsp>]
+faustscript <file.fsc> [-o <file.dsp>] [--channels <N>]
 faustscript --version
 ```
 
-The command applies the file to a new session and writes the Faust program to standard output, or to the file given by `-o`. Each refused line goes to standard error as `<file>:<line>:<column>: refused <CODE> — <message>`, the position being the fault's origin, followed by the line. It exits with 0 once the file is read, refused lines included, and with 2 when no file is given.
+The command applies the file to a new session whose master bus has the channels given by `--channels`, 2 when the option is absent, and writes the Faust program to standard output, or to the file given by `-o`. Each refused line goes to standard error as `<file>:<line>:<column>: refused <CODE> — <message>`, the position being the fault's origin, followed by the line. It exits with 0 once the file is read, refused lines included, and with 2 when no file is given or when `--channels` is not a positive integer.
 
-**Guard** — `tests/unit/transpiler.test.js` (the command line translates a file).
+**Guard** — `tests/unit/transpiler.test.js` (the command line translates a file); target, faustx-zj5.54: `--channels` sets the outputs of the program written, 2 by default, and an invalid count exits with 2.

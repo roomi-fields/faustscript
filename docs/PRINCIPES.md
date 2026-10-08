@@ -11,7 +11,7 @@ This document states the directives that apply to the whole project: every refer
 - A decoration has one meaning in every position: a `!` in front cancels the sign it precedes, a number after says how many, a dot reaches into an instance. One rule that applies everywhere outweighs several separate signs.
 - A decoration serves a gesture made while the sound plays. Faust's constructions that are written once — `seq`, `sum`, `prod`, substitution — stay as Faust writes them.
 - A Faust writing always stays valid, and FaustScript adds at most one writing for the same act, a decorated one: `fi.lowpass(3, 800)` is Faust's call, `fi.lowpass(N=3, fc=800)` its FaustScript writing.
-- Where Faust has a convention, FaustScript takes it: channels count from 1, the sink is `process`, an input is `_`.
+- Where Faust has a convention, FaustScript takes it: channels count from 1, the master bus is `process`, an input is `_`.
 - FaustScript guesses nothing: a value it cannot derive passes as written.
 - A writing never stops the sound: widths adapt instead of being refused, and a refused line changes nothing while the rest applies. FaustScript checks the writing, not the music.
 

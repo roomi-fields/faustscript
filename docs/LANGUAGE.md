@@ -34,6 +34,15 @@ let hpf1 fi.highpass
 hpf1 = 3;                            // refused: NAME_IS_INSTANCE
 ```
 
+In the same way, a `let` on a name that a Faust definition gives is refused: the name designates the definition.
+
+```faustscript
+level = 0.5;
+let level os.osc                     // refused: NAME_IS_DEFINITION
+```
+
+An `import` or a `declare` line is also the gesture `define`. An import can change the meaning of any name, so every placed instance is recompiled.
+
 A text sent while the sound plays is applied to the graph as it stands, and a file is the same sequence of lines applied to an empty graph.
 
 ### 1.2 `=` gives a value, `:` connects
@@ -126,12 +135,14 @@ let voix:8 os.sawtooth(freq=110 * (i+1))     // eight harmonics
 
 `i` has a meaning only in the body of a bank.
 
-The number of copies is a constant for Faust. A placed name followed by a number, alone on its line, gives the instance that many copies of its body; its body, its wires and its settings stay. A new body keeps the number of copies (§5).
+The number of copies is a constant for Faust. A placed name followed by a number, alone on its line, gives the instance that many copies of its body; its body, its wires and its settings stay. An instance placed without a number has one copy, and the same line makes it a bank. A new body keeps the number of copies (§5).
 
 ```faustscript
 let lpfs:8 fi.lowpass(fc=800)
 lpfs:16                              // the bank becomes sixteen filters
 lpfs fi.highpass                     // sixteen high-pass filters, fc stays 800
+let hpf2 fi.highpass
+hpf2:4                               // hpf2 becomes a bank of four
 ```
 
 A number between two names is always a wire: `lpfs:16 lpf2` connects `lpfs` to `lpf2` as sixteen copies (§4.1).
@@ -364,6 +375,14 @@ let dst2 si.bus(2)
 src1.1 :4 dst1.1                     // channels 1 to 4 into channels 1 to 4 of dst1
 src1.5 : lpf1                        // channel 5 into lpf1
 src1.6 :2 dst2.1                     // channels 6 and 7 into channels 1 and 2 of dst2
+```
+
+A range that runs past the last channel of its source or of its destination is refused, and the line changes nothing:
+
+```faustscript
+let src2 si.bus(3)
+let dst3 si.bus(4)
+src2.2 :4 dst3.1                     // refused: CHANNEL_OUT_OF_RANGE
 ```
 
 ## 8. The master bus and the inputs
