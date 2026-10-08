@@ -66,14 +66,12 @@ function examplesOf(body, problem) {
 }
 
 /**
- * Every `faustscript` block of `doc`, and the problems that keep a writing from being read: a fence that
- * names faustscript without opening a block at the left edge, a fence never closed, a block without an
- * example, a malformed refusal mark. A block holds its text, the line of the document where it
- * opens, and its examples; a problem holds the document line it is on and what is wrong.
+ * Every fenced block of `doc`, in order: the line of the document where it opens, its margin, its
+ * info string, its fence line and its body lines. A fence never closed ends the reading and is
+ * returned with `closed` false and the lines after it as its body.
  */
-export function read(doc) {
-  const blocks = []
-  const problems = []
+export function fences(doc) {
+  const out = []
   const lines = doc.split('\n')
   for (let i = 0; i < lines.length; i++) {
     const open = FENCE.exec(lines[i])
@@ -85,27 +83,48 @@ export function read(doc) {
     while (j < lines.length && !closes(lines[j], marker)) {
       j++
     }
-    if (j === lines.length) {
-      problems.push({ at: i + 1, what: 'a fence is never closed' })
+    out.push({
+      at: i + 1,
+      margin,
+      info,
+      fence: lines[i],
+      body: lines.slice(i + 1, j),
+      closed: j < lines.length,
+    })
+    i = j
+  }
+  return out
+}
+
+/**
+ * Every `faustscript` block of `doc`, and the problems that keep a writing from being read: a fence that
+ * names faustscript without opening a block at the left edge, a fence never closed, a block without an
+ * example, a malformed refusal mark. A block holds its text, the line of the document where it
+ * opens, and its examples; a problem holds the document line it is on and what is wrong.
+ */
+export function read(doc) {
+  const blocks = []
+  const problems = []
+  for (const { at, margin, info, fence, body, closed } of fences(doc)) {
+    if (!closed) {
+      problems.push({ at, what: 'a fence is never closed' })
       break
     }
     const isFaustScript = /faustscript/i.test(info)
     if (isFaustScript && (margin !== '' || info !== 'faustscript')) {
       problems.push({
-        at: i + 1,
-        what: `a faustscript block opens with \`\`\`faustscript at the left edge: ${lines[i]}`,
+        at,
+        what: `a faustscript block opens with \`\`\`faustscript at the left edge: ${fence}`,
       })
     } else if (isFaustScript) {
-      const body = lines.slice(i + 1, j)
-      const problem = (k, what) => problems.push({ at: i + 1 + k, what })
+      const problem = (k, what) => problems.push({ at: at + k, what })
       const examples = examplesOf(body, problem)
       if (examples.length === 0) {
         problem(0, 'a faustscript block holds no example')
       } else {
-        blocks.push({ at: i + 1, text: body.join('\n'), examples })
+        blocks.push({ at, text: body.join('\n'), examples })
       }
     }
-    i = j
   }
   return { blocks, problems }
 }
