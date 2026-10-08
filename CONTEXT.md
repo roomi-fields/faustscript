@@ -5,7 +5,7 @@ This file defines the words of FaustScript: the language, and the transpiler tha
 ## 1. The language
 
 - **FaustScript** — a superset of Faust for live coding: Faust plus named instances that a text places, connects, sets and changes while the sound plays. Every Faust program is a FaustScript program, with its Faust meaning.
-- **Line** — the unit of a FaustScript text: a FaustScript line, ended by a newline, or a Faust definition, ended by its `;`; each is a gesture. A session applies each line on its own, in order; a blank line or a comment returns no result.
+- **Line** — the unit of a FaustScript text, which expresses one gesture: a Faust definition, ended by its `;`, or any other writing, ended by a newline. A session applies each line on its own, in order; a blank line or a comment returns no result.
 - **Decoration** — one of the three marks FaustScript adds to a Faust sign: a `!` in front cancels it (`!:`, `!let`, `!_`), a number after says how many (`:8`, `~4`), a dot reaches into an instance (`lpf1.fc`, `saw1.3`). A decoration has one meaning in every position.
 - **Module** — a Faust function that the catalogue declares, or that a declaration in the text declares (`fi.lowpass(N=4, fc=2000) fi.lowpass(N, fc)`), with the names of its parameters and their starting values. A module is written under its Faust name, prefix included: `fi.lowpass`; `lowpass` alone designates no module.
 - **Parameter** — a named argument of a module, with its starting value and, through its attributes, its bounds. A parameter that carries a nature (a function, a signal) is part of the module's structure and never a port.

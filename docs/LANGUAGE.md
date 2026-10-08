@@ -12,12 +12,12 @@ A line that starts as a Faust definition is Faust up to its `;`, and it may run 
 gain = 0.5;                          // a Faust definition, up to its ;
 voice(f) = os.sawtooth(f)
   : fi.lowpass(2, 800);              // a Faust definition over two lines
-let lpf1 fi.lowpass(fc=800)          // a gesture, up to the newline
+let lpf1 fi.lowpass(fc=800)          // a FaustScript line, up to the newline
 let = 1;                             // a Faust definition of the identifier let
 voix2(f) = os.sawtooth(freq=f) : fi.lowpass(fc=800);  // named settings in a Faust definition
 ```
 
-A Faust definition gives a module's parameters by name, `freq=f`, as a gesture does: Faust's grammar refuses `=` in a call. The decorations of wiring stay on wiring lines (§4.1).
+A Faust definition gives a module's parameters by name, `freq=f`, as a FaustScript line does: Faust's grammar refuses `=` in a call. The decorations of wiring stay on wiring lines (§4.1).
 
 A Faust definition of a name is the gesture `define`. It gives the name its Faust meaning for the whole text, and each instance whose body cites the name is recompiled with the new definition; a later definition of the same name replaces the earlier one.
 
@@ -27,7 +27,7 @@ let vca1 *(gain)
 gain = 0.25;                         // defines gain again: vca1 is recompiled
 ```
 
-A name designates either a Faust definition or an instance. A Faust definition of a placed instance's name is refused; an instance changes through its ports (§6) or a new body (§5).
+A Faust definition of a placed instance's name is refused: the name designates the instance, which changes through its ports (§6) or a new body (§5).
 
 ```faustscript
 let hpf1 fi.highpass
@@ -63,13 +63,13 @@ FaustScript qualifies Faust's signs with three decorations, each with one meanin
 
 Spaces separate words as in Faust, and a FaustScript sign is read by its place in the line. Two writings are fixed: `_lpf1` is one Faust identifier, so the bypass is written `_ lpf1`; the `!` that cancels a sign is stuck to it: `!:`, `!~`, `!let`, `!_`.
 
-On a wiring line, a number after `:`, stuck or spaced, is a number of lanes (§4.1). A negative number is written as in Faust, a `-` before the number, wherever Faust accepts a number.
+On a wiring line, a number after `:`, stuck or spaced, says over how many lanes the wire runs: copies, or channels (§4.1). A negative number is written as in Faust, a `-` before the number, wherever Faust accepts a number.
 
 ```faustscript
 let saw1 os.sawtooth
 let lpf1 fi.lowpass
 saw1 : 8 lpf1                        // eight copies, as saw1 :8 lpf1
-let gate1 ef.gate_mono(thresh=-40)   // a negative number, after =
+let gate1 ef.gate_mono(thresh=-40)   // a negative number, in a named setting
 let gate2 ef.gate_mono(-40, 0.001, 0.1, 0.05)  // a negative number, in Faust's order
 ```
 
@@ -134,7 +134,7 @@ lpfs:16                              // the bank becomes sixteen filters
 lpfs fi.highpass                     // sixteen high-pass filters, fc stays 800
 ```
 
-A number between two names is always a wire: `lpfs:16 lpf2` connects `lpfs` to `lpf2` over sixteen lanes (§4.1).
+A number between two names is always a wire: `lpfs:16 lpf2` connects `lpfs` to `lpf2` as sixteen copies (§4.1).
 
 ## 3. Modules
 
