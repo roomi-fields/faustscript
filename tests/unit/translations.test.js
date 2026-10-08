@@ -1,7 +1,7 @@
 /**
  * The English translations of the reference documents: each tracked `<name>.en.md` stands next to its
- * French `<name>.md`, which decides, and carries the same numbered sections in the same order and the
- * same fenced blocks, byte for byte.
+ * French `<name>.md`, which decides, and carries the same numbered sections and the same rule numbers
+ * (`R1`…), in the same order, and the same fenced blocks, byte for byte.
  */
 
 import { execFileSync } from 'node:child_process'
@@ -27,17 +27,25 @@ const TRANSLATIONS = execFileSync('git', ['ls-files', '*.en.md'], { cwd: ROOT, e
 /** The fenced blocks of `doc`, each as its fence line and body. */
 const blocksOf = doc => fences(doc).map(f => [f.fence, ...f.body].join('\n'))
 
-/** The numbers of the numbered headings of `doc` outside its fenced blocks, in order: `3.4` for `### 3.4 …`. */
-function sectionsOf(doc) {
+/** The lines of `doc` outside its fenced blocks, in order. */
+function proseOf(doc) {
   const fenced = new Set(
     fences(doc).flatMap(f => [...Array(f.body.length + 2).keys()].map(k => f.at + k))
   )
-  return doc
-    .split('\n')
-    .filter((_, k) => !fenced.has(k + 1))
+  return doc.split('\n').filter((_, k) => !fenced.has(k + 1))
+}
+
+/** The numbers of the numbered headings of `doc`, in order: `3.4` for `### 3.4 …`. */
+const sectionsOf = doc =>
+  proseOf(doc)
     .map(line => /^#{1,6}\s+(\d+(?:\.\d+)*)\.?\s/.exec(line)?.[1])
     .filter(n => n !== undefined)
-}
+
+/** The numbers of the rules of `doc`, in order: `R10` for `- **R10.** …`. */
+const rulesOf = doc =>
+  proseOf(doc)
+    .flatMap(line => line.match(/\*\*R\d+\.\*\*/g) ?? [])
+    .map(r => r.slice(2, -3))
 
 /** The differences between a French document and its translation, one sentence each. */
 function gaps(french, english) {
@@ -45,6 +53,10 @@ function gaps(french, english) {
   const [fs, es] = [sectionsOf(french), sectionsOf(english)]
   if (fs.join(' ') !== es.join(' ')) {
     out.push(`sections differ: ${fs.join(' ')} | ${es.join(' ')}`)
+  }
+  const [fr, er] = [rulesOf(french), rulesOf(english)]
+  if (fr.join(' ') !== er.join(' ')) {
+    out.push(`rules differ: ${fr.join(' ')} | ${er.join(' ')}`)
   }
   const [fb, eb] = [blocksOf(french), blocksOf(english)]
   if (fb.length !== eb.length) {
@@ -83,6 +95,10 @@ describe('the English translations of the reference documents', () => {
     ])
     expect(gaps(french, '# T\n\n## 1. A\n\n```ts\ny\n```\n\n## 2. B\n')).toEqual([
       'fenced block 1 differs',
+    ])
+    expect(gaps(french, french + '\n## 3. C\n')).toEqual(['sections differ: 1 2 | 1 2 3'])
+    expect(gaps('- **R1.** a\n- **R2.** b\n', '- **R1.** a\n- **R3.** b\n')).toEqual([
+      'rules differ: R1 R2 | R1 R3',
     ])
     expect(gaps(french, '# T\n\n## 1. A\n\n## 2. B\n')).toEqual([
       '1 fenced blocks in French, 0 in English',
