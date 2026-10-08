@@ -31,7 +31,7 @@ Ce document énonce les directives qui valent pour tout le projet : chaque docum
 
 Quand deux règles écrites se contredisent, la première force de cette liste qui s'applique l'emporte, et le choix la nomme. Deux règles de même force demandent une décision de Romain.
 
-1. **Faust est la référence.** Une écriture que Faust lit garde le sens de Faust. Une affirmation sur ce que fait Faust cite son niveau : l'exécution du compilateur, puis son source, puis sa documentation.
+1. **Faust est la référence.** Une écriture que Faust lit garde le sens de Faust. Une affirmation sur ce que fait Faust cite son niveau : l'exécution du compilateur, puis son code source, puis sa documentation.
 2. **Le son ne s'arrête pas.** Entre refuser une écriture et lui donner le sens qui garde le son, le second l'emporte quand ce sens est unique.
 3. **Les signes sont fixés.** Les signes du langage sont ceux de `LANGUAGE.md` ; une expressivité nouvelle compose les décorations existantes, et ajouter un signe est une décision de Romain.
 4. **FaustScript ne connaît aucun hôte.** Ce qui concerne les périphériques de sortie, le temps musical, les scènes ou la substitution d'une instance en cours de jeu appartient à l'hôte, qui connaît FaustScript.

@@ -1,45 +1,45 @@
-# FaustScript — the frame
+# FaustScript — le cadre
 
-FaustScript is a superset of Faust for live coding, and its transpiler: it reads a FaustScript text line by line, applies each line as a gesture on a living graph of named instances, and writes the Faust that the graph describes. The package `faustscript` (`packages/040-faustscript`) carries that boundary: a host creates one session per piece, sends it text, and compiles and plays the Faust it returns with the faustwasm version the package declares.
+FaustScript est un sur-ensemble de Faust pour le live coding, et son transpileur : il lit un texte FaustScript ligne par ligne, applique chaque ligne comme un geste sur un graphe vivant d'instances nommées, et écrit le Faust que décrit ce graphe. Le paquet `faustscript` (`packages/040-faustscript`) porte cette frontière : un hôte crée une session par morceau, lui envoie du texte, et compile et joue le Faust qu'elle retourne avec la version de faustwasm que le paquet déclare.
 
-## 1. Role
+## 1. Le rôle
 
-- **R1.** FaustScript translates FaustScript text into Faust text: the whole program of the graph, and, for a gesture that changes an instance's circuit, that instance's Faust alone.
-- **R2.** FaustScript holds the state of a piece as a graph of instances and wires, one graph per session; a line of text is the only way to change it.
+- **R1.** FaustScript traduit du texte FaustScript en texte Faust : le programme entier du graphe, et, pour un geste qui change le circuit d'une instance, le Faust de cette seule instance.
+- **R2.** FaustScript tient l'état d'un morceau comme un graphe d'instances et de câbles, un graphe par session ; une ligne de texte est le seul moyen de le changer.
 
-## 2. Receives
+## 2. Ce qu'il reçoit
 
-- **R3.** At the creation of a session, the number of channels of its master bus; the catalogue belongs to the library, which reads it once for every session.
-- **R4.** Then, FaustScript text, as the author wrote it, one or more lines at a time.
+- **R3.** À la création d'une session, le nombre de canaux de son bus master ; le catalogue appartient à la bibliothèque, qui le lit une fois pour toutes les sessions.
+- **R4.** Ensuite, du texte FaustScript, tel que l'auteur l'a écrit, une ou plusieurs lignes à la fois.
 
-## 3. Returns
+## 3. Ce qu'il retourne
 
-- **R5.** For each line that carries a statement, in order: the line, the gesture, the instance it touched, and either its outcome or its refusal; for a gesture that recompiles, the instance's Faust and the instances that Faust cites; for a Faust definition, the instances to recompile; for a setting, the port, the value and the control path. A blank line or a comment returns nothing.
-- **R6.** On request, the whole Faust program of the graph at that instant, a frozen view of the graph, the list of the program's controls with their paths, bounds, units, starting values and smoothing, and the catalogue as a frozen value that marks the modules faustwasm does not provide.
-- **R17.** For an editor, the parser of the grammar, and what a text would do on the session that plays: its refusals as diagnostics of the Language Server Protocol, without changing the session.
+- **R5.** Pour chaque ligne qui porte une instruction, dans l'ordre : la ligne, le geste, l'instance qu'il a touchée, et soit son issue, soit son refus ; pour un geste qui recompile, le Faust de l'instance et les instances que ce Faust cite ; pour une définition Faust, les instances à recompiler ; pour un réglage, le port, la valeur et le chemin de contrôle. Une ligne vide ou un commentaire ne retourne rien.
+- **R6.** Sur demande, le programme Faust entier du graphe à cet instant, une vue figée du graphe, la liste des contrôles du programme avec leurs chemins, bornes, unités, valeurs de départ et lissages, et le catalogue comme une valeur figée qui marque les modules que faustwasm ne fournit pas.
+- **R17.** Pour un éditeur, l'analyseur de la grammaire, et ce qu'un texte ferait sur la session qui joue : ses refus comme diagnostics du Language Server Protocol, sans changer la session.
 
-## 4. Knows
+## 4. Ce qu'il connaît
 
-- **R7.** Faust's syntax and the modules its libraries declare, with their parameters, starting values and bounds, through the catalogue, generated from the libraries of the faustwasm version the package declares.
-- **R8.** The signs of FaustScript, through the grammar that generates its parser and through the templates.
+- **R7.** La syntaxe de Faust et les modules que ses bibliothèques déclarent, avec leurs paramètres, valeurs de départ et bornes, par le catalogue, généré à partir des bibliothèques de la version de faustwasm que le paquet déclare.
+- **R8.** Les signes de FaustScript, par la grammaire qui génère son analyseur et par les gabarits.
 
-## 5. Does not know
+## 5. Ce qu'il ne connaît pas
 
-- **R9.** The host, the audio context, musical time, scenes and the consumers of its package; the Faust compiler at run time, which the host calls.
+- **R9.** L'hôte, le contexte audio, le temps musical, les scènes et les consommateurs de son paquet ; le compilateur Faust à l'exécution, que l'hôte appelle.
 
-## 6. Refuses
+## 6. Ce qu'il refuse
 
-- **R10.** A line that does not read, an empty expression, an unknown form, a name already placed, a name that does not exist, a module that faustwasm does not provide, a setting that is incomplete or targets a port the instance does not carry (a parameter of its module, or a `key=value` its author named in its Faust body), a port driven by a signal that carries one of the program's inputs, a wire that does not exist, a Faust definition of an instance's name or an instance on a Faust definition's name, a master bus given parameters, a range of channels past a width: the refusal carries a fault with the fields of BPScript's: a stable code, a sentence that names the cause and the name involved, the values it is written from, and the position of the writing at fault; the line changes nothing.
-- **R11.** An error the Faust compiler raises on the Faust FaustScript writes stays the compiler's message; the host receives it from the compiler.
+- **R10.** Une ligne qui ne se lit pas, une expression vide, une forme inconnue, un nom déjà placé, un nom qui n'existe pas, un module que faustwasm ne fournit pas, un réglage incomplet ou qui vise un port que l'instance ne porte pas (un paramètre de son module, ou un `key=value` que son auteur a nommé dans son corps Faust), un port piloté par un signal qui porte l'une des entrées du programme, un câble qui n'existe pas, une définition Faust du nom d'une instance ou une instance sur le nom d'une définition Faust, un bus master doté de paramètres, une plage de canaux qui dépasse une largeur : le refus porte une faute avec les champs de celle de BPScript : un code stable, une phrase qui nomme la cause et le nom en jeu, les valeurs dont elle est écrite, et la position de l'écriture fautive ; la ligne ne change rien.
+- **R11.** Une erreur que le compilateur Faust lève sur le Faust qu'écrit FaustScript reste le message du compilateur ; l'hôte la reçoit du compilateur.
 
-## 7. Invariants
+## 7. Les invariants
 
-- **R12.** The same text, in the same order of gestures, gives the same result, to the character.
-- **R13.** A refused line leaves the graph as it was.
-- **R14.** No sign of the language is written in the code: the grammar and the files under `lib/` carry them.
-- **R15.** FaustScript computes no signal and modifies nothing of Faust; its output is Faust that the declared faustwasm version compiles.
-- **R18.** Two sessions share no state; they read the same frozen catalogue.
+- **R12.** Le même texte, dans le même ordre de gestes, donne le même résultat, au caractère près.
+- **R13.** Une ligne refusée laisse le graphe tel qu'il était.
+- **R14.** Aucun signe du langage n'est écrit dans le code : la grammaire et les fichiers de `lib/` les portent.
+- **R15.** FaustScript ne calcule aucun signal et ne modifie rien de Faust ; sa sortie est du Faust que la version déclarée de faustwasm compile.
+- **R18.** Deux sessions ne partagent aucun état ; elles lisent le même catalogue figé.
 
-## 8. Cost
+## 8. Le coût
 
-- **R16.** One applied line has a measured cost, and a ceiling that only goes down. A gesture that recompiles returns one instance's Faust, so that the host compiles one instance instead of the program.
+- **R16.** Une ligne appliquée a un coût mesuré, et un plafond qui ne fait que baisser. Un geste qui recompile retourne le Faust d'une seule instance, pour que l'hôte compile une instance au lieu du programme.

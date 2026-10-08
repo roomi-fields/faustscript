@@ -6,7 +6,7 @@ FaustScript est Faust avec des instances nommées. Un texte FaustScript est une 
 
 ### 1.1 Deux sortes de ligne
 
-Une ligne qui commence comme une définition Faust est du Faust jusqu'à son `;`, et elle peut courir sur plusieurs lignes : un nom ou un nom avec ses paramètres suivi de `=`, un `import(`, un `declare`. Toute autre ligne est une ligne FaustScript — elle place, connecte, règle ou change une instance — et se termine au retour à la ligne ; les lignes indentées sous la déclaration d'un module lui appartiennent (§3.2). Un commentaire commence par `//` et court jusqu'à la fin de la ligne.
+Une ligne qui commence comme une définition Faust est du Faust jusqu'à son `;`, et elle peut s'étendre sur plusieurs lignes : un nom ou un nom avec ses paramètres suivi de `=`, un `import(`, un `declare`. Toute autre ligne est une ligne FaustScript — elle place, connecte, règle ou change une instance — et se termine au retour à la ligne ; les lignes indentées sous la déclaration d'un module lui appartiennent (§3.2). Un commentaire commence par `//` et va jusqu'à la fin de la ligne.
 
 ```faustscript
 gain = 0.5;                          // a Faust definition, up to its ;
@@ -124,7 +124,7 @@ rev1 : process
 
 ### 2.3 Les banques et le rang `i`
 
-Un nombre après le nom déclaré fait désigner au nom autant de copies du corps : `let lpfs:8 fi.lowpass` est le `par(i, 8, fi.lowpass)` de Faust. Le nombre appartient au nom, donc un corps fait de plusieurs modules n'a pas besoin de parenthèses : `let voix:8 os.sawtooth : fi.lowpass`. Le point atteint alors une copie, comptée à partir de 1 (`lpfs.3`), et le nom seul les atteint toutes.
+Avec un nombre après le nom déclaré, le nom désigne autant de copies du corps : `let lpfs:8 fi.lowpass` est le `par(i, 8, fi.lowpass)` de Faust. Le nombre appartient au nom, donc un corps fait de plusieurs modules n'a pas besoin de parenthèses : `let voix:8 os.sawtooth : fi.lowpass`. Le point atteint alors une copie, comptée à partir de 1 (`lpfs.3`), et le nom seul les atteint toutes.
 
 `i` est le rang de la copie dans une banque, à partir de 0, comme dans le `par(i, N, …)` de Faust. Il permet aux copies de différer ; huit copies identiques seraient réduites par Faust à un seul circuit.
 
