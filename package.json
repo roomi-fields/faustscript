@@ -55,7 +55,9 @@
     "grammaire": "lezer-generator src/faustscript.grammar -o src/parser.js",
     "prepublishOnly": "npm run lint && npm run typecheck && npm test",
     "interfaces": "node scripts/index-interfaces.mjs",
-    "pretest": "node scripts/index-interfaces.mjs --verifier && node scripts/consommateurs.mjs"
+    "pretest": "node scripts/index-interfaces.mjs --verifier && node scripts/consommateurs.mjs",
+    "integration:suites": "node scripts/integration/suites-vitest.mjs",
+    "integration:gardes": "npm run --silent pretest"
   },
   "devDependencies": {
     "@grame/faustwasm": "0.19.0",
