@@ -53,7 +53,9 @@
     "format": "prettier --write \"{src,tests,bin,tools}/**/*.{ts,js,mjs}\"",
     "format:check": "prettier --check \"{src,tests,bin,tools}/**/*.{ts,js,mjs}\"",
     "grammaire": "lezer-generator src/faustscript.grammar -o src/parser.js",
-    "prepublishOnly": "npm run lint && npm run typecheck && npm test"
+    "prepublishOnly": "npm run lint && npm run typecheck && npm test",
+    "interfaces": "node scripts/index-interfaces.mjs",
+    "pretest": "node scripts/index-interfaces.mjs --verifier"
   },
   "devDependencies": {
     "@grame/faustwasm": "0.19.0",

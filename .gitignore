@@ -22,3 +22,6 @@ coverage/
 .beads-credential-key
 .beads/proxieddb/
 .codegraph/
+
+# Agent copies (one worktree per ticket) and their session logs
+.claude/worktrees/
