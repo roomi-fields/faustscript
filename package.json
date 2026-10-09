@@ -57,7 +57,8 @@
     "interfaces": "node scripts/index-interfaces.mjs",
     "pretest": "node scripts/index-interfaces.mjs --verifier && node scripts/consommateurs.mjs",
     "integration:suites": "node scripts/integration/suites-vitest.mjs",
-    "integration:gardes": "npm run --silent pretest"
+    "integration:gardes": "npm run --silent pretest",
+    "frontieres": "node scripts/frontieres.mjs"
   },
   "devDependencies": {
     "@grame/faustwasm": "0.19.0",
@@ -68,6 +69,7 @@
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "@vitest/coverage-v8": "^2.1.9",
+    "dependency-cruiser": "18.4.0",
     "eslint": "^8.57.1",
     "prettier": "^3.9.9",
     "typescript": "^5.9.3",
