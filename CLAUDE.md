@@ -30,7 +30,7 @@ The aim is a mature, professional product that holds its domain's requirements.
 4. The ticket closes on its targeted tests, the verdict of the `relecteur` agent on the lot, and the commit of the `integrateur` agent, the only one to commit.
 5. `/handoff` in the ticket, then `bd close`, with what is not done and why.
 
-A supervision session loads the supervisor (`pitmaster`). The roles are project agents (`.claude/agents/`): `testeur`, `developpeur`, `relecteur`, `integrateur`, each under its write locks, and `arbitre`, who settles a design question.
+A supervision session loads the supervisor (`pitmaster`). The roles are project agents (`.claude/agents/`): `testeur`, `developpeur`, `relecteur`, `integrateur`, each under its write locks, `arbitre`, who settles a design question, and `explorateur`, who runs an exploration. A goal whose split is unknown starts with an exploration, without code; a realisation ticket touches one component and makes one delivery; a discovery becomes a linked ticket (`discovered-from`), to be validated.
 
 ## What keeps the repository straight
 
@@ -47,7 +47,7 @@ A supervision session loads the supervisor (`pitmaster`). The roles are project 
 - ⛔ **No command that can ask for a validation**: a prompt freezes the session. Every temporary file goes in the session scratchpad; no `cd` (`env -C <dir>` or `git -C`); a deletion targets a named path that was read.
 - **The index first**: every exploratory search starts with `rtfm_search` (mode `hybrid`), then `rtfm_expand` on the relevant results.
 - Tickets: Beads (`bd`), prefix `faustx-`, see `docs/agents/issue-tracker.md`.
-- Repository skills: the supervisor (`pitmaster`), the five roles (`testeur`, `developpeur`, `relecteur`, `integrateur`, `arbitre`), initialisation and architecture (`grill`), measurement (`mesure`), the writer for a human reader (`redacteur`), release (`release`). Flow: the `mattpocock-skills` plugin, prefix required; a document for an agent is written with `mattpocock-skills:writing-for-agents`.
+- Repository skills: the supervisor (`pitmaster`), the six roles (`testeur`, `developpeur`, `relecteur`, `integrateur`, `arbitre`, `explorateur`), initialisation and architecture (`grill`), measurement (`mesure`), the writer for a human reader (`redacteur`), release (`release`). Flow: the `mattpocock-skills` plugin, prefix required; a document for an agent is written with `mattpocock-skills:writing-for-agents`.
 - Answers and reference documents (LANGUAGE, PRINCIPES, ARCHITECTURE, each package's CADRE, INTERFACE and ARCHITECTURE, CONTEXT) in French, so the owner reads what he validates; code, identifiers, API names, refusal messages and commit messages in English.
 
 ## Commands
