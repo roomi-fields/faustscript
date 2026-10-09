@@ -30,7 +30,7 @@ The aim is a mature, professional product that holds its domain's requirements.
 4. The ticket closes on its targeted tests, the verdict of the `relecteur` agent on the lot, and the commit of the `integrateur` agent, the only one to commit.
 5. `/handoff` in the ticket, then `bd close`, with what is not done and why.
 
-A supervision session loads the supervisor (`pitmaster`). The roles are project agents (`.claude/agents/`): `testeur`, `developpeur`, `relecteur`, `integrateur`, each under its write locks, `arbitre`, who settles a design question, and `explorateur`, who runs an exploration. A goal whose split is unknown starts with an exploration, without code; a realisation ticket touches one component and makes one delivery; a discovery becomes a linked ticket (`discovered-from`), to be validated.
+A supervision session loads the supervisor (`pitmaster`). The roles are project agents (`.claude/agents/`), each known by its role's number, in the order of the flow: 1 `explorateur`, who runs an exploration, 2 `arbitre`, who settles a design question, 3 `testeur`, 4 `developpeur`, 5 `relecteur`, 6 `integrateur`, each under its write locks. A goal whose split is unknown starts with an exploration, without code; a realisation ticket touches one component and makes one delivery; every ticket is created under its mother, and a discovery under the ticket that found it, to be validated (`docs/agents/issue-tracker.md`).
 
 ## What keeps the repository straight
 
