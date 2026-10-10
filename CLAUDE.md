@@ -26,9 +26,9 @@ The aim is a mature, professional product that holds its domain's requirements.
 
 1. `bd ready`, `bd update <id> --claim`, read the ticket and the frame of what it touches.
 2. A decision remains to be taken: `/grill-me` before writing, its questions in the ticket. A structure decision (split, packages, modules, interfaces, frontiers) goes through the `grill` skill and is settled on goals, consumers, data representations and axes of change, never on the code's size. A reported defect is first an architecture question: its ticket opens on an « Architecture » section (the mature model named, the address in the architecture, the common mechanism), never on a local compensation.
-3. The plan goes in the ticket (`bd update <id> -d`). A change of behaviour takes two tickets: the tests first (agent `testeur`), then the code that makes them pass (agent `developpeur`). A commit that changes a behaviour corrects in the same commit every text that describes it.
-4. The ticket closes on its targeted tests, the verdict of the `relecteur` agent on the lot, and the commit of the `integrateur` agent, the only one to commit.
-5. `/handoff` in the ticket, then `bd close`, with what is not done and why.
+3. The plan goes in the ticket (`bd update <id> -d`). A change of behaviour is one ticket that passes from agent to agent in its copy: the tests first (agent `testeur`), then the code that makes them pass (agent `developpeur`). A commit that changes a behaviour corrects in the same commit every text that describes it.
+4. The ticket closes on its targeted tests, the verdict of the `relecteur` agent on the lot, and the commit of the `integrateur` agent, the only one to commit, which closes it.
+5. Each agent leaves its handoff in the ticket (`/handoff`), with what is not done and why.
 
 A supervision session loads the supervisor (`pitmaster`). The roles are project agents (`.claude/agents/`), each known by its role's number, in the order of the flow: 1 `explorateur`, who runs an exploration, 2 `arbitre`, who settles a design question, 3 `testeur`, 4 `developpeur`, 5 `relecteur`, 6 `integrateur`, each under its write locks. A goal whose split is unknown starts with an exploration, without code; a realisation ticket touches one component and makes one delivery; every ticket is created under its mother, and a discovery under the ticket that found it, to be validated (`docs/agents/issue-tracker.md`).
 
