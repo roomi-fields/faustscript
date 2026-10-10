@@ -45,7 +45,7 @@ A supervision session loads the supervisor (`pitmaster`). The roles are project 
 ## Tools
 
 - ⛔ **No command that can ask for a validation**: a prompt freezes the session. Every temporary file goes in the session scratchpad; no `cd` (`env -C <dir>` or `git -C`); a deletion targets a named path that was read.
-- ⛔ **No command makes Romain wait**: every command that can run past a minute goes to the background, and its end notice wakes the session; no wait loop, no long timeout in the foreground. What the session announces about its way of working holds from the next command; when Romain stops, nothing more is launched.
+- ⛔ **No command makes Romain wait**: in a session he waits on, the supervisor's, every command that can run past a minute goes to the background, and its end notice wakes the session; no wait loop, no long timeout in the foreground. What the session announces about its way of working holds from the next command; when Romain stops, nothing more is launched. A role agent waits in the foreground for what it launches, as its session ends with its turn.
 - **The index first**: every exploratory search starts with `rtfm_search` (mode `hybrid`), then `rtfm_expand` on the relevant results.
 - Tickets: Beads (`bd`), prefix `faustx-`, see `docs/agents/issue-tracker.md`.
 - Repository skills: the supervisor (`pitmaster`), the six roles (`testeur`, `developpeur`, `relecteur`, `integrateur`, `arbitre`, `explorateur`), initialisation and architecture (`grill`), measurement (`mesure`), the writer for a human reader (`redacteur`), release (`release`). Flow: the `mattpocock-skills` plugin, prefix required; a document for an agent is written with `mattpocock-skills:writing-for-agents`.
